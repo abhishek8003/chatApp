@@ -1,0 +1,35 @@
+*{
+  box-sizing: border-box;
+  margin: 0px;
+  padding:0px;
+}
+.isActive {
+  color: red;
+  text-decoration: none;
+}
+.isNotActive {
+  color: white;
+  text-decoration: none;
+}
+.people_cont {
+  /* border: 2px solid pink; */
+  transition-property: all;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+  
+}
+.people_cont:hover {
+  background-color: #f0f0f0 ; 
+  color: black ;
+}
+.people_img {
+  height: 100%;
+  width: 70px;
+  /* border: 2px solid green; */
+}
+.people_img img {
+  width: 80%;
+  height: 80%;
+  border: 2px solid black;
+  border-radius: 50%;
+}

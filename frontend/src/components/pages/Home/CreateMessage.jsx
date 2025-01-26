@@ -1,0 +1,173 @@
+import { Box, Button, TextField } from "@mui/material";
+import React, { useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import CollectionsIcon from "@mui/icons-material/Collections";
+import SendIcon from "@mui/icons-material/Send";
+import { setChats } from "../../../redux/features/Chats";
+import toast from "react-hot-toast";
+function CreateMessage() {
+  let selectedUser = useSelector((store) => {
+    return store.selectedUser;
+  });
+  let inputFile = useRef();
+
+  let chats = useSelector((store) => {
+    return store.chats;
+  });
+
+  let [preview, setPreview] = useState(false);
+  let [previewUrl, setPreviewUrl] = useState("");
+  let [messageText, setMessageText] = useState("");
+
+  let dispatch = useDispatch();
+  let handleFilePreview = () => {
+    setPreview(true);
+    if (inputFile) {
+      let fileObj = inputFile.current.files[0];
+      let fileReader = new FileReader();
+      fileReader.addEventListener("loadend", (e) => {
+        console.log(e.target.result);
+        setPreviewUrl(e.target.result);
+      });
+      fileReader.readAsDataURL(fileObj);
+    }
+  };
+  let form = useRef();
+  let handleSendMessage = async (myForm) => {
+    let text = myForm.newMessage.value;
+    let file = myForm.messageFile && myForm.messageFile.files[0];
+    console.log(text);
+    console.log(file);
+    if (!text && !file) {
+      return;
+    }
+    let formData = new FormData();
+    if (text) {
+      formData.append("messageText", text);
+    }
+    if (file) {
+      formData.append("messageImage", file);
+    }
+    try {
+      let response = await fetch(
+        `http://localhost:5000/api/chats/${selectedUser._id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        }
+      );
+      let json = await response.json();
+      if (response.status === 200) {
+        console.log(json.newMessage);
+        dispatch(setChats([...chats, json.newMessage]));
+        setMessageText("")
+        inputFile.current.value = "";
+        setPreview(null);
+        setPreviewUrl(null);
+      }
+    } catch (error) {}
+  };
+  return (
+    <>
+      <Box sx={{ width: "fit-content" }}>
+        {inputFile.current && inputFile.current.files[0] ? (
+          <>
+            <div style={{ position: "absolute", bottom: "80px", left: "10px" }}>
+              <img src={previewUrl} height={"100px"} width={"100px"}></img>
+              <i
+                onClick={() => {
+                  (inputFile.current.value = ""), setPreview(null);
+                  setPreviewUrl(null);
+                }}
+                class="fa-solid fa-square-xmark"
+                style={{
+                  position: "absolute",
+                  right: "-11px",
+                  top: "-11px",
+                  fontSize: "1.25rem",
+                  color: "red",
+                }}
+              ></i>
+            </div>
+          </>
+        ) : (
+          ""
+        )}
+      </Box>
+      <form
+        ref={form}
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSendMessage(form.current);
+        }}
+      >
+        <div
+          style={{
+            minHeight: "70px",
+            width: "100%",
+            border: "",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <TextField
+            placeholder="Type a message..."
+            autoComplete="off"
+            value={messageText}
+            name="newMessage"
+            onChange={(e) => {
+              setMessageText(e.target.value);
+            }}
+            sx={{ flexGrow: "1", border: "" }}
+          ></TextField>
+          <Box
+            style={{
+              width: "fit-content",
+              //   border:"2px solid red",
+
+              display: "flex",
+              justifyContent: "space-around",
+              alignItems: "center",
+            }}
+            sx={{
+              "& svg": {
+                height: "56px",
+                margin: "0px 0.4rem",
+                fontSize: "2.2rem",
+              },
+            }}
+          >
+            <label for="messageFile">
+              <CollectionsIcon></CollectionsIcon>
+            </label>
+            <input
+              type="file"
+              ref={inputFile}
+              id="messageFile"
+              name="messageFile"
+              onChange={() => {
+                handleFilePreview();
+              }}
+              style={{ display: "none" }}
+            ></input>
+            <label>
+              <Button
+                onClick={(e) => {
+                  e.preventDefault();
+                  form.current.requestSubmit();
+                }}
+                disabled={messageText.length > 0 ? false : true}
+              >
+                <SendIcon></SendIcon>
+              </Button>
+            </label>
+          </Box>
+        </div>
+      </form>
+    </>
+  );
+}
+
+export default CreateMessage;
