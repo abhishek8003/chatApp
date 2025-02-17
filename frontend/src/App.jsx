@@ -5,7 +5,7 @@ import Login from "./components/pages/Login/Login";
 import LinearProgress from "@mui/material/LinearProgress";
 import Footer from "./components/Footer";
 import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setUser } from "./redux/features/userAuth";
 import { setCheckingAuth } from "./redux/features/checkingAuth";
@@ -13,8 +13,8 @@ import Home from "./components/pages/Home/Home";
 import Signup from "./components/pages/SignUp/Signup";
 import Profile from "./components/pages/Profile/Profile";
 import toast, { Toaster } from "react-hot-toast";
-import { io } from "socket.io-client";
-import { setSocket } from "./redux/features/socket";
+import { socketContext } from "./SocketProvider";
+
 function App() {
   let checkingAuth = useSelector((store) => {
     return store.checkingAuth;
@@ -22,9 +22,9 @@ function App() {
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
-  
- 
+  // let clientSocket=useContext(socketContext);
   let [isLoadingCheckAuth, setLoadingCheckAuth] = useState(true);
+  // console.log(clientSocket);
   let dispatch = useDispatch();
   useEffect(() => {
     const checkAuth = async () => {
@@ -40,12 +40,6 @@ function App() {
             const user = json.user;
             console.log(user);
             toast.success(`Welcome ${user.fullName}`);
-            // let socket=io("http://localhost:5000",{
-            //   query:{
-            //     user:json.user
-            //   }
-            // });
-            // dispatch(setSocket(socket));
             dispatch(setCheckingAuth(false));
             dispatch(setUser(user));
           } else {

@@ -7,9 +7,10 @@ const bcryptjs = require("bcryptjs");
 const userSchema = require("../schema/userSchema");
 const upload_profile_pics = require("../storage/localConfig/profilePicslocal");
 const My_SECRET = "mysecret1";
-const cloudinary = require("../storage/cloudConfig/cloud")
+const cloudinary = require("../storage/cloudConfig/cloud");
 
-const { validate_user, isAuthenticated } = require("../middlewares")
+const { validate_user, isAuthenticated } = require("../middlewares");
+const { io_server } = require("../socket");
 auth_router.post("/login", validate_user, async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -26,7 +27,7 @@ auth_router.post("/login", validate_user, async (req, res, next) => {
         }
 
         const newAccessToken = jwt.sign(
-            { _id: registeredUser._id, fullName: registeredUser.fullName },
+            { _id: registeredUser._id,fullName: registeredUser.fullName },
             My_SECRET,
             { expiresIn: "1h" }
         );
@@ -74,14 +75,16 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
         if (!exists) {
             let newUser = new User({ ...req.body, profilePic: profilePic });
             let registeredUser = await newUser.save();
-            console.log(registeredUser);
+            console.log("newUserRegistered:",registeredUser);
+            io_server.emit("newUserRegistered", registeredUser);
             let newAccessToken = jwt.sign({ _id: registeredUser._id, fullName: registeredUser.fullName }, My_SECRET, {
                 expiresIn: "1h"
             })
             res.cookie("access_token", newAccessToken, {
                 maxAge: (1000 * 60 * 60)
             })
-            res.status(200).json({ message: "user registered", user: registeredUser })
+            res.status(200).json({ message: "user registered", user: registeredUser });
+            
         }
         else {
             res.status(400).json({ message: "user already exists kinldy login" });

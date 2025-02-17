@@ -7,8 +7,12 @@ const usersSlice=createSlice({
         setUsers:(state,action)=>{
             state=action.payload;
             return state;
+        },
+        addNewUser:(state,action)=>{
+            state=[...state,action.payload];
+            return state;
         }
     }
 });
 export default usersSlice.reducer;
-export const {setUsers}=usersSlice.actions;
+export const {setUsers,addNewUser}=usersSlice.actions;

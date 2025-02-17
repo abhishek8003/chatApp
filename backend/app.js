@@ -10,7 +10,7 @@ const message_router = require("./routes/message.route");
 const auth_router = require(`${path.join(__dirname, "/routes/auth.route")}`);
 // const app = express();
 const {http_server,app}=require("./socket");
-mongoose.connect("mongodb://127.0.0.1:27017/chatApp").then(() => {
+mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("connected to mongoDB");
 }).catch((err) => {
     console.log(err);

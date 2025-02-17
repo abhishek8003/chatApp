@@ -7,7 +7,7 @@ import usersReducer from "./features/users";
 import chatsReducer from "./features/Chats";
 import selectedUserReducer from "./features/selectedUser"
 import gettingChatsReducer from "./features/gettingChats";
-import setSocketReducer from "./features/socket";
+import onlineUserReducer from "./features/onlineUsers";
 
 const store=configureStore({
     reducer:{
@@ -19,7 +19,7 @@ const store=configureStore({
         selectedUser:selectedUserReducer,
         chats:chatsReducer,
         gettingChats:gettingChatsReducer,
-        socket:setSocketReducer
+        onlineUsers:onlineUserReducer
     }
 });
 export default store;

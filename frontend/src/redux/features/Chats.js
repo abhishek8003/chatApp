@@ -7,8 +7,12 @@ const chatsSlice = createSlice({
         setChats: (state, action) => {
             state = action.payload;
             return state;
+        },
+        updateChats(state,action){
+            state=[...state,action.payload];
+            return state;
         }
     }
 });
 export default chatsSlice.reducer;
-export const { setChats } = chatsSlice.actions;
+export const { setChats,updateChats } = chatsSlice.actions;

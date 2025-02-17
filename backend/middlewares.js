@@ -26,9 +26,9 @@ const isAuthenticated = async (req, res, next) => {
         if (access_token) {
             jwt.verify(access_token, My_SECRET, async (err, data) => {
                 if (err) {
-                    console.log("token expired kindly login again!");
+                    console.log("token invalid or expired kindly login again!");
                     
-                    res.status(401).json({ message: "token expired kindly login again!" });
+                    res.status(401).json({ message: "token invalid or expired kindly login again!" });
                 }
                 else {
                     let user = await User.findById(data._id);

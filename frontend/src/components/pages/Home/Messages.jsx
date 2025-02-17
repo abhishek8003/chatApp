@@ -1,5 +1,5 @@
 import { Box, Typography } from "@mui/material";
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import CreateMessage from "./CreateMessage";
@@ -9,6 +9,7 @@ import ChatbodySkeltion from "./skeletions/ChatbodySkeltion";
 import { setGettingChats } from "../../../redux/features/gettingChats";
 import { setChats } from "../../../redux/features/Chats";
 import toast from "react-hot-toast";
+import { socketContext } from "../../../SocketProvider";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -16,7 +17,7 @@ function Messages() {
   let gettingChats=useSelector((store)=>{
     return store.gettingChats
   });
-  
+  let clientSocket=useContext(socketContext)
   useEffect(()=>{
     dispatch(setGettingChats(true))
     let fetchChats=async()=>{

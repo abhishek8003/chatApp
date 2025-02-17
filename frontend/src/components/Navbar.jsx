@@ -1,5 +1,5 @@
 import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink } from "react-router";
@@ -10,6 +10,7 @@ import { setCheckingAuth } from "../redux/features/checkingAuth";
 import { sideNavToggle } from "../redux/features/sideNav";
 import SideNav from "./SideNav.jsx";
 import { loggingOutToggle } from "../redux/features/logOut";
+import { socketContext } from "../SocketProvider.jsx";
 function Navbar() {
   let loggingOut = useSelector((store) => {
     return store.loggingOut;
@@ -25,6 +26,9 @@ function Navbar() {
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
+  let clientSocket=useContext(socketContext);
+  console.log(clientSocket);
+  
   let dispatch = useDispatch();
 
   let handleLogout = async () => {
@@ -37,6 +41,9 @@ function Navbar() {
       });
       let json = await response.json();
       if (response.status === 200) {
+        console.log(userAuth);
+        
+        clientSocket.emit("deleteOnlineUser",userAuth);
         dispatch(setUser(null));
         toast.success(json.message);
       } else {
@@ -76,7 +83,7 @@ function Navbar() {
                   display: "flex",
                   gap: "20px",
                   marginLeft: "auto",
-                  "@media (max-width:600px)": { display: "none" },
+                  "@media (max-width:699px)": { display: "none" },
                 }}
               >
                 <NavLink
@@ -95,6 +102,7 @@ function Navbar() {
                 >
                   <Typography variant="h6">Profile</Typography>
                 </NavLink>
+                <Typography variant="h6">Welcome,{userAuth.fullName}</Typography>
                 <Button
                   variant="contained"
                   color="success"
@@ -117,7 +125,7 @@ function Navbar() {
                   display: "none",
                   gap: "10px",
                   marginLeft: "auto",
-                  "@media (max-width:600px)": { display: "flex" },
+                  "@media (max-width:700px)": { display: "flex" },
                 }}
               >
                 <MenuIcon

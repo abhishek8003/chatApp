@@ -9,28 +9,31 @@ import Profile from "./components/pages/Profile/Profile.jsx";
 import Signup from "./components/pages/SignUp/Signup.jsx";
 import store from "./redux/store.js";
 import { Toaster } from "react-hot-toast";
+import SocketProvider from "./SocketProvider.jsx";
 
-const Router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App></App>,
-    children: [
-      {
-        path: "/",
-        element: <Home></Home>,
-      },
-      {
-        path: "/signup",
-        element: <Signup></Signup>,
-      },
-      { path: "/myProfile", element: <Profile></Profile> },
-    ],
-  },
-]);
+// const Router = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: <App></App>,
+//     children: [
+//       {
+//         path: "/",
+//         element: <Home></Home>,
+//       },
+//       {
+//         path: "/signup",
+//         element: <Signup></Signup>,
+//       },
+//       { path: "/myProfile", element: <Profile></Profile> },
+//     ],
+//   },
+// ]);
 
 createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <App />
-    <Toaster />
+    <SocketProvider>
+      <App />
+      <Toaster />
+    </SocketProvider>
   </Provider>
 );
