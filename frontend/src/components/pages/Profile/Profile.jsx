@@ -8,10 +8,10 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { setUser } from "../../../redux/features/userAuth";
 import toast from "react-hot-toast";
 import { AccountCircle, ContactMail } from "@mui/icons-material";
-import BackendProvider from "../../../BackendProvider";
+import  { backendContext } from "../../../BackendProvider";
 
 function Profile() {
-  let backendUrl=useContext(BackendProvider)
+  let backendUrl=useContext(backendContext)
   let userAuth = useSelector((store) => store.userAuth);
   let dispatch = useDispatch();
   let [uploadingImg, setUploadingImg] = useState(false);

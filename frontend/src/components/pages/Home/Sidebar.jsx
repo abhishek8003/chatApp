@@ -15,7 +15,7 @@ import { setSelectedUser } from "../../../redux/features/selectedUser";
 import UserCardSkeltion from "./skeletions/UserCardSkeltion";
 import { socketContext } from "../../../SocketProvider";
 import { setOnlineUsers } from "../../../redux/features/onlineUsers";
-import BackendProvider from "../../../BackendProvider";
+import BackendProvider, { backendContext } from "../../../BackendProvider";
 
 function Sidebar() {
   let [loadingUser, setLoadingUsers] = useState(true);
@@ -26,7 +26,7 @@ function Sidebar() {
     return store.selectedUser;
   });
   let clientSocket = useContext(socketContext);
-  let backendUrl=useContext(BackendProvider);
+  let backendUrl=useContext(backendContext);
   let handleSelectUser = (user) => {
     console.log("selecting a user", user);
     dispatch(setSelectedUser(user));

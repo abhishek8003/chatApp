@@ -14,10 +14,10 @@ import Signup from "./components/pages/SignUp/Signup";
 import Profile from "./components/pages/Profile/Profile";
 import toast, { Toaster } from "react-hot-toast";
 import { socketContext } from "./SocketProvider";
-import BackendProvider from "./BackendProvider";
+import BackendProvider, { backendContext } from "./BackendProvider";
 
 function App() {
-  let backendUrl=useContext(BackendProvider);
+  let backendUrl=useContext(backendContext);
   console.log(backendUrl);
   
   let checkingAuth = useSelector((store) => {
