@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
             },
             cloud_url:{
                 type:String,
-                default:`http://${process.env.hostname}:${process.env.PORT}/images/default_user.png`
+                default:`${process.env.backendURL}:${process.env.PORT}/images/default_user.png`
             },
             public_id:{
                 type:String
