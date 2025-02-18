@@ -42,6 +42,11 @@ function SocketProvider({ children }) {
       socket.on("error", (error) => {
         console.error("Socket error:", error);
       });
+      socket.on("getOnlineUsers", (onlineUsers) => {
+        console.log("online:");
+        console.log(onlineUsers);
+        dispatch(setOnlineUsers(onlineUsers));
+      });
       
       return () => {
         console.log("socket requested disconnection!");

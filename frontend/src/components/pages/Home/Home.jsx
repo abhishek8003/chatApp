@@ -20,7 +20,8 @@ function Home() {
 
   useEffect(() => {
     console.log("setted x");
-    clientSocket.emit("fetchAllUsers");
+    clientSocket.emit("fetchAllUsers"); //to set all_users
+
     clientSocket.on("getOnlineUsers", (onlineUsers) => {
       console.log("online:");
       console.log(onlineUsers);
@@ -28,7 +29,8 @@ function Home() {
     });
     return ()=>{
       clientSocket.off("getOnlineUsers");
-      dispatch(setOnlineUsers(null));
+      clientSocket.off("fetchAllUsers");
+      // dispatch(setOnlineUsers(null));
     }
   },[]);
   return (
