@@ -27,7 +27,7 @@ auth_router.post("/login", validate_user, async (req, res, next) => {
         }
 
         const newAccessToken = jwt.sign(
-            { _id: registeredUser._id,fullName: registeredUser.fullName },
+            { _id: registeredUser._id, fullName: registeredUser.fullName },
             My_SECRET,
             { expiresIn: "1h" }
         );
@@ -35,6 +35,9 @@ auth_router.post("/login", validate_user, async (req, res, next) => {
         res.cookie("access_token", newAccessToken, {
             maxAge: 1000 * 60 * 60,
             httpOnly: true,
+            secure: process.env.NODE_ENV == "production",
+            sameSite: "None",
+
         });
 
         res.status(200).json({ message: "Login successful", user: registeredUser });
@@ -50,7 +53,7 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
         let exists = await User.findOne({ email: email });
         let profilePic;
         console.log(req.file);
-        
+
         if (req.file) {
             console.log("REQUEST FLE CAME");
 
@@ -75,16 +78,18 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
         if (!exists) {
             let newUser = new User({ ...req.body, profilePic: profilePic });
             let registeredUser = await newUser.save();
-            console.log("newUserRegistered:",registeredUser);
+            console.log("newUserRegistered:", registeredUser);
             io_server.emit("newUserRegistered", registeredUser);
             let newAccessToken = jwt.sign({ _id: registeredUser._id, fullName: registeredUser.fullName }, My_SECRET, {
                 expiresIn: "1h"
             })
             res.cookie("access_token", newAccessToken, {
-                maxAge: (1000 * 60 * 60)
+                maxAge: (1000 * 60 * 60),
+                secure: process.env.NODE_ENV == "production",
+                sameSite: "None",
             })
             res.status(200).json({ message: "user registered", user: registeredUser });
-            
+
         }
         else {
             res.status(400).json({ message: "user already exists kinldy login" });
@@ -98,8 +103,8 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
 })
 auth_router.get("/logout", (req, res, next) => {
     try {
-            res.clearCookie("access_token");
-            res.status(200).json({ message: "You are logged out!" });
+        res.clearCookie("access_token");
+        res.status(200).json({ message: "You are logged out!" });
     }
     catch (err) {
         res.status(500).json({ message: err.message })
