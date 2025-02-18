@@ -12,7 +12,7 @@ import { useDispatch, useSelector } from "react-redux";
 import toast from "react-hot-toast";
 import { setUsers } from "../../../redux/features/users";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
-import UserCardSkeltion from "./skeletions/userCardSkeltion";
+import UserCardSkeltion from "./skeletions/UserCardSkeltion";
 import { socketContext } from "../../../SocketProvider";
 import { setOnlineUsers } from "../../../redux/features/onlineUsers";
 import BackendProvider from "../../../BackendProvider";
