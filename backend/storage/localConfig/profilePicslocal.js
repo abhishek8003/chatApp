@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
-
-const uploadDir = path.join(__dirname, 'profilePics');
+const multer=require("multer");
+const uploadDir = path.join(__dirname, 'messageImages');
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
