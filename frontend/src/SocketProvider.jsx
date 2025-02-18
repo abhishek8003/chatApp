@@ -5,6 +5,7 @@ import { setOnlineUsers } from "./redux/features/onlineUsers";
 import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
 import { updateChats } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
+import { updateSelectedUser } from "./redux/features/selectedUser";
 
 const socketContext = createContext();
 
@@ -41,11 +42,7 @@ function SocketProvider({ children }) {
       socket.on("error", (error) => {
         console.error("Socket error:", error);
       });
-      socket.on("profileUpdated", (data) => {
-        console.log("PROFILE UPLADTEd");
-        console.log(data);
-        dispatch(updateOneUser(data));
-      });
+      
       return () => {
         console.log("socket requested disconnection!");
         socket.disconnect();
@@ -77,9 +74,15 @@ function SocketProvider({ children }) {
           );
         }
       });
-      
+      clientSocket.on("profileUpdated", (data) => {
+        console.log("PROFILE UPLADTEd");
+        console.log(data);
+        dispatch(updateOneUser(data));
+        if(selectedUser._id==data._id){
+          dispatch(updateSelectedUser(data));
+        }
+      });
     }
-
     return () => {
       if (clientSocket) {
         clientSocket.off("recieveMessageLive"); // Clean up the listener
