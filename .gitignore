@@ -4,3 +4,4 @@
 
 # Ignore .env file in the backend
 /backend/.env
+/frontend/.env
