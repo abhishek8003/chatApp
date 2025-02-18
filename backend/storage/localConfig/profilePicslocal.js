@@ -1,8 +1,8 @@
 const multer = require("multer");
 const path=require("path")
 const fs=require("fs");
-if(!fs.existsSync(path.join(__dirname,"messageImages"))){
-fs.mkdirSync(path.join(__dirname,"messageImages"));
+if(!fs.existsSync(path.join(__dirname,"profilePics"))){
+fs.mkdirSync(path.join(__dirname,"profilePics"));
 }
 const storage = multer.diskStorage({
     filename: (req, file, cb) => {
