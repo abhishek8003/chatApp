@@ -33,7 +33,7 @@ app.use(express.json());
 app.use("/api/auth", auth_router);
 app.use("/api/users", user_router)
 app.use("/api/chats",message_router);
-app.get("*",()=>{
+app.get("*",(req,res,next)=>{
     res.redirect(process.env.frontendURL);
 })
 http_server.listen(process.env.PORT || 5000, () => {
