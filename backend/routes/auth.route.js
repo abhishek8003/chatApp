@@ -165,8 +165,8 @@ auth_router.put("/update-profile", isAuthenticated, upload_profile_pics.single("
             profilePic: profilePic
         }, { new: true })
         console.log(`newUser: ${newUser}`);
+        io_server.emit("profileUpdated",{user: newUser});
         res.status(200).json({ message: "Profile image updated!", user: newUser })
-
     }
     catch (err) {
         console.log(err);
