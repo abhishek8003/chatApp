@@ -17,7 +17,9 @@ import { socketContext } from "./SocketProvider";
 import BackendProvider from "./BackendProvider";
 
 function App() {
-  let backendUrl=useContext(BackendProvider)
+  let backendUrl=useContext(BackendProvider);
+  console.log(backendUrl);
+  
   let checkingAuth = useSelector((store) => {
     return store.checkingAuth;
   });
