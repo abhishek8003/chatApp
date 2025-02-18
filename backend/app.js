@@ -35,7 +35,7 @@ app.use(express.json());
 app.use("/api/auth", auth_router);
 app.use("/api/users", user_router)
 app.use("/api/chats",message_router)
-http_server.listen(process.env.PORT, () => {
-    console.log(`Server is running on ${process.env.PORT}...`);
+http_server.listen(process.env.PORT || 5000, () => {
+    console.log(`Server is running on ${process.env.PORT || 5000}...`);
 
 })
