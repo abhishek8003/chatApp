@@ -46,8 +46,12 @@ function App() {
             toast.success(`Welcome ${user.fullName}`);
             dispatch(setCheckingAuth(false));
             dispatch(setUser(user));
-          } else {
+          } else if(response.status==401) {
             console.log("its 401");
+            console.log(json.message);
+          }
+          else if(response.status==404){
+            console.log("its 404");
             toast.error(json.message);
           }
           setLoadingCheckAuth(false);

@@ -39,7 +39,7 @@ const isAuthenticated = async (req, res, next) => {
                     else {
                         console.log("user doesnt exists anymore");
                         
-                        res.status(401).json({ message: "user doesnt exists anymore" });
+                        res.status(404).json({ message: "user doesnt exists anymore" });
                     }
                 }
             });
