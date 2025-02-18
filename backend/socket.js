@@ -5,7 +5,7 @@ const User = require("./models/users");
 const app = express();
 const http_server = http.createServer(app);
 const io_server = new Server(http_server, {
-    cors: { origin: "http://localhost:5173" },
+    cors: { origin: `${process.env.frontendURL}` },
     maxHttpBufferSize: 1e8
 });
 
