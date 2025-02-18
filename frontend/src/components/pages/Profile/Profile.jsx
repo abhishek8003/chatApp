@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import Navbar from "../../Navbar";
 import EmailIcon from "@mui/icons-material/Email";
 import Footer from "../../Footer";
@@ -8,8 +8,10 @@ import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import { setUser } from "../../../redux/features/userAuth";
 import toast from "react-hot-toast";
 import { AccountCircle, ContactMail } from "@mui/icons-material";
+import BackendProvider from "../../../BackendProvider";
 
 function Profile() {
+  let backendUrl=useContext(BackendProvider)
   let userAuth = useSelector((store) => store.userAuth);
   let dispatch = useDispatch();
   let [uploadingImg, setUploadingImg] = useState(false);
@@ -25,7 +27,7 @@ function Profile() {
       let formData = new FormData();
       formData.append("profilePic", event.target.img1.files[0]);
 
-      let response = await fetch("http://localhost:5000/api/auth/update-profile", {
+      let response = await fetch(`${backendUrl}/api/auth/update-profile`, {
         method: "PUT",
         credentials: "include",
         body: formData,

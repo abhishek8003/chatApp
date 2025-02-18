@@ -10,6 +10,7 @@ import { setGettingChats } from "../../../redux/features/gettingChats";
 import { setChats } from "../../../redux/features/Chats";
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
+import { backendContext } from "../../../BackendProvider";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -17,12 +18,13 @@ function Messages() {
   let gettingChats=useSelector((store)=>{
     return store.gettingChats
   });
+  let backendUrl=useContext(backendContext);
   let clientSocket=useContext(socketContext)
   useEffect(()=>{
     dispatch(setGettingChats(true))
     let fetchChats=async()=>{
       try {
-        let response=await fetch(`http://localhost:5000/api/chats/${selectedUser._id}`,{
+        let response=await fetch(`${backendUrl}/api/chats/${selectedUser._id}`,{
           method:"GET",
           credentials:"include"
         });

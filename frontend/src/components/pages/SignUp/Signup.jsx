@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import { useForm } from "react-hook-form";
 import LockIcon from "@mui/icons-material/Lock";
@@ -19,8 +19,10 @@ import { useDispatch } from "react-redux";
 import Navbar from "../../Navbar";
 import Footer from "../../Footer";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
+import { backendContext } from "../../../BackendProvider";
 
 function Signup() {
+  let backendUrl=useContext(backendContext)
   const [showPassword, setShowPassword] = React.useState(false);
   let dispatch = useDispatch();
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -53,7 +55,7 @@ function Signup() {
     formData.append("profilePic", "");
     console.log(isSubmitting);
     try {
-      let response = await fetch("http://localhost:5000/api/auth/register", {
+      let response = await fetch(`${backendUrl}/api/auth/register`, {
         method: "POST",
         credentials: "include",
         body: formData,

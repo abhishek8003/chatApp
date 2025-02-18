@@ -14,8 +14,10 @@ import Signup from "./components/pages/SignUp/Signup";
 import Profile from "./components/pages/Profile/Profile";
 import toast, { Toaster } from "react-hot-toast";
 import { socketContext } from "./SocketProvider";
+import BackendProvider from "./BackendProvider";
 
 function App() {
+  let backendUrl=useContext(BackendProvider)
   let checkingAuth = useSelector((store) => {
     return store.checkingAuth;
   });
@@ -31,7 +33,7 @@ function App() {
       console.log("hello");
       if (checkingAuth) {
         try {
-          let response = await fetch("http://localhost:5000/api/auth/check", {
+          let response = await fetch(`${backendUrl}/api/auth/check`, {
             method: "GET",
             credentials: "include",
           });

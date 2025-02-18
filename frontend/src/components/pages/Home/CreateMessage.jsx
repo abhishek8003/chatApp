@@ -6,7 +6,9 @@ import SendIcon from "@mui/icons-material/Send";
 import { setChats, updateChats } from "../../../redux/features/Chats";
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
+import { backendContext } from "../../../BackendProvider";
 function CreateMessage() {
+  let backendUrl=useContext(backendContext)
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
   });
@@ -71,7 +73,7 @@ let clientSocket=useContext(socketContext);
     }
     try {
       let response = await fetch(
-        `http://localhost:5000/api/chats/${selectedUser._id}`,
+        `${backendUrl}/api/chats/${selectedUser._id}`,
         {
           method: "POST",
           credentials: "include",

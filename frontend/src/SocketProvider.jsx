@@ -1,14 +1,16 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/features/onlineUsers";
 import { addNewUser } from "./redux/features/users";
 import { updateChats } from "./redux/features/Chats";
+import { backendContext } from "./BackendProvider";
 
 const socketContext = createContext();
 
 function SocketProvider({ children }) {
   const dispatch = useDispatch();
+  let backendUrl=useContext(backendContext);
   const userAuth = useSelector((store) => store.userAuth);
   const [clientSocket, setClientSocket] = useState(null);
   let selectedUser = useSelector((store) => {
@@ -16,7 +18,7 @@ function SocketProvider({ children }) {
   });
   useEffect(() => {
     if (userAuth) {
-      const socket = io("http://localhost:5000", {
+      const socket = io(backendUrl, {
         query: { user: JSON.stringify(userAuth) },
       });
       setClientSocket(socket);

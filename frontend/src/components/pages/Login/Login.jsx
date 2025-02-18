@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import { useForm } from "react-hook-form";
 import LockIcon from "@mui/icons-material/Lock";
@@ -18,6 +18,7 @@ import { useDispatch } from "react-redux";
 import Navbar from "../../Navbar";
 import Footer from "../../Footer";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
+import { backendContext } from "../../../BackendProvider";
 
 function Login() {
   const [showPassword, setShowPassword] = React.useState(false);
@@ -38,12 +39,12 @@ function Login() {
     formState: { errors },
     formState: { isSubmitting },
   } = useForm();
-
+let backendUrl=useContext(backendContext)
   const onSubmit = async (data) => {
     console.log(data);
     console.log(isSubmitting);
     try {
-      let response = await fetch("http://localhost:5000/api/auth/login", {
+      let response = await fetch(`${backendUrl}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

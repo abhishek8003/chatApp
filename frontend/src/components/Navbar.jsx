@@ -11,7 +11,9 @@ import { sideNavToggle } from "../redux/features/sideNav";
 import SideNav from "./SideNav.jsx";
 import { loggingOutToggle } from "../redux/features/logOut";
 import { socketContext } from "../SocketProvider.jsx";
+import { backendContext } from "../BackendProvider.jsx";
 function Navbar() {
+  let backendUrl=useContext(backendContext)
   let loggingOut = useSelector((store) => {
     return store.loggingOut;
   });
@@ -36,7 +38,7 @@ function Navbar() {
       console.log(loggingOut);
 
       dispatch(loggingOutToggle());
-      let response = await fetch("http://localhost:5000/api/auth/logout", {
+      let response = await fetch(`${backendUrl}/api/auth/logout`, {
         credentials: "include",
       });
       let json = await response.json();

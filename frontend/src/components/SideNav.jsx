@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { sideNavToggle } from "../redux/features/sideNav";
 import MessageIcon from "@mui/icons-material/Message";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +8,9 @@ import { loggingOutToggle } from "../redux/features/logOut";
 
 import toast from "react-hot-toast";
 import { setUser } from "../redux/features/userAuth";
+import { backendContext } from "../BackendProvider";
 function sideNav() {
+  let backendUrl=useContext(backendContext)
   let sideNav = useSelector((store) => {
     return store.sideNav;
   });
@@ -26,7 +28,7 @@ function sideNav() {
       console.log(loggingOut);
 
       dispatch(loggingOutToggle());
-      let response = await fetch("http://localhost:5000/api/auth/logout", {
+      let response = await fetch(`${backendUrl}/api/auth/logout`, {
         credentials: "include",
       });
       let json = await response.json();
