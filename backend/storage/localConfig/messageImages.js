@@ -6,7 +6,7 @@ const storage = multer.diskStorage({
         cb(null, uniqueSuffix+"-"+file.originalname )
     },
     destination: (req, file, cb) => {
-        cb(null,path.join(__dirname,"/messageImages"))
+        cb(null,path.join(__dirname,"messageImages"))
     }
 });
 const upload=multer({
