@@ -98,10 +98,8 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
 })
 auth_router.get("/logout", (req, res, next) => {
     try {
-        setTimeout(() => {
             res.clearCookie("access_token");
             res.status(200).json({ message: "You are logged out!" });
-        }, 5000)
     }
     catch (err) {
         res.status(500).json({ message: err.message })
