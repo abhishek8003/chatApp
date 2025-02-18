@@ -22,9 +22,7 @@ mongoose.connect(process.env.MONGO_URL).then(() => {
 //     })
 //   );
 app.use(cors({
-    origin: (origin, cb) => {
-        cb(null, origin)
-    },
+    origin: process.env.frontendURL,
     credentials: true
 }))
 app.use(express.static(`${path.join(__dirname, "/public")}`))
