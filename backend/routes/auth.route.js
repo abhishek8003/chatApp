@@ -68,7 +68,7 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
         else {
             profilePic = {
                 local_url: "",
-                cloud_url: `${req.protocol}://${req.hostname}:${process.env.PORT}/images/default_user.png`,
+                cloud_url: `${process.env.backendURL}/images/default_user.png`,
                 public_id: ""
             };
         }
@@ -131,7 +131,7 @@ auth_router.put("/update-profile", isAuthenticated, upload_profile_pics.single("
         else {
             profilePic = {
                 local_url: "",
-                cloud_url: `${req.protocol}://${req.hostname}:${process.env.PORT}/images/default_user.png`,
+                cloud_url: `${process.env.backendURL}/images/default_user.png`,
                 public_id: ""
             };
         }
