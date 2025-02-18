@@ -36,7 +36,7 @@ auth_router.post("/login", validate_user, async (req, res, next) => {
             maxAge: 1000 * 60 * 60,
             httpOnly: true,
             secure: process.env.NODE_ENV == "production",
-            sameSite: "None",
+            sameSite: process.env.NODE_ENV == "production"?"None":"strict",
 
         });
 
@@ -86,7 +86,7 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
             res.cookie("access_token", newAccessToken, {
                 maxAge: (1000 * 60 * 60),
                 secure: process.env.NODE_ENV == "production",
-                sameSite: "None",
+                sameSite: process.env.NODE_ENV == "production"?"None":"strict",
             })
             res.status(200).json({ message: "user registered", user: registeredUser });
 
@@ -165,7 +165,7 @@ auth_router.put("/update-profile", isAuthenticated, upload_profile_pics.single("
             profilePic: profilePic
         }, { new: true })
         console.log(`newUser: ${newUser}`);
-        io_server.emit("profileUpdated",{user: newUser});
+        io_server.emit("profileUpdated",newUser);
         res.status(200).json({ message: "Profile image updated!", user: newUser })
     }
     catch (err) {
