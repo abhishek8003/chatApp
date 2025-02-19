@@ -137,7 +137,9 @@ function Profile() {
           </div>
           <Typography className={"text-center text-muted fs-6"}>Click camera icon to update profile name</Typography>
           <label htmlFor="fullName" style={{ padding: "0px" }}>
-                  Full Name <span className="text-muted fs-6"> (Cant be changed now)</span>
+                  Full Name 
+                  {/* <span className="text-muted fs-6"> (Cant be changed now)</span> */}
+
                 </label>
                 <TextField
                   id="fullName"
@@ -161,7 +163,9 @@ function Profile() {
                   fullWidth
                 />
           <label htmlFor="email" style={{ padding: "0px" }}>
-                  Email <span className="text-muted fs-6"> (Cant be changed now)</span>
+                  Email 
+                  {/* <span className="text-muted fs-6"> (Cant be changed now)</span> */}
+
                 </label>
                 <TextField
                   id="email"

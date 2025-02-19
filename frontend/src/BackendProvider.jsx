@@ -4,7 +4,7 @@ const backendContext = createContext();
 
 function BackendProvider({ children }) {
     // const url = "http://localhost:5000";
-    const url="https://chatapp-q0p1.onrender.com"
+    const url="https://chatapp-q0p1.onrender.com";
     return (
         <backendContext.Provider value={url}>
             {children}
