@@ -10,12 +10,14 @@ function ChatBody() {
   const chats = useSelector((store) => store.chats);
   const chatContainer = useRef();
   const scrollTo = useRef();
-  let dispatch=useDispatch();
-  let handleImagePreview=(imageUrl)=>{
+  let dispatch = useDispatch();
+
+  let handleImagePreview = (imageUrl) => {
     console.log(imageUrl);
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
-  }
+  };
+
   useEffect(() => {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
   }, [chats]);
@@ -56,24 +58,29 @@ function ChatBody() {
                 }}
               >
                 <div style={{ display: "flex" }}>
-                  <img src={profilePic} width={70} height={70} alt="Profile" />
+                  <img src={profilePic} width={50} height={50} alt="Profile" style={{ borderRadius: "50%" }} />
                   {chat.image && chat.image.cloud_url ? (
                     <div
                       className="card"
                       style={{
-                        width: "18rem",
+                        width: "100%",
+                        maxWidth: "300px",
                         borderRadius: "1rem",
                         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
                       }}
                     >
                       <img
                         src={chat.image.cloud_url}
-                        onClick={()=>{handleImagePreview(chat.image.cloud_url)}}
+                        onClick={() => {
+                          handleImagePreview(chat.image.cloud_url);
+                        }}
                         className="card-img-top rounded-top"
                         alt="Chat Image"
-                        style={{ height: "12rem", width: "100%",
+                        style={{
+                          width: "100%",
+                          height: "auto",
                           borderRadius: "1rem",
-                         }}
+                        }}
                       />
                       {chat.text && (
                         <div className="card-body text-center">
@@ -111,7 +118,7 @@ function ChatBody() {
           className="d-flex justify-content-center align-items-center"
           style={{ height: "100%" }}
         >
-          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize:"2rem"}}>
+          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem" }}>
             No messages!
           </Typography>
         </div>
