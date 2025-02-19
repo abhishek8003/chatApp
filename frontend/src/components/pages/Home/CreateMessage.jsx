@@ -8,12 +8,12 @@ import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
 function CreateMessage() {
-  let backendUrl=useContext(backendContext)
+  let backendUrl = useContext(backendContext);
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
   });
   let inputFile = useRef();
-let clientSocket=useContext(socketContext);
+  let clientSocket = useContext(socketContext);
   let chats = useSelector((store) => {
     return store.chats;
   });
@@ -22,9 +22,9 @@ let clientSocket=useContext(socketContext);
   let [previewUrl, setPreviewUrl] = useState("");
   let [messageText, setMessageText] = useState("");
   let [isSendingMessage, setSendingMessage] = useState(false);
-  let userAuth=useSelector((store)=>{
+  let userAuth = useSelector((store) => {
     return store.userAuth;
-  })
+  });
 
   let dispatch = useDispatch();
   let handleFilePreview = () => {
@@ -39,25 +39,32 @@ let clientSocket=useContext(socketContext);
       fileReader.readAsDataURL(fileObj);
     }
   };
- 
+
   let form = useRef();
   let handleSendMessage = async (myForm) => {
     setSendingMessage(true);
     let text = myForm.newMessage.value;
-    let imgTempUrl=previewUrl;
-    dispatch(updateChats({
-                senderId:userAuth._id,
-                receiverId:selectedUser._id,
-                text:text,
-                image:{
-                  local_url:"",
-                  cloud_url:imgTempUrl
-                }
-              }));
-    clientSocket.emit("sendMessage",{senderId:userAuth._id,recieverId:selectedUser._id,message_text:text,message_image:imgTempUrl});
+    let imgTempUrl = previewUrl;
+    dispatch(
+      updateChats({
+        senderId: userAuth._id,
+        receiverId: selectedUser._id,
+        text: text,
+        image: {
+          local_url: "",
+          cloud_url: imgTempUrl,
+        },
+      })
+    );
+    clientSocket.emit("sendMessage", {
+      senderId: userAuth._id,
+      recieverId: selectedUser._id,
+      message_text: text,
+      message_image: imgTempUrl,
+    });
     setPreview(false);
     console.log(`logged socket after emiting:`, clientSocket);
-    
+
     let file = myForm.messageFile && myForm.messageFile.files[0];
     console.log(text);
     console.log(file);
@@ -86,23 +93,21 @@ let clientSocket=useContext(socketContext);
         // dispatch(setChats([...chats, json.newMessage]));
         setMessageText("");
         inputFile.current.value = "";
-        setSendingMessage(false)
+        setSendingMessage(false);
         setPreview(false);
         setPreviewUrl(null);
       }
     } catch (error) {
       console.log(error);
-      toast.error(error)
-      
+      toast.error(error);
     } finally {
       setSendingMessage(false);
     }
   };
   return (
     <>
-      
       <Box sx={{ width: "fit-content" }}>
-        {preview&&inputFile.current && inputFile.current.files[0] ? (
+        {preview && inputFile.current && inputFile.current.files[0] ? (
           <>
             <div style={{ position: "absolute", bottom: "80px", left: "10px" }}>
               <img src={previewUrl} height={"100px"} width={"100px"}></img>
@@ -151,6 +156,13 @@ let clientSocket=useContext(socketContext);
             onChange={(e) => {
               setMessageText(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (!(messageText.length > 0 || preview)) {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault(); // Prevent form submission
+                }
+              }
+            }}
             sx={{ flexGrow: "1", border: "" }}
           ></TextField>
           <Box
@@ -180,6 +192,7 @@ let clientSocket=useContext(socketContext);
               name="messageFile"
               onChange={() => {
                 handleFilePreview();
+                document.querySelector('input[name="newMessage"]').focus();
               }}
               style={{ display: "none" }}
             ></input>
@@ -190,7 +203,8 @@ let clientSocket=useContext(socketContext);
                   form.current.requestSubmit();
                 }}
                 disabled={
-                  ((messageText.length > 0 || preview) ? false : true) || isSendingMessage
+                  (messageText.length > 0 || preview ? false : true) ||
+                  isSendingMessage
                 }
               >
                 <SendIcon></SendIcon>

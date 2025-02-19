@@ -36,7 +36,7 @@ function Profile() {
       let json = await response.json();
       if (response.status === 200) {
         // console.log("Before dispatch:", userAuth);
-        // console.log("Server user:",json.user);
+        console.log("new updated user:",json.user);
         dispatch(setUser(json.user));
         // console.log("After dispatch:", userAuth);
         toast.success(json.message);

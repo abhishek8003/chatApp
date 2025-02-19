@@ -11,6 +11,7 @@ import { setChats } from "../../../redux/features/Chats";
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
+import MessageImagePreview from "./MessageImagePreview";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -18,10 +19,16 @@ function Messages() {
   let gettingChats=useSelector((store)=>{
     return store.gettingChats
   });
+  let users=useSelector((store)=>{
+    return store.users;
+  });
+  let messageImagePreview=useSelector((store)=>{
+    return store.messageImagePreviewReducer;
+  })
   let backendUrl=useContext(backendContext);
   let clientSocket=useContext(socketContext)
   useEffect(()=>{
-    dispatch(setGettingChats(true))
+    dispatch(setGettingChats(true));
     let fetchChats=async()=>{
       try {
         let response=await fetch(`${backendUrl}/api/chats/${selectedUser._id}`,{
@@ -42,7 +49,8 @@ function Messages() {
       }
     }
     fetchChats();
-  },[selectedUser])
+  },[selectedUser]);
+
   let dispatch=useDispatch();
   console.log(selectedUser);
   return (
@@ -56,7 +64,12 @@ function Messages() {
       }}
     >
       <ChatHeader></ChatHeader>
-      {gettingChats?<ChatbodySkeltion></ChatbodySkeltion>:<ChatBody></ChatBody>}
+      
+      {gettingChats?<ChatbodySkeltion></ChatbodySkeltion>:
+      <>
+      <MessageImagePreview></MessageImagePreview>
+      <ChatBody></ChatBody>
+      </>}
       <CreateMessage></CreateMessage>
     </Box>
   );

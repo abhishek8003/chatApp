@@ -1,6 +1,8 @@
 import { Box, Typography } from "@mui/material";
 import React, { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { setmessageImagePreviewUrl } from "../../../redux/features/messageImagePreviewUrl";
+import { messageImagePreviewToggle } from "../../../redux/features/messageImagePreview";
 
 function ChatBody() {
   const selectedUser = useSelector((store) => store.selectedUser);
@@ -8,7 +10,12 @@ function ChatBody() {
   const chats = useSelector((store) => store.chats);
   const chatContainer = useRef();
   const scrollTo = useRef();
-
+  let dispatch=useDispatch();
+  let handleImagePreview=(imageUrl)=>{
+    console.log(imageUrl);
+    dispatch(setmessageImagePreviewUrl(imageUrl));
+    dispatch(messageImagePreviewToggle());
+  }
   useEffect(() => {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
   }, [chats]);
@@ -61,6 +68,7 @@ function ChatBody() {
                     >
                       <img
                         src={chat.image.cloud_url}
+                        onClick={()=>{handleImagePreview(chat.image.cloud_url)}}
                         className="card-img-top rounded-top"
                         alt="Chat Image"
                         style={{ height: "12rem", width: "100%",
