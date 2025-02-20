@@ -245,7 +245,7 @@ function CreateDm() {
               : null}
             <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
               <Button
-                sx={{ width: "30%" }}
+                sx={{ width: "30%",minWidth:"200px" }}
                 variant="contained"
                 onClick={handleAddFriends}
                 disabled={addingFriends}

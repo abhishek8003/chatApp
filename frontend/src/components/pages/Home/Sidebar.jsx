@@ -62,7 +62,7 @@ function Sidebar() {
         );
         let json = await response.json();
         if (response.status === 200) {
-          console.log("current friends:",json);
+          console.log("current friends:", json);
           console.log(json.friends);
           dispatch(addFriends(json.friends));
         } else {
@@ -145,6 +145,10 @@ function Sidebar() {
             padding: "20px",
             fontSize: "1rem",
             color: "#777",
+            display:"block",
+            "@media (min-width:1px) and (max-width:600px)": {
+              display: "none",
+            },
           }}
         >
           You have no friends. Add some friends to start chatting!
