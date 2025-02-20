@@ -49,6 +49,7 @@ function CreateDm() {
         friend,
       ]);
     } else {
+      setSelectedValue("");
       toast.error("Friend already selected");
     }
   };
