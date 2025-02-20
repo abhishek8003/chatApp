@@ -20,6 +20,7 @@ import { addFriends } from "../../../redux/features/friends";
 import { changeDm } from "../../../redux/features/toggleDm";
 
 function CreateDm() {
+  const [selectedValue, setSelectedValue] = useState(null);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [loadingUser, setLoadingUsers] = useState(true);
   const users = useSelector((store) => store.users);
@@ -145,9 +146,11 @@ function CreateDm() {
           </IconButton>
         </Typography>
         <Autocomplete
+        value={selectedValue}
           onChange={(event, value) => {
             if (users.includes(value)) {
               handleSelectingFriend(value);
+              setSelectedValue("");
             }
           }}
           options={users || []}
