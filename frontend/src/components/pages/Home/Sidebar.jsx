@@ -17,7 +17,7 @@ import UserCardSkeltion from "./skeletions/UserCardSkeltion";
 import { socketContext } from "../../../SocketProvider";
 import { setOnlineUsers } from "../../../redux/features/onlineUsers";
 import BackendProvider, { backendContext } from "../../../BackendProvider";
-import CreateDm from "./createDm";
+import CreateDm from "./CreateDm";
 import { addFriends, intializeFriends } from "../../../redux/features/friends";
 import { changeDm } from "../../../redux/features/toggleDm";
 
