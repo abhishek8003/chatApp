@@ -28,10 +28,30 @@ io_server.on("connection", (clientSocket) => {
         online_users = online_users.filter((u) => u._id !== data._id);
         io_server.emit("getOnlineUsers", online_users);
     });
+    clientSocket.on("sendFriend",async(data)=>{
+        console.log(data);
+        let onlineUsersIds=online_users.map(e=>e._id);
+        let newFriend=await User.findById(data.newFriend);
+        data.target.forEach((target)=>{
+            if(onlineUsersIds.includes(target._id)){
+                let targetUserWithSocket=online_users.find((e)=>{
+                    if(e._id==target._id){
+                        return e;
+                    }
+                });
+                console.log(targetUserWithSocket.socketId);
+                targetSocketId=targetUserWithSocket.socketId;
+                io_server.to(targetSocketId).emit("addFriend",newFriend);
+            }
+        })
+        
+    });
     clientSocket.on("fetchAllUsers", async () => {
         let allUsers = await User.find({
             _id: { $ne: user._id }
         });
+        console.log(allUsers);
+        
         clientSocket.emit("getAllUsersExceptMe", allUsers);
     });
     clientSocket.on("sendMessage", (messageBody) => {

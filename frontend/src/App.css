@@ -15,6 +15,7 @@
   /* border: 2px solid pink; */
   transition-property: all;
   transition-duration: 0.3s;
+  justify-content: center;
   transition-timing-function: ease;
   
 }
@@ -32,4 +33,10 @@
   height: 80%;
   border: 2px solid black;
   border-radius: 50%;
+}
+.add_dm_icon {
+  width: 100%  !important;
+  height: 100% !important;
+  /* border: 2px solid black; */
+  /* border-radius: 50%; */
 }

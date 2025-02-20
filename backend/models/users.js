@@ -10,6 +10,13 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    friends: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "user" // Assuming friends are also users
+        }
+    ],
+
     password: {
         type: String,
         required: true
@@ -17,16 +24,16 @@ const userSchema = new mongoose.Schema({
     profilePic: {
         type: {
             local_url: {
-                type:String,
+                type: String,
 
             },
-            cloud_url:{
-                type:String,
-                default:`${process.env.backendURL}/images/default_user.png`
+            cloud_url: {
+                type: String,
+                default: `${process.env.backendURL}/images/default_user.png`
             },
-            public_id:{
-                type:String
-            } 
+            public_id: {
+                type: String
+            }
         }
 
     },

@@ -5,6 +5,7 @@ import {
   Skeleton,
   Typography,
 } from "@mui/material";
+import ControlPointIcon from "@mui/icons-material/ControlPoint";
 import React, { useContext, useEffect, useState } from "react";
 import PeopleIcon from "@mui/icons-material/People";
 
@@ -16,9 +17,18 @@ import UserCardSkeltion from "./skeletions/UserCardSkeltion";
 import { socketContext } from "../../../SocketProvider";
 import { setOnlineUsers } from "../../../redux/features/onlineUsers";
 import BackendProvider, { backendContext } from "../../../BackendProvider";
+import CreateDm from "./createDm";
+import { addFriends, intializeFriends } from "../../../redux/features/friends";
+import { changeDm } from "../../../redux/features/toggleDm";
 
 function Sidebar() {
-  let [loadingUser, setLoadingUsers] = useState(true);
+  let [loadingUserFriends, setloadingUserFriends] = useState(true);
+  let friends = useSelector((store) => {
+    return store.friends;
+  });
+  let userAuth = useSelector((store) => {
+    return store.userAuth;
+  });
   let users = useSelector((store) => {
     return store.users;
   });
@@ -26,7 +36,7 @@ function Sidebar() {
     return store.selectedUser;
   });
   let clientSocket = useContext(socketContext);
-  let backendUrl=useContext(backendContext);
+  let backendUrl = useContext(backendContext);
   let handleSelectUser = (user) => {
     console.log("selecting a user", user);
     dispatch(setSelectedUser(user));
@@ -35,33 +45,38 @@ function Sidebar() {
     return store.onlineUsers;
   });
   let dispatch = useDispatch();
+  let toggleDm = useSelector((store) => {
+    return store.toggleDm;
+  });
+
   useEffect(() => {
-    let getAllUsers = async () => {
+    let getAllFriends = async () => {
+      dispatch(intializeFriends([]));
       try {
-        // let response = await fetch(`${backendUrl}/api/users`, {
-        //   method: "GET",
-        //   credentials: "include",
-        // });
-        // let json = await response.json();
-        // if (response.status === 200) {
-        //   console.log(json.users);
-        //   dispatch(setUsers(json.users));
-        // } else {
-        //   toast.error(json.message);
-        // }
-        // clientSocket.emit("fetchAllUsers");
-        clientSocket.on("getAllUsersExceptMe", (users) => {
-          console.log("all users:", users);
-          dispatch(setUsers(users));
-        });
+        let response = await fetch(
+          `${backendUrl}/api/users/${userAuth._id}/friends`,
+          {
+            method: "GET",
+            credentials: "include",
+          }
+        );
+        let json = await response.json();
+        if (response.status === 200) {
+          console.log("current friends:",json);
+          console.log(json.friends);
+          dispatch(addFriends(json.friends));
+        } else {
+          toast.error(json.message);
+        }
+        clientSocket.emit("fetchAllUsers");
       } catch (error) {
         toast.error(error.message);
         console.log(error);
       } finally {
-        setLoadingUsers(false);
+        setloadingUserFriends(false);
       }
     };
-    getAllUsers();
+    getAllFriends();
   }, []);
 
   return (
@@ -123,158 +138,196 @@ function Sidebar() {
           Contacts
         </Typography>
       </div>
-
-      {!loadingUser ? (
-        users.map((user) => {
-          return (
-            <div
-              key={user._id}
-              className="people_cont"
-              style={{
-                display: "flex",
-                height: "70px",
-                alignItems: "center",
-                backgroundColor:
-                  selectedUser && selectedUser._id === user._id
-                    ? "#3f51b5"
-                    : "",
-                color:
-                  selectedUser && selectedUser._id === user._id
-                    ? "white"
-                    : "black",
-                cursor: "pointer",
-              }}
-              onClick={() => handleSelectUser(user)}
-            >
-              <Typography
-                variant="h6"
-                className="people_img"
-                sx={{
+      {friends.length === 0 && !loadingUserFriends ? (
+        <Typography
+          sx={{
+            textAlign: "center",
+            padding: "20px",
+            fontSize: "1rem",
+            color: "#777",
+          }}
+        >
+          You have no friends. Add some friends to start chatting!
+        </Typography>
+      ) : null}
+      {!loadingUserFriends ? (
+        <>
+          {friends.map((user) => {
+            return (
+              <div
+                key={user._id}
+                className="people_cont"
+                style={{
                   display: "flex",
-                  position: "relative",
-                  justifyContent: "center",
+                  height: "70px",
                   alignItems: "center",
+                  backgroundColor:
+                    selectedUser && selectedUser._id === user._id
+                      ? "#3f51b5"
+                      : "",
+                  color:
+                    selectedUser && selectedUser._id === user._id
+                      ? "white"
+                      : "black",
+                  cursor: "pointer",
                 }}
+                onClick={() => handleSelectUser(user)}
               >
-                <img src={user.profilePic.cloud_url} alt="Profile" />
-                {onlineUsers &&
-                onlineUsers.find((e) => {
-                  if (e._id == user._id) {
-                    return e;
-                  }
-                }) ? (
-                  <Typography
-                    sx={{
-                      display:"none",
-                      "@media (min-width:1px) and (max-width:600px)": {
-                        display: "inline",
-                      },
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: "16px",
-                        height: "16px",
-                        borderRadius: "50%",
-                        backgroundColor: "green",
-                        marginRight: "5px",
-                        position: "absolute",
-                        bottom: "10px",
-                        right: "2px",
+                <Typography
+                  variant="h6"
+                  className="people_img"
+                  sx={{
+                    display: "flex",
+                    position: "relative",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <img src={user.profilePic.cloud_url} alt="Profile" />
+                  {onlineUsers &&
+                  onlineUsers.find((e) => {
+                    if (e._id == user._id) {
+                      return e;
+                    }
+                  }) ? (
+                    <Typography
+                      sx={{
+                        display: "none",
+                        "@media (min-width:1px) and (max-width:600px)": {
+                          display: "inline",
+                        },
                       }}
-                    ></span>
-                  </Typography>
-                ) : (
-                  <Typography sx={{
-                    display:"none",
-                    "@media (min-width:1px) and (max-width:600px)": {
-                        display: "inline",
-                      }
-                  }}>
-                    <span
-                      style={{
-                        width: "16px",
-                        height: "16px",
-                        borderRadius: "50%",
-                        backgroundColor: "red",
-                        marginRight: "5px",
-                        position: "absolute",
-                        bottom: "10px",
-                        right: "2px",
+                    >
+                      <span
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          backgroundColor: "green",
+                          marginRight: "5px",
+                          position: "absolute",
+                          bottom: "10px",
+                          right: "2px",
+                        }}
+                      ></span>
+                    </Typography>
+                  ) : (
+                    <Typography
+                      sx={{
+                        display: "none",
+                        "@media (min-width:1px) and (max-width:600px)": {
+                          display: "inline",
+                        },
                       }}
-                    ></span>
-                  </Typography>
-                )}
-              </Typography>
-              <Typography
-                variant="body1"
-                sx={{
-                  flexGrow: "1",
-                  display: "flex",
-                  flexDirection: "column",
-                  wordBreak: "break-all",
-                  "@media (max-width:600px)": {
-                    display: "none",
-                  },
-                }}
-              >
-                {user.fullName}
-                {onlineUsers &&
-                onlineUsers.find((e) => {
-                  if (e._id == user._id) {
-                    return e;
-                  }
-                }) ? (
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      color:
-                        selectedUser && selectedUser._id === user._id
-                          ? "white"
-                          : "green",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: "8px",
-                        height: "8px",
-                        borderRadius: "50%",
-                        backgroundColor: "green",
-                        marginRight: "5px",
+                    >
+                      <span
+                        style={{
+                          width: "16px",
+                          height: "16px",
+                          borderRadius: "50%",
+                          backgroundColor: "red",
+                          marginRight: "5px",
+                          position: "absolute",
+                          bottom: "10px",
+                          right: "2px",
+                        }}
+                      ></span>
+                    </Typography>
+                  )}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    flexGrow: "1",
+                    display: "flex",
+                    flexDirection: "column",
+                    wordBreak: "break-all",
+                    "@media (max-width:600px)": {
+                      display: "none",
+                    },
+                  }}
+                >
+                  {user.fullName}
+                  {onlineUsers &&
+                  onlineUsers.find((e) => {
+                    if (e._id == user._id) {
+                      return e;
+                    }
+                  }) ? (
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color:
+                          selectedUser && selectedUser._id === user._id
+                            ? "white"
+                            : "green",
                       }}
-                    ></span>
-                    Online
-                  </Typography>
-                ) : (
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      color:
-                        selectedUser && selectedUser._id === user._id
-                          ? "white"
-                          : "red",
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: "8px",
-                        height: "8px",
-                        borderRadius: "50%",
-                        backgroundColor: "red",
-                        marginRight: "5px",
+                    >
+                      <span
+                        style={{
+                          width: "8px",
+                          height: "8px",
+                          borderRadius: "50%",
+                          backgroundColor: "green",
+                          marginRight: "5px",
+                        }}
+                      ></span>
+                      Online
+                    </Typography>
+                  ) : (
+                    <Typography
+                      variant="subtitle2"
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        color:
+                          selectedUser && selectedUser._id === user._id
+                            ? "white"
+                            : "red",
                       }}
-                    ></span>
-                    Offline
-                  </Typography>
-                )}
-              </Typography>
-            </div>
-          );
-        })
+                    >
+                      <span
+                        style={{
+                          width: "8px",
+                          height: "8px",
+                          borderRadius: "50%",
+                          backgroundColor: "red",
+                          marginRight: "5px",
+                        }}
+                      ></span>
+                      Offline
+                    </Typography>
+                  )}
+                </Typography>
+              </div>
+            );
+          })}
+          {/* Add the "hi" div here */}
+          <CreateDm></CreateDm>
+          <div
+            style={{
+              display: "flex",
+              height: "70px",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "2px solid red",
+              fontSize: "1.5rem",
+            }}
+            onClick={() => {
+              dispatch(changeDm());
+            }}
+          >
+            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+              Create new DM
+            </Typography>
+            <ControlPointIcon
+              className="add_dm_icon"
+              sx={{ display: { xs: "inline-block", sm: "none" } }}
+            />
+          </div>
+        </>
       ) : (
         <>
           {new Array(8).fill(null).map(() => {

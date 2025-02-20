@@ -6,6 +6,7 @@ import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
 import { updateChats } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
 import { updateSelectedUser } from "./redux/features/selectedUser";
+import { addFriends, addNewFriend } from "./redux/features/friends";
 
 const socketContext = createContext();
 
@@ -47,7 +48,10 @@ function SocketProvider({ children }) {
         console.log(onlineUsers);
         dispatch(setOnlineUsers(onlineUsers));
       });
-      
+      socket.on("addFriend",(data)=>{
+        console.log("new friend without reload:",data);
+        dispatch(addNewFriend(data));
+      });
       return () => {
         console.log("socket requested disconnection!");
         socket.disconnect();
@@ -79,6 +83,7 @@ function SocketProvider({ children }) {
           );
         }
       });
+      
       clientSocket.on("profileUpdated", (data) => {
         console.log("PROFILE UPLADTEd");
         console.log(data);

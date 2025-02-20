@@ -10,6 +10,8 @@ import gettingChatsReducer from "./features/gettingChats";
 import onlineUserReducer from "./features/onlineUsers";
 import messageImagePreviewReducer from "./features/messageImagePreview";
 import messageImagePreviewUrlReducer from "./features/messageImagePreviewUrl";
+import friendsSliceReducer from "./features/friends";
+import toggleDmReducer from "./features/toggleDm";
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -22,7 +24,9 @@ const store=configureStore({
         gettingChats:gettingChatsReducer,
         onlineUsers:onlineUserReducer,
         messageImagePreview:messageImagePreviewReducer,
-        messageImagePreviewUrl:messageImagePreviewUrlReducer
+        messageImagePreviewUrl:messageImagePreviewUrlReducer,
+        friends:friendsSliceReducer,
+        toggleDm:toggleDmReducer
     }
 });
 export default store;
