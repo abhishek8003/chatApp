@@ -14,7 +14,7 @@ import { socketContext } from "../SocketProvider.jsx";
 import { backendContext } from "../BackendProvider.jsx";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { setNotificationToggle } from "../redux/features/notificationToggle.js";
-import NotificationPanel from "./pages/Home/notificationPanel.jsx";
+import NotificationPanel from "./pages/Home/NotificationPanel.jsx";
 function Navbar() {
   let backendUrl = useContext(backendContext);
   let loggingOut = useSelector((store) => {
