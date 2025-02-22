@@ -42,6 +42,7 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                     public_id: responseFromCloud.public_id
                 }
             }
+            
             const newMessage = new Message({
                 senderId,
                 receiverId,

@@ -1,4 +1,4 @@
-import { AppBar, Box, Button, Toolbar, Typography } from "@mui/material";
+import { AppBar, Badge, Box, Button, Toolbar, Typography } from "@mui/material";
 import React, { useContext, useState } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,8 +12,11 @@ import SideNav from "./SideNav.jsx";
 import { loggingOutToggle } from "../redux/features/logOut";
 import { socketContext } from "../SocketProvider.jsx";
 import { backendContext } from "../BackendProvider.jsx";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import { setNotificationToggle } from "../redux/features/notificationToggle.js";
+import NotificationPanel from "./pages/Home/notificationPanel.jsx";
 function Navbar() {
-  let backendUrl=useContext(backendContext)
+  let backendUrl = useContext(backendContext);
   let loggingOut = useSelector((store) => {
     return store.loggingOut;
   });
@@ -24,14 +27,19 @@ function Navbar() {
   let sideNav = useSelector((store) => {
     return store.sideNav;
   });
-
+  let notification = useSelector((store) => {
+    return store.notification;
+  });
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
-  let clientSocket=useContext(socketContext);
+  let clientSocket = useContext(socketContext);
   console.log(clientSocket);
-  
+
   let dispatch = useDispatch();
+  let notificationToggle = useSelector((store) => {
+    return store.notificationToggle;
+  });
 
   let handleLogout = async () => {
     try {
@@ -44,8 +52,8 @@ function Navbar() {
       let json = await response.json();
       if (response.status === 200) {
         console.log(userAuth);
-        
-        clientSocket.emit("deleteOnlineUser",userAuth);
+
+        clientSocket.emit("deleteOnlineUser", userAuth);
         dispatch(setUser(null));
         toast.success(json.message);
       } else {
@@ -104,7 +112,34 @@ function Navbar() {
                 >
                   <Typography variant="h6">Profile</Typography>
                 </NavLink>
-                <Typography variant="h6">Welcome,{userAuth.fullName}</Typography>
+                <Typography variant="h6">
+                  Welcome,{userAuth.fullName}
+                </Typography>
+                <Typography variant="h6">
+                  <Badge
+                    badgeContent={
+                      notification.length > 9
+                        ? "9+"
+                        : notification.length.toString()
+                    }
+                    color="primary"
+                    onClick={() => {
+                      dispatch(setNotificationToggle());
+                    }}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        minWidth: "27px", // Ensures enough space for two-digit numbers
+                        height: "27px",
+                        fontSize: "0.75rem", // Adjust font size
+                        padding: "0 6px", // Ensures content fits
+                      },
+                    }}
+                  >
+                    <Typography variant="h6"><MessageIcon /></Typography>
+                    
+                  </Badge>
+                </Typography>
+                <NotificationPanel></NotificationPanel>
                 <Button
                   variant="contained"
                   color="success"
@@ -127,9 +162,37 @@ function Navbar() {
                   display: "none",
                   gap: "10px",
                   marginLeft: "auto",
-                  "@media (max-width:700px)": { display: "flex" },
+                  "@media (max-width:700px)": { display: "flex",
+                    justifyContent:"flex-end",
+                    alignItems:"center"
+                   },
                 }}
               >
+                <Typography variant="h6">
+                  <Badge
+                    badgeContent={
+                      notification.length > 9
+                        ? "9+"
+                        : notification.length.toString()
+                    }
+                    color="primary"
+                    onClick={() => {
+                      dispatch(setNotificationToggle());
+                    }}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        minWidth: "27px", // Ensures enough space for two-digit numbers
+                        height: "27px",
+                        fontSize: "0.75rem", // Adjust font size
+                        padding: "0 6px", // Ensures content fits
+                      },
+                    }}
+                  >
+                    <Typography variant="h6"><MessageIcon /></Typography>
+                    
+                  </Badge>
+                </Typography>
+                <NotificationPanel></NotificationPanel>
                 <MenuIcon
                   onClick={() => {
                     dispatch(sideNavToggle());
@@ -150,7 +213,7 @@ function Navbar() {
                 }}
               >
                 <NavLink
-                  to="/login" 
+                  to="/login"
                   className={({ isActive }) =>
                     isActive ? "isActive" : "isNotActive"
                   }

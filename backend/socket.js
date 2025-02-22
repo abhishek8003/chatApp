@@ -54,7 +54,7 @@ io_server.on("connection", (clientSocket) => {
         
         clientSocket.emit("getAllUsersExceptMe", allUsers);
     });
-    clientSocket.on("sendMessage", (messageBody) => {
+    clientSocket.on("sendMessage", async(messageBody) => {
         console.log("messageBOdy", messageBody);
         console.log("onlineUSersss", online_users.length);
         if (online_users.find((u) => {
@@ -67,8 +67,16 @@ io_server.on("connection", (clientSocket) => {
                     return r;
                 }
             });
+            // let sender=await User.findById(messageBody.senderId);
 
             io_server.to(reciever.socketId).emit("recieveMessageLive", {
+                createdAt:new Date(Date.now()),
+                senderId: messageBody.senderId,
+                recieverId: messageBody.recieverId,
+                text: messageBody.message_text,
+                image: messageBody.message_image
+            });
+            io_server.to(reciever.socketId).emit("addNotification", {
                 createdAt:new Date(Date.now()),
                 senderId: messageBody.senderId,
                 recieverId: messageBody.recieverId,

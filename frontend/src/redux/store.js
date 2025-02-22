@@ -12,6 +12,8 @@ import messageImagePreviewReducer from "./features/messageImagePreview";
 import messageImagePreviewUrlReducer from "./features/messageImagePreviewUrl";
 import friendsSliceReducer from "./features/friends";
 import toggleDmReducer from "./features/toggleDm";
+import notificationToggleReducer from "./features/notificationToggle"
+import notificationReducer from "./features/notifications";
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -26,7 +28,9 @@ const store=configureStore({
         messageImagePreview:messageImagePreviewReducer,
         messageImagePreviewUrl:messageImagePreviewUrlReducer,
         friends:friendsSliceReducer,
-        toggleDm:toggleDmReducer
+        toggleDm:toggleDmReducer,
+        notificationToggle:notificationToggleReducer,
+        notification:notificationReducer
     }
 });
 export default store;

@@ -7,6 +7,7 @@ import { updateChats } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
 import { updateSelectedUser } from "./redux/features/selectedUser";
 import { addFriends, addNewFriend } from "./redux/features/friends";
+import { addNotification } from "./redux/features/notifications";
 
 const socketContext = createContext();
 
@@ -15,13 +16,11 @@ function SocketProvider({ children }) {
   let backendUrl = useContext(backendContext);
   const userAuth = useSelector((store) => store.userAuth);
   const [clientSocket, setClientSocket] = useState(null);
-  let selectedUser = useSelector((store) => {
-    return store.selectedUser;
-  });
-  let allUsers = useSelector((store) => {
-    return store.users;
-  });
+  let selectedUser = useSelector((store) => store.selectedUser);
   let isLoggedIn = !!userAuth;
+
+  const notificationSound = useRef(new Audio("/notificationSound.mp3"));
+
   useEffect(() => {
     if (isLoggedIn) {
       const socket = io(backendUrl, {
@@ -36,40 +35,38 @@ function SocketProvider({ children }) {
         console.log("Disconnected from socket server");
         setClientSocket(null);
       });
+
       socket.on("newUserRegistered", (newUser) => {
         dispatch(addNewUser(newUser));
       });
-      
+
       socket.on("error", (error) => {
         console.error("Socket error:", error);
       });
+
       socket.on("getOnlineUsers", (onlineUsers) => {
         console.log("online:");
         console.log(onlineUsers);
         dispatch(setOnlineUsers(onlineUsers));
       });
-      socket.on("addFriend",(data)=>{
-        console.log("new friend without reload:",data);
+
+      socket.on("addFriend", (data) => {
+        console.log("new friend without reload:", data);
         dispatch(addNewFriend(data));
       });
+
       return () => {
         console.log("socket requested disconnection!");
         socket.disconnect();
       };
     }
   }, [isLoggedIn]);
+
   useEffect(() => {
     if (selectedUser && clientSocket) {
       clientSocket.on("recieveMessageLive", (newMessage) => {
-        console.log(selectedUser._id);
-        console.log(newMessage.senderId.toString());
-        console.log(newMessage.image);
-        console.log(
-          `compare`,
-          selectedUser._id == newMessage.senderId.toString()
-        );
-        if (selectedUser._id == newMessage.senderId.toString()) {
-          console.log("recieved new message");
+        if (selectedUser._id === newMessage.senderId.toString()) {
+          console.log("received new message");
           dispatch(
             updateChats({
               senderId: newMessage.senderId,
@@ -83,24 +80,41 @@ function SocketProvider({ children }) {
           );
         }
       });
-      
+
       clientSocket.on("profileUpdated", (data) => {
-        console.log("PROFILE UPLADTEd");
-        console.log(data);
+        console.log("PROFILE UPDATED");
         dispatch(updateOneUser(data));
-        if(selectedUser._id==data._id){
+        if (selectedUser._id === data._id) {
           dispatch(updateSelectedUser(data));
         }
       });
     }
+
+    if (clientSocket) {
+      clientSocket.on("addNotification", (message) => {
+        console.log(message);
+        dispatch(addNotification(message));
+
+        const playSound = async () => {
+          try {
+            await notificationSound.current.play();
+          } catch (error) {
+            console.error("Audio play failed:", error);
+          }
+        };
+
+        playSound();
+      });
+    }
+
     return () => {
       if (clientSocket) {
-        clientSocket.off("recieveMessageLive"); // Clean up the listener
-        // Clean up the listener
+        clientSocket.off("recieveMessageLive");
+        clientSocket.off("addNotification");
       }
     };
-  }, [selectedUser]);
-  
+  }, [selectedUser, clientSocket]);
+
   return (
     <socketContext.Provider value={clientSocket}>
       {children}
