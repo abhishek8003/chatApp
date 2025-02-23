@@ -22,7 +22,7 @@ import { addFriends, intializeFriends } from "../../../redux/features/friends";
 import { changeDm } from "../../../redux/features/toggleDm";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import { changeGroupBox } from "../../../redux/features/toggleGroup";
-import CreateGroup from "./createGroup";
+import CreateGroup from "./CreateGroup";
 import store from "../../../redux/store";
 import { setSelectedGroup } from "../../../redux/features/selectedGroup";
 import { intializeGroups, setGroups } from "../../../redux/features/groups";
