@@ -12,6 +12,9 @@ function Home() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
   });
+  let selectedGroup = useSelector((store) => {
+    return store.selectedGroup;
+  });
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
@@ -27,12 +30,12 @@ function Home() {
       console.log(onlineUsers);
       dispatch(setOnlineUsers(onlineUsers));
     });
-    return ()=>{
+    return () => {
       clientSocket.off("getOnlineUsers");
       clientSocket.off("fetchAllUsers");
       // dispatch(setOnlineUsers(null));
-    }
-  },[]);
+    };
+  }, []);
   return (
     <>
       <Navbar></Navbar>
@@ -46,10 +49,10 @@ function Home() {
       >
         <Sidebar></Sidebar>
         <div style={{ flexGrow: "1", border: "2px solid yellow" }}>
-          {!selectedUser ? (
-            <MessagePlaceholder></MessagePlaceholder>
+          {!selectedUser && !selectedGroup ? (
+            <MessagePlaceholder />
           ) : (
-            <Messages></Messages>
+            <Messages />
           )}
         </div>
       </div>

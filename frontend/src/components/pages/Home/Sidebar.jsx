@@ -20,9 +20,16 @@ import BackendProvider, { backendContext } from "../../../BackendProvider";
 import CreateDm from "./CreateDm";
 import { addFriends, intializeFriends } from "../../../redux/features/friends";
 import { changeDm } from "../../../redux/features/toggleDm";
+import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import { changeGroupBox } from "../../../redux/features/toggleGroup";
+import CreateGroup from "./createGroup";
+import store from "../../../redux/store";
+import { setSelectedGroup } from "../../../redux/features/selectedGroup";
+import { intializeGroups, setGroups } from "../../../redux/features/groups";
 
 function Sidebar() {
   let [loadingUserFriends, setloadingUserFriends] = useState(true);
+  let [loadingUserGroups, setloadingUserGroups] = useState(true);
   let friends = useSelector((store) => {
     return store.friends;
   });
@@ -38,9 +45,18 @@ function Sidebar() {
   let clientSocket = useContext(socketContext);
   let backendUrl = useContext(backendContext);
   let handleSelectUser = (user) => {
+    dispatch(setSelectedUser(null));
+    dispatch(setSelectedGroup(null));
     console.log("selecting a user", user);
     dispatch(setSelectedUser(user));
   };
+  let handleSelectGroup = (group) => {
+    dispatch(setSelectedUser(null));
+    dispatch(setSelectedGroup(null));
+    console.log("selecting a group", group);
+    dispatch(setSelectedGroup(group));
+  };
+
   let onlineUsers = useSelector((store) => {
     return store.onlineUsers;
   });
@@ -48,7 +64,9 @@ function Sidebar() {
   let toggleDm = useSelector((store) => {
     return store.toggleDm;
   });
-
+  let selectedGroup = useSelector((store) => {
+    return store.selectedGroup;
+  });
   useEffect(() => {
     let getAllFriends = async () => {
       dispatch(intializeFriends([]));
@@ -76,8 +94,33 @@ function Sidebar() {
         setloadingUserFriends(false);
       }
     };
+    let getAllGroups = async () => {
+      dispatch(intializeGroups([]));
+      try {
+        let response = await fetch(`${backendUrl}/api/groups/${userAuth._id}`, {
+          method: "GET",
+          credentials: "include",
+        });
+        let json = await response.json();
+        if (response.status === 200) {
+          console.log("current groups:", json.allGroups);
+          dispatch(setGroups(json.allGroups));
+        } else {
+          toast.error(json.message);
+        }
+      } catch (error) {
+        toast.error(error.message);
+        console.log(error);
+      } finally {
+        setloadingUserGroups(false);
+      }
+    };
     getAllFriends();
+    getAllGroups();
   }, []);
+  let groups = useSelector((store) => {
+    return store.groups;
+  });
 
   return (
     <Box
@@ -138,22 +181,87 @@ function Sidebar() {
           Contacts
         </Typography>
       </div>
-      {friends.length === 0 && !loadingUserFriends ? (
+      {groups.length === 0 &&
+      !loadingUserGroups &&
+      !loadingUserFriends &&
+      friends.length == 0 ? (
         <Typography
           sx={{
             textAlign: "center",
             padding: "20px",
             fontSize: "1rem",
             color: "#777",
-            display:"block",
+            display: "block",
             "@media (min-width:1px) and (max-width:600px)": {
               display: "none",
             },
           }}
         >
-          You have no friends. Add some friends to start chatting!
+          You have no Groups and No friend. Join some groups or friends to start
+          chatting!
         </Typography>
       ) : null}
+      {!loadingUserGroups ? (
+        <>
+          {groups.map((group) => {
+            return (
+              <div
+                key={group._id}
+                className="people_cont"
+                style={{
+                  display: "flex",
+                  height: "70px",
+                  alignItems: "center",
+                  backgroundColor:
+                    selectedGroup && selectedGroup._id === group._id
+                      ? "#3f51b5"
+                      : "",
+                  color:
+                    selectedGroup && selectedGroup._id === group._id
+                      ? "white"
+                      : "black",
+                  cursor: "pointer",
+                }}
+                onClick={() => handleSelectGroup(group)}
+              >
+                <Typography
+                  variant="h6"
+                  className="people_img"
+                  sx={{
+                    display: "flex",
+                    position: "relative",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  <img src={group.groupIcon.cloud_url} alt="Group" />
+                </Typography>
+                <Typography
+                  variant="body1"
+                  sx={{
+                    flexGrow: "1",
+                    display: "flex",
+                    flexDirection: "column",
+                    wordBreak: "break-all",
+                    "@media (max-width:600px)": {
+                      display: "none",
+                    },
+                  }}
+                >
+                  {group.groupName}
+                </Typography>
+              </div>
+            );
+          })}
+        </>
+      ) : (
+        <>
+          {new Array(2).fill(null).map(() => {
+            return <UserCardSkeltion></UserCardSkeltion>;
+          })}
+        </>
+      )}
+
       {!loadingUserFriends ? (
         <>
           {friends.map((user) => {
@@ -327,6 +435,28 @@ function Sidebar() {
               Create new DM
             </Typography>
             <ControlPointIcon
+              className="add_dm_icon"
+              sx={{ display: { xs: "inline-block", sm: "none" } }}
+            />
+          </div>
+          <CreateGroup></CreateGroup>
+          <div
+            style={{
+              display: "flex",
+              height: "70px",
+              alignItems: "center",
+              justifyContent: "center",
+              border: "2px solid red",
+              fontSize: "1.5rem",
+            }}
+            onClick={() => {
+              dispatch(changeGroupBox());
+            }}
+          >
+            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+              Create new Group!
+            </Typography>
+            <GroupAddIcon
               className="add_dm_icon"
               sx={{ display: { xs: "inline-block", sm: "none" } }}
             />

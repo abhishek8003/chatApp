@@ -12,47 +12,88 @@ import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
 import MessageImagePreview from "./MessageImagePreview";
+import { setGroups } from "../../../redux/features/groups";
+import GroupHeader from "./GroupHeader";
+import GroupBody from "./GroupBody";
+import { setGroupChat } from "../../../redux/features/groupChats";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
   });
-  let gettingChats=useSelector((store)=>{
-    return store.gettingChats
+  let selectedGroup = useSelector((store) => {
+    return store.selectedGroup;
   });
-  let users=useSelector((store)=>{
+  let gettingChats = useSelector((store) => {
+    return store.gettingChats;
+  });
+  let users = useSelector((store) => {
     return store.users;
   });
-  let messageImagePreview=useSelector((store)=>{
+  let groups = useSelector((store) => {
+    return store.groups;
+  });
+  let messageImagePreview = useSelector((store) => {
     return store.messageImagePreviewReducer;
-  })
-  let backendUrl=useContext(backendContext);
-  let clientSocket=useContext(socketContext)
-  useEffect(()=>{
-    dispatch(setGettingChats(true));
-    let fetchChats=async()=>{
-      try {
-        let response=await fetch(`${backendUrl}/api/chats/${selectedUser._id}`,{
-          method:"GET",
-          credentials:"include"
-        });
-        let json=await response.json();
-        if(response.status===200){
-          console.log(json.allMessages);
-          dispatch(setChats(json.allMessages))
+  });
+  let backendUrl = useContext(backendContext);
+  let clientSocket = useContext(socketContext);
+  useEffect(() => {
+    if (selectedUser) {
+      dispatch(setGettingChats(true));
+      let fetchChats = async () => {
+        try {
+          let response = await fetch(
+            `${backendUrl}/api/chats/${selectedUser._id}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+          let json = await response.json();
+          if (response.status === 200) {
+            console.log(json.allMessages);
+            dispatch(setChats(json.allMessages));
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error.message);
+        } finally {
+          dispatch(setGettingChats(false));
         }
-      } catch (error) {
-        console.log(error);
-        toast.error(error.message)
-      }
-      finally{
-        dispatch(setGettingChats(false));
-      }
+      };
+      fetchChats();
     }
-    fetchChats();
-  },[selectedUser]);
+  }, [selectedUser]);
+  useEffect(() => {
+    if (selectedGroup) {
+      dispatch(setGettingChats(true));
+      let fetchChats = async () => {
+        try {
+          let response = await fetch(
+            `${backendUrl}/api/groups/group/${selectedGroup._id}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+          let json = await response.json();
+          if (response.status === 200) {
+            console.log(json.group);
+            dispatch(setGroupChat(json.group));
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error.message);
+        } finally {
+          dispatch(setGettingChats(false));
+        }
+      };
+      fetchChats();
+    }
+  }, [selectedGroup]);
 
-  let dispatch=useDispatch();
-  console.log(selectedUser);
+  let dispatch = useDispatch();
+
   return (
     <Box
       sx={{
@@ -60,17 +101,44 @@ function Messages() {
         display: "flex",
         flexDirection: "column",
         minWidth: "80px",
-        position:"relative",
+        position: "relative",
       }}
     >
-      <ChatHeader></ChatHeader>
-      
-      {gettingChats?<ChatbodySkeltion></ChatbodySkeltion>:
-      <>
-      <MessageImagePreview></MessageImagePreview>
-      <ChatBody></ChatBody>
-      </>}
-      <CreateMessage></CreateMessage>
+      {selectedUser ? (
+        <>
+          <ChatHeader></ChatHeader>
+
+          {gettingChats ? (
+            <ChatbodySkeltion></ChatbodySkeltion>
+          ) : (
+            <>
+              <MessageImagePreview></MessageImagePreview>
+              <ChatBody></ChatBody>
+            </>
+          )}
+          <CreateMessage></CreateMessage>
+        </>
+      ) : (
+        <></>
+      )}
+      {selectedGroup ? (
+        <>
+          <>
+            <GroupHeader></GroupHeader>
+            {gettingChats ? (
+              <ChatbodySkeltion></ChatbodySkeltion>
+            ) : (
+              <>
+                <MessageImagePreview></MessageImagePreview>
+                <GroupBody></GroupBody>
+              </>
+            )}
+            <CreateMessage></CreateMessage>
+          </>
+        </>
+      ) : (
+        <></>
+      )}
     </Box>
   );
 }

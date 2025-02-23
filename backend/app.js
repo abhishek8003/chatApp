@@ -10,6 +10,7 @@ const message_router = require("./routes/message.route");
 const auth_router = require(`${path.join(__dirname, "/routes/auth.route")}`);
 // const app = express();
 const {http_server,app}=require("./socket");
+const group_route = require("./routes/group.route");
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("connected to mongoDB");
 }).catch((err) => {
@@ -33,6 +34,7 @@ app.use(express.json());
 app.use("/api/auth", auth_router);
 app.use("/api/users", user_router)
 app.use("/api/chats",message_router);
+app.use("/api/groups",group_route)
 app.get("*",(req,res,next)=>{
     res.redirect(process.env.frontendURL);
 })

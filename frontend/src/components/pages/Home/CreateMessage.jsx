@@ -7,7 +7,11 @@ import { setChats, updateChats } from "../../../redux/features/Chats";
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
+import { setGroupChat } from "../../../redux/features/groupChats";
 function CreateMessage() {
+  let selectedGroup = useSelector((store) => {
+    return store.selectedGroup;
+  });
   let backendUrl = useContext(backendContext);
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -25,7 +29,6 @@ function CreateMessage() {
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
-
   let dispatch = useDispatch();
   let handleFilePreview = () => {
     setPreview(true);
@@ -45,63 +48,113 @@ function CreateMessage() {
     setSendingMessage(true);
     let text = myForm.newMessage.value;
     let imgTempUrl = previewUrl;
-    dispatch(
-      updateChats({
-        senderId: userAuth._id,
-        receiverId: selectedUser._id,
-        text: text,
-        image: {
-          local_url: "",
-          cloud_url: imgTempUrl,
-        },
-      })
-    );
-    clientSocket.emit("sendMessage", {
-      senderId: userAuth._id,
-      recieverId: selectedUser._id,
-      message_text: text,
-      message_image: imgTempUrl,
-    });
-    setPreview(false);
-    console.log(`logged socket after emiting:`, clientSocket);
-
-    let file = myForm.messageFile && myForm.messageFile.files[0];
-    console.log(text);
-    console.log(file);
-    if (!text && !file) {
-      return;
-    }
-    let formData = new FormData();
-    if (text) {
-      formData.append("messageText", text);
-    }
-    if (file) {
-      formData.append("messageImage", file);
-    }
-    try {
-      let response = await fetch(
-        `${backendUrl}/api/chats/${selectedUser._id}`,
-        {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        }
+    if (selectedUser) {
+      dispatch(
+        updateChats({
+          senderId: userAuth._id,
+          receiverId: selectedUser._id,
+          text: text,
+          image: {
+            local_url: "",
+            cloud_url: imgTempUrl,
+          },
+        })
       );
-      let json = await response.json();
-      if (response.status === 200) {
-        console.log(json.newMessage);
-        // dispatch(setChats([...chats, json.newMessage]));
-        setMessageText("");
-        inputFile.current.value = "";
-        setSendingMessage(false);
-        setPreview(false);
-        setPreviewUrl(null);
+
+      clientSocket.emit("sendMessage", {
+        senderId: userAuth._id,
+        recieverId: selectedUser._id,
+        message_text: text,
+        message_image: imgTempUrl,
+      });
+      setPreview(false);
+      console.log(`logged socket after emiting:`, clientSocket);
+
+      let file = myForm.messageFile && myForm.messageFile.files[0];
+      console.log(text);
+      console.log(file);
+      if (!text && !file) {
+        return;
       }
-    } catch (error) {
-      console.log(error);
-      toast.error(error);
-    } finally {
-      setSendingMessage(false);
+      let formData = new FormData();
+      if (text) {
+        formData.append("messageText", text);
+      }
+      if (file) {
+        formData.append("messageImage", file);
+      }
+      try {
+        let response = await fetch(
+          `${backendUrl}/api/chats/${selectedUser._id}`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        let json = await response.json();
+        if (response.status === 200) {
+          console.log(json.newMessage);
+          // dispatch(setChats([...chats, json.newMessage]));
+          setMessageText("");
+          inputFile.current.value = "";
+          setSendingMessage(false);
+          setPreview(false);
+          setPreviewUrl(null);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error(error);
+      } finally {
+        setSendingMessage(false);
+      }
+    }
+    if (selectedGroup) {
+      let file = myForm.messageFile && myForm.messageFile.files[0];
+      console.log(text);
+      console.log(file);
+      if (!text && !file) {
+        return;
+      }
+      let formData = new FormData();
+      if (text) {
+        formData.append("messageText", text);
+      }
+      if (file) {
+        formData.append("messageImage", file);
+      }
+      try {
+        clientSocket.emit("addGroupMessage",{
+          selectedGroup:selectedGroup._id,
+          messageBody:{
+            messageText:text,
+            messageImage:previewUrl
+          }
+        });
+        let response = await fetch(
+          `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
+        let json = await response.json();
+        if (response.status === 200) {
+          console.log(json.group);
+          dispatch(setGroupChat(json.group));
+          setMessageText("");
+          inputFile.current.value = "";
+          setSendingMessage(false);
+          setPreview(false);
+          setPreviewUrl(null);
+        }
+      } catch (error) {
+        console.log(error);
+        toast.error(error);
+      } finally {
+        setSendingMessage(false);
+      }
     }
   };
   return (

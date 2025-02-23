@@ -1,8 +1,9 @@
-import { Box, Typography } from "@mui/material";
-import React, { useEffect, useRef } from "react";
+import { Box, Typography, Avatar, Card, CardMedia, CardContent } from "@mui/material";
+import React, { useContext, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setmessageImagePreviewUrl } from "../../../redux/features/messageImagePreviewUrl";
 import { messageImagePreviewToggle } from "../../../redux/features/messageImagePreview";
+import { backendContext } from "../../../BackendProvider";
 
 function ChatBody() {
   const selectedUser = useSelector((store) => store.selectedUser);
@@ -10,10 +11,10 @@ function ChatBody() {
   const chats = useSelector((store) => store.chats);
   const chatContainer = useRef();
   const scrollTo = useRef();
-  let dispatch = useDispatch();
+  const backendUrl = useContext(backendContext);
+  const dispatch = useDispatch();
 
-  let handleImagePreview = (imageUrl) => {
-    console.log(imageUrl);
+  const handleImagePreview = (imageUrl) => {
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
   };
@@ -23,108 +24,118 @@ function ChatBody() {
   }, [chats]);
 
   return (
-    <div
+    <Box
       ref={chatContainer}
-      style={{
+      sx={{
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
         width: "100%",
-        border: "2px solid blue",
+        border: "2px solid #1976d2",
+        borderRadius: "8px",
+        padding: "16px",
+        backgroundColor: "#f5f5f5",
       }}
     >
       {chats.length > 0 ? (
         chats.map((chat) => {
-          const isSender = chat.senderId === userAuth._id;
-          const profilePic = isSender
-            ? userAuth.profilePic?.cloud_url
-            : selectedUser.profilePic?.cloud_url;
+          if (!chat.isGroupChat) {
+            const isSender = chat.senderId === userAuth._id;
+            const profilePic = isSender
+              ? userAuth.profilePic?.cloud_url
+              : selectedUser.profilePic?.cloud_url;
 
-          return (
-            <Box
-              key={chat.id}
-              sx={{
-                display: "flex",
-                gap: "2px",
-                flexDirection: "row",
-                marginBottom: "20px",
-              }}
-            >
-              <div
-                style={{
+            return (
+              <Box
+                key={chat._id}
+                sx={{
                   display: "flex",
-                  justifyContent: isSender ? "flex-end" : "flex-start",
-                  width: "100%",
+                  gap: "8px",
+                  flexDirection: isSender ? "row-reverse" : "row",
+                  marginBottom: "16px",
                 }}
               >
-                <div style={{ display: "flex" }}>
-                  <img src={profilePic} width={50} height={50} alt="Profile" style={{ borderRadius: "50%" }} />
+                <Avatar
+                  src={profilePic || `${backendUrl}/images/default_profile_icon.png`}
+                  sx={{ width: 50, height: 50 }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: isSender ? "flex-end" : "flex-start",
+                    maxWidth: "70%",
+                  }}
+                >
+                  <Typography variant="caption" sx={{ color: "text.secondary", marginBottom: "4px" }}>
+                    {isSender ? "You" : selectedUser.fullName}
+                  </Typography>
                   {chat.image && chat.image.cloud_url ? (
-                    <div
-                      className="card"
-                      style={{
-                        width: "100%",
-                        maxWidth: "300px",
-                        borderRadius: "1rem",
+                    <Card
+                      sx={{
+                        borderRadius: "12px",
                         boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                        "&:hover": {
+                          boxShadow: "0 6px 8px rgba(0, 0, 0, 0.15)",
+                        },
                       }}
                     >
-                      <img
-                        src={chat.image.cloud_url}
-                        onClick={() => {
-                          handleImagePreview(chat.image.cloud_url);
-                        }}
-                        className="card-img-top rounded-top"
+                      <CardMedia
+                        component="img"
+                        image={chat.image.cloud_url}
                         alt="Chat Image"
-                        style={{
+                        sx={{
                           width: "100%",
                           height: "auto",
-                          borderRadius: "1rem",
+                          borderRadius: "12px 12px 0 0",
+                          cursor: "pointer",
                         }}
+                        onClick={() => handleImagePreview(chat.image.cloud_url)}
                       />
                       {chat.text && (
-                        <div className="card-body text-center">
-                          <Typography
-                            variant="body2"
-                            className="card-text bg-light p-3 rounded"
-                          >
+                        <CardContent sx={{ padding: "8px 16px" }}>
+                          <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
                             {chat.text}
                           </Typography>
-                        </div>
+                        </CardContent>
                       )}
-                    </div>
+                    </Card>
                   ) : (
-                    <Typography
-                      variant="body1"
-                      style={{
-                        backgroundColor: "#f0f0f0",
-                        padding: "10px",
-                        borderRadius: "8px",
-                        wordBreak: "break-word",
-                        maxWidth: "300px",
+                    <Box
+                      sx={{
+                        backgroundColor: isSender ? "#1976d2" : "#ffffff",
+                        color: isSender ? "#ffffff" : "#000000",
+                        padding: "8px 16px",
+                        borderRadius: "12px",
                         boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                        wordBreak: "break-word",
                       }}
                     >
-                      {chat.text}
-                    </Typography>
+                      <Typography variant="body1">{chat.text}</Typography>
+                    </Box>
                   )}
-                </div>
-              </div>
-            </Box>
-          );
+                </Box>
+              </Box>
+            );
+          }
+          return null; // Skip rendering for group chats
         })
       ) : (
-        <div
-          className="d-flex justify-content-center align-items-center"
-          style={{ height: "100%" }}
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
         >
-          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem", color: "text.secondary" }}>
             No messages!
           </Typography>
-        </div>
+        </Box>
       )}
       <div ref={scrollTo} style={{ visibility: "hidden" }}></div>
-    </div>
+    </Box>
   );
 }
 

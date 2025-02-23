@@ -12,8 +12,12 @@ import messageImagePreviewReducer from "./features/messageImagePreview";
 import messageImagePreviewUrlReducer from "./features/messageImagePreviewUrl";
 import friendsSliceReducer from "./features/friends";
 import toggleDmReducer from "./features/toggleDm";
+import toggleGroupReducer from "./features/toggleGroup";
 import notificationToggleReducer from "./features/notificationToggle"
 import notificationReducer from "./features/notifications";
+import groupReducer from "./features/groups";
+import selectGroupReducer from "./features/selectedGroup"
+import groupChatReducer from "./features/groupChats"
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -29,8 +33,12 @@ const store=configureStore({
         messageImagePreviewUrl:messageImagePreviewUrlReducer,
         friends:friendsSliceReducer,
         toggleDm:toggleDmReducer,
+        toggleGroup:toggleGroupReducer,
         notificationToggle:notificationToggleReducer,
-        notification:notificationReducer
+        notification:notificationReducer,
+        groups:groupReducer,
+        groupChat:groupChatReducer,
+        selectedGroup:selectGroupReducer
     }
 });
 export default store;

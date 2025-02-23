@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema({
+    isGroupChat:{
+        type:Boolean,
+        required:true,
+        default:false
+    },
     senderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref:"user",

@@ -8,14 +8,17 @@ const message_router = express.Router();
 message_router.get("/:id", isAuthenticated, async (req, res, next) => {
     try {
         let senderId = req.user._id;
-        let recieverId = req.params.id;
+        let receiverId = req.params.id;
 
         let messages = await Message.find({
-            $or: [{ senderId: senderId, receiverId: recieverId },
-            { senderId: recieverId, receiverId: senderId }
-            ]
+            $or: [
+                { senderId: senderId, receiverId: receiverId },
+                { senderId: receiverId, receiverId: senderId }
+            ],
+            isGroupChat: false // Exclude group chats
         });
-        res.status(200).send({ allMessages: messages });//now useless
+        
+        res.status(200).send({ allMessages: messages });
     } catch (error) {
         console.log(error);
         res.status(500).send({ message: error.message })
