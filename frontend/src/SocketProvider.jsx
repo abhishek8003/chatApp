@@ -6,7 +6,7 @@ import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
 import { updateChats } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
 import { updateSelectedUser } from "./redux/features/selectedUser";
-import { addFriends, addNewFriend } from "./redux/features/friends";
+import { addFriends, addNewFriend, updateFriends } from "./redux/features/friends";
 import { addNotification } from "./redux/features/notifications";
 import { addGroup } from "./redux/features/groups";
 import { updateGroupChat } from "./redux/features/groupChats";
@@ -100,9 +100,8 @@ function SocketProvider({ children }) {
     clientSocket.on("profileUpdated", (data) => {
       console.log("Profile updated:", data);
       dispatch(updateOneUser(data));
-      if (selectedUser?._id === data._id) {
-        dispatch(updateSelectedUser(data));
-      }
+      dispatch(updateSelectedUser(data));
+      dispatch(updateFriends(data));
     });
 
     clientSocket.on("addNotification", (message) => {

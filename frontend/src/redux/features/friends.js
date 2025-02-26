@@ -11,6 +11,22 @@ const friendsSlice = createSlice({
             state=[...state,...action.payload]
             return state;
         },
+        updateFriends: (state, action) => {
+            console.log("updating friends.......");
+            
+            return state.map((user) => {
+                if (user._id === action.payload._id) {
+                    return {
+                        ...user,
+                        profilePic: {
+                            ...user.profilePic,
+                            cloud_url: action.payload.profilePic.cloud_url,
+                        },
+                    };
+                }
+                return user;
+            });
+        },
         addNewFriend: (state, action) => {
             console.log("Adding one friend"); 
             state=[...state,action.payload]
@@ -26,4 +42,4 @@ const friendsSlice = createSlice({
 });
 
 export default friendsSlice.reducer;
-export const { addFriends,intializeFriends,addNewFriend } = friendsSlice.actions;
+export const { addFriends,intializeFriends,addNewFriend,updateFriends } = friendsSlice.actions;

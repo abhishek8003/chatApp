@@ -68,7 +68,8 @@ function App() {
   if (isLoadingCheckAuth) {
     return (
       <Box sx={{ width: "100%" }}>
-        <LinearProgress color="success" />
+        <LinearProgress color="secondary" />
+        <p>Loading resources....</p>
       </Box>
     );
   } else {
