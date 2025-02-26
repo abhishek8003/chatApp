@@ -100,8 +100,10 @@ function SocketProvider({ children }) {
     clientSocket.on("profileUpdated", (data) => {
       console.log("Profile updated:", data);
       dispatch(updateOneUser(data));
-      dispatch(updateSelectedUser(data));
-      dispatch(updateFriends(data));
+      if (selectedUser?._id === data._id) {
+        dispatch(updateSelectedUser(data));
+        dispatch(updateFriends(data));
+      }
     });
 
     clientSocket.on("addNotification", (message) => {
