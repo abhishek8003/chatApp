@@ -102,8 +102,8 @@ function SocketProvider({ children }) {
       dispatch(updateOneUser(data));
       if (selectedUser?._id === data._id) {
         dispatch(updateSelectedUser(data));
-        dispatch(updateFriends(data));
       }
+      dispatch(updateFriends(data));
     });
 
     clientSocket.on("addNotification", (message) => {
