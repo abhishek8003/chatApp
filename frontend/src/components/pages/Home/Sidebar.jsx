@@ -26,7 +26,10 @@ import CreateGroup from "./CreateGroup";
 import store from "../../../redux/store";
 import { setSelectedGroup } from "../../../redux/features/selectedGroup";
 import { intializeGroups, setGroups } from "../../../redux/features/groups";
-import { deleteNotificationOfGroup, deleteNotificationOfUser } from "../../../redux/features/notifications";
+import {
+  deleteNotificationOfGroup,
+  deleteNotificationOfUser,
+} from "../../../redux/features/notifications";
 
 function Sidebar() {
   let [loadingUserFriends, setloadingUserFriends] = useState(true);
@@ -43,57 +46,50 @@ function Sidebar() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
   });
-  let notifications=useSelector((store)=>{
+  let notifications = useSelector((store) => {
     return store.notification;
-  })
+  });
   let clientSocket = useContext(socketContext);
   let backendUrl = useContext(backendContext);
   let handleSelectUser = (user) => {
     console.log(userAuth);
-    
     dispatch(deleteNotificationOfUser(user));
-    let targetUserNotifications=notifications.filter((e)=>{
-      if(e.senderId==user._id && e.recieverId==userAuth._id){
+    let targetUserNotifications = notifications.filter((e) => {
+      if (e.senderId == user._id && e.recieverId == userAuth._id) {
         return true;
       }
-    })
-    console.log("targetUserNotifications:",targetUserNotifications);
-    
-    let response =  fetch(
-      `${backendUrl}/api/notifications/`,
-      {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(targetUserNotifications[0]),
-      }
-    );
+    });
+    console.log("targetUserNotifications:", targetUserNotifications);
+
+    let response = fetch(`${backendUrl}/api/notifications/`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(targetUserNotifications[0]),
+    });
     dispatch(setSelectedUser(null));
     dispatch(setSelectedGroup(null));
     console.log("selecting a user", user);
     dispatch(setSelectedUser(user));
   };
   let handleSelectGroup = (group) => {
-    dispatch(deleteNotificationOfGroup(group))
-    let targetGroupNotifications=notifications.filter((e)=>{
-      if(e.receiverId==group._id){
+    dispatch(deleteNotificationOfGroup(group));
+    let targetGroupNotifications = notifications.filter((e) => {
+      if (e.receiverId == group._id) {
         return true;
       }
-    })
-    console.log("targetGroupNotifications:",targetGroupNotifications);
-    let response =  fetch(
-      `${backendUrl}/api/notifications/`,
-      {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(targetGroupNotifications[0]),
-      }
-    );
+    });
+    console.log("targetGroupNotifications:", targetGroupNotifications);
+    let response = fetch(`${backendUrl}/api/notifications/`, {
+      method: "DELETE",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(targetGroupNotifications[0]),
+    });
     dispatch(setSelectedUser(null));
     dispatch(setSelectedGroup(null));
     console.log("selecting a group", group);
