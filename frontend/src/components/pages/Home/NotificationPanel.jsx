@@ -138,7 +138,7 @@ function NotificationPanel() {
                   </Box>
                 );
               }
-              if (message.isGroupChat) {
+              if (message.isGroupChat && groups ) {
                 console.log(groups);
                 console.log(message.receiverId);
                 let targetGroup = groups.find((g) => {
@@ -205,7 +205,7 @@ function NotificationPanel() {
                       </Box>
 
                       <img
-                        src={targetGroup.groupIcon.cloud_url}
+                        src={targetGroup?targetGroup.groupIcon.cloud_url:""}
                         height="60"
                         width="60"
                         alt="Notification"

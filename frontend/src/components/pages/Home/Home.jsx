@@ -20,6 +20,9 @@ function Home() {
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
+  let groups=useSelector((store)=>{
+    return store.groups
+  })
   let dispatch = useDispatch();
   let clientSocket = useContext(socketContext);
   let backendUrl = useContext(backendContext);
@@ -36,10 +39,13 @@ function Home() {
       clientSocket.off("getOnlineUsers");
       clientSocket.off("fetchAllUsers");
       // dispatch(setOnlineUsers(null));
+      console.log("home unmouted!")
     };
   }, []);
   useEffect(() => {
     let fetchNotifications = async () => {
+      console.log("fetching notifications...");
+      
       try {
         if (userAuth) {
           let response = await fetch(
@@ -62,7 +68,10 @@ function Home() {
     };
     fetchNotifications();
   }, [userAuth]);
-
+useEffect(()=>{
+  console.log("groups changed!");
+  alert("groups changed!",groups)
+},[groups]);
   return (
     <>
       <Navbar></Navbar>

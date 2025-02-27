@@ -110,6 +110,7 @@ function Sidebar() {
     let getAllFriends = async () => {
       dispatch(intializeFriends([]));
       try {
+        console.log("fetching frieds.....");
         let response = await fetch(
           `${backendUrl}/api/users/${userAuth._id}/friends`,
           {
@@ -134,6 +135,8 @@ function Sidebar() {
       }
     };
     let getAllGroups = async () => {
+      console.log("fetching groups.....");
+      
       dispatch(intializeGroups([]));
       try {
         let response = await fetch(`${backendUrl}/api/groups/${userAuth._id}`, {
@@ -156,10 +159,15 @@ function Sidebar() {
     };
     getAllFriends();
     getAllGroups();
+    return ()=>{
+      console.log("sidebar unmouted");
+      
+    }
   }, []);
   let groups = useSelector((store) => {
     return store.groups;
   });
+  
 
   return (
     <Box

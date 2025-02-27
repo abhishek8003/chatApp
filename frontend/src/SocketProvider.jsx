@@ -122,17 +122,14 @@ function SocketProvider({ children }) {
 
       dispatch(addNotification(message));
       console.log("New notification:", message);
-      let response =  fetch(
-        `${backendUrl}/api/notifications/${userAuth._id}`,
-        {
-          method: "POST",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(message),
-        }
-      );
+      let response = fetch(`${backendUrl}/api/notifications/${userAuth._id}`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+      });
       // Play notification sound
       notificationSound.current.play().catch((error) => {
         console.error("Audio play failed:", error);
