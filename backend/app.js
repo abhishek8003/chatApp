@@ -11,6 +11,7 @@ const auth_router = require(`${path.join(__dirname, "/routes/auth.route")}`);
 // const app = express();
 const {http_server,app}=require("./socket");
 const group_route = require("./routes/group.route");
+const notification_router = require("./routes/notification.route");
 mongoose.connect(process.env.MONGO_URL).then(() => {
     console.log("connected to mongoDB");
 }).catch((err) => {
@@ -35,6 +36,7 @@ app.use("/api/auth", auth_router);
 app.use("/api/users", user_router)
 app.use("/api/chats",message_router);
 app.use("/api/groups",group_route)
+app.use("/api/notifications",notification_router);
 app.get("*",(req,res,next)=>{
     res.redirect(process.env.frontendURL);
 })

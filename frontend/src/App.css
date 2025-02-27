@@ -3,6 +3,13 @@
   margin: 0px;
   padding:0px;
 }
+#root{
+  min-height: 100vh !important;
+  min-width: 100vw !important;
+}
+.main-cont{
+  min-height: calc(100vh);
+}
 .isActive {
   color: red;
   text-decoration: none;

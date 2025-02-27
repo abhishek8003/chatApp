@@ -41,6 +41,7 @@ group_route.get("/group/:group_id", isAuthenticated, async (req, res, next) => {
 });
 const fs = require("fs");
 const mongoose = require("mongoose");
+const groupNotification = require("../models/groupNotification");
 
 group_route.post("/group/:group_id/message", upload_message_images.single("messageImage"), isAuthenticated, async (req, res, next) => {
     try {
@@ -74,6 +75,7 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             image: image
         });
 
+        let notificationImage=image?image.cloud_url:"";
         let savedMessage = await newMessage.save();
         console.log(savedMessage);
 
@@ -82,7 +84,20 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             { $push: { groupMessages: savedMessage._id } },
             { new: true }
         ).populate(["groupAdmin", "groupMembers", { path: "groupMessages", populate: "senderId" }]);
-
+        let notification = new groupNotification({
+            isGroupChat: true,
+            senderId: senderId,
+            receiverId: updatedGroup._id,
+            text: message_text,
+            image:notificationImage
+        });
+        try{
+            let response = await notification.save();
+        }
+        catch(err){
+            console.log(err);
+            
+        }
         res.json({ group: updatedGroup, message: "Group message saved!" });
     } catch (error) {
         console.error(error);

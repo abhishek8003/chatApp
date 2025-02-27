@@ -1,10 +1,15 @@
 import { Box, Modal, Typography, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotificationToggle } from "../../../redux/features/notificationToggle";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
 import { setSelectedGroup } from "../../../redux/features/selectedGroup";
+import {
+  deleteNotification,
+  intializeNotification,
+} from "../../../redux/features/notifications";
+import { backendContext } from "../../../BackendProvider";
 
 function NotificationPanel() {
   const { notificationToggle, notification, users } = useSelector((store) => ({
@@ -15,14 +20,14 @@ function NotificationPanel() {
   let groups = useSelector((store) => {
     return store.groups;
   });
-  let userAuth=useSelector((store) => {
+  let backendUrl=useContext(backendContext);
+  let userAuth = useSelector((store) => {
     return store.userAuth;
   });
   let selectedGroup = useSelector((store) => {
     return store.selectedGroup;
   });
   const dispatch = useDispatch();
-
   return (
     <Modal
       open={notificationToggle}
@@ -89,6 +94,18 @@ function NotificationPanel() {
                           }
                         });
                         console.log(senderUser);
+                        let response =  fetch(
+                          `${backendUrl}/api/notifications/`,
+                          {
+                            method: "DELETE",
+                            credentials: "include",
+                            headers: {
+                              "Content-Type": "application/json",
+                            },
+                            body: JSON.stringify(message),
+                          }
+                        );
+                        dispatch(deleteNotification(message));
                         dispatch(setSelectedGroup(null));
                         dispatch(setSelectedUser(senderUser));
                         dispatch(setNotificationToggle());
@@ -152,6 +169,18 @@ function NotificationPanel() {
                         textAlign={{ xs: "center", sm: "left" }}
                         onClick={() => {
                           console.log(targetGroup);
+                          dispatch(deleteNotification(message));
+                          let response =  fetch(
+                            `${backendUrl}/api/notifications/`,
+                            {
+                              method: "DELETE",
+                              credentials: "include",
+                              headers: {
+                                "Content-Type": "application/json",
+                              },
+                              body: JSON.stringify(message),
+                            }
+                          );
                           dispatch(setSelectedUser(null));
                           dispatch(setSelectedGroup(targetGroup));
                           dispatch(setNotificationToggle());
@@ -167,11 +196,7 @@ function NotificationPanel() {
                             {message.text}
                           </Typography>
                         )}
-                        {
-                          message.image.cloud_url&&(
-                            <p>image</p>
-                          )
-                        }
+                        {message.image.cloud_url && <p>image</p>}
                         {message.createdAt && (
                           <Typography variant="caption" color="gray" mt={0.5}>
                             {new Date(message.createdAt).toLocaleString()}

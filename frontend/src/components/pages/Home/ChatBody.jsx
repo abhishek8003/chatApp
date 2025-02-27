@@ -27,6 +27,7 @@ function ChatBody() {
     <Box
       ref={chatContainer}
       sx={{
+       
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",

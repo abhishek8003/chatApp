@@ -4,6 +4,7 @@ const Message = require('../models/messages');
 const upload_message_images = require("../storage/localConfig/messageImages");
 const cloudinary = require("../storage/cloudConfig/cloud");
 const { io_server } = require("../socket");
+const chatNotification = require("../models/chatNotification");
 const message_router = express.Router();
 message_router.get("/:id", isAuthenticated, async (req, res, next) => {
     try {
@@ -17,7 +18,7 @@ message_router.get("/:id", isAuthenticated, async (req, res, next) => {
             ],
             isGroupChat: false // Exclude group chats
         });
-        
+
         res.status(200).send({ allMessages: messages });
     } catch (error) {
         console.log(error);
@@ -45,13 +46,29 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                     public_id: responseFromCloud.public_id
                 }
             }
-            
+
             const newMessage = new Message({
                 senderId,
                 receiverId,
                 text: message_text,
                 image: image
             });
+            let notification_image=image?image.cloud_url:"";
+            let notificationToBeSaved = new chatNotification({
+                createdAt: new Date(Date.now()),
+                senderId: senderId,
+                recieverId: receiverId,
+                text: message_text,
+                image: notification_image,
+                isGroupChat: false
+            });
+            try {
+                let response = await notificationToBeSaved.save();
+                console.log(response);
+            }
+            catch (err) {
+                console.log(err);
+            }
             const result = await newMessage.save();
             console.log(result);
             res.status(200).json({ newMessage: result });

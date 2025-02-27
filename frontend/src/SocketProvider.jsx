@@ -6,7 +6,11 @@ import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
 import { updateChats } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
 import { updateSelectedUser } from "./redux/features/selectedUser";
-import { addFriends, addNewFriend, updateFriends } from "./redux/features/friends";
+import {
+  addFriends,
+  addNewFriend,
+  updateFriends,
+} from "./redux/features/friends";
 import { addNotification } from "./redux/features/notifications";
 import { addGroup } from "./redux/features/groups";
 import { updateGroupChat } from "./redux/features/groupChats";
@@ -106,10 +110,29 @@ function SocketProvider({ children }) {
       dispatch(updateFriends(data));
     });
 
-    clientSocket.on("addNotification", (message) => {
-      console.log("New notification:", message);
-      dispatch(addNotification(message));
+    clientSocket.on("addNotification", async (message) => {
+      if (selectedUser && message.senderId == selectedUser._id) {
+        console.log(message.senderId);
+        console.log(selectedUser._id);
+        notificationSound.current.play().catch((error) => {
+          console.error("Audio play failed:", error);
+        });
+        return;
+      }
 
+      dispatch(addNotification(message));
+      console.log("New notification:", message);
+      let response =  fetch(
+        `${backendUrl}/api/notifications/${userAuth._id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(message),
+        }
+      );
       // Play notification sound
       notificationSound.current.play().catch((error) => {
         console.error("Audio play failed:", error);
@@ -122,24 +145,35 @@ function SocketProvider({ children }) {
       clientSocket.off("profileUpdated");
       clientSocket.off("addNotification");
     };
-  }, [clientSocket, selectedUser, dispatch]);
+  }, [clientSocket, selectedUser, dispatch, userAuth]);
 
   // Handle group messages
   useEffect(() => {
-    if (!clientSocket || !selectedGroup || !groupChat) return;
+    if (!clientSocket) return;
 
     clientSocket.on("recieveGroupMessageLive", (data) => {
       console.log("Received group message:", data);
       dispatch(updateGroupChat(data));
     });
     clientSocket.on("addGroupNotification", (message) => {
+      if (selectedGroup && message.receiverId == selectedGroup._id) {
+        console.log(message.receiverId);
+        console.log(selectedGroup._id);
+        if (message.senderId == userAuth._id) {
+          return;
+        }
+        notificationSound.current.play().catch((error) => {
+          console.error("Audio play failed:", error);
+        });
+        return;
+      }
       console.log("New notification:", message);
+
       dispatch(addNotification(message));
       // Play notification sound
       notificationSound.current.play().catch((error) => {
         console.error("Audio play failed:", error);
       });
-
     });
     // Cleanup event listener
     return () => {

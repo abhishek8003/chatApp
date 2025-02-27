@@ -15,6 +15,8 @@ import { backendContext } from "../BackendProvider.jsx";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { setNotificationToggle } from "../redux/features/notificationToggle.js";
 import NotificationPanel from "./pages/Home/NotificationPanel.jsx";
+import { setSelectedGroup } from "../redux/features/selectedGroup.js";
+import { setSelectedUser } from "../redux/features/selectedUser.js";
 function Navbar() {
   let backendUrl = useContext(backendContext);
   let loggingOut = useSelector((store) => {
@@ -55,6 +57,8 @@ function Navbar() {
 
         clientSocket.emit("deleteOnlineUser", userAuth);
         dispatch(setUser(null));
+        dispatch(setSelectedGroup(null));
+        dispatch(setSelectedUser(null))
         toast.success(json.message);
       } else {
         toast.error(json.message);

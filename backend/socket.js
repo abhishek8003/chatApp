@@ -8,6 +8,8 @@ const io_server = new Server(http_server, {
     cors: { origin: `${process.env.frontendURL}` },
     maxHttpBufferSize: 1e8
 });
+const ChatNotification = require("./models/chatNotification")
+const GroupNotification = require("./models/groupNotification");
 
 let online_users = [];
 
@@ -74,14 +76,16 @@ io_server.on("connection", (clientSocket) => {
                 senderId: messageBody.senderId,
                 recieverId: messageBody.recieverId,
                 text: messageBody.message_text,
-                image: messageBody.message_image
+                image: messageBody.message_image,
+                isGroupChat: false
             });
             io_server.to(reciever.socketId).emit("addNotification", {
                 createdAt: new Date(Date.now()),
                 senderId: messageBody.senderId,
                 recieverId: messageBody.recieverId,
                 text: messageBody.message_text,
-                image: messageBody.message_image
+                image: messageBody.message_image,
+                isGroupChat: false
             });
         }
     });
@@ -131,7 +135,7 @@ io_server.on("connection", (clientSocket) => {
         // Emit the event to the room
         io_server.to(roomID).emit("createNewGroup", { newGroup: data.newGroup });
     });
-    clientSocket.on("addGroupMessage", (data) => {
+    clientSocket.on("addGroupMessage", async(data) => {
         let user = JSON.parse(clientSocket.handshake.query.user);
         let completeUser = online_users.find((u) => { if (u._id == user._id) { return true } });
 
@@ -162,6 +166,7 @@ io_server.on("connection", (clientSocket) => {
                     public_id: '',
                 }
             })
+            
         }
     })
     clientSocket.on("disconnect", () => {

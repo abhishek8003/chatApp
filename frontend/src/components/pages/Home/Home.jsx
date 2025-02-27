@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import Messages from "./Messages";
 import { socketContext } from "../../../SocketProvider";
 import { setOnlineUsers } from "../../../redux/features/onlineUsers";
+import { backendContext } from "../../../BackendProvider";
+import { intializeNotification } from "../../../redux/features/notifications";
 
 function Home() {
   let selectedUser = useSelector((store) => {
@@ -20,7 +22,7 @@ function Home() {
   });
   let dispatch = useDispatch();
   let clientSocket = useContext(socketContext);
-
+  let backendUrl = useContext(backendContext);
   useEffect(() => {
     console.log("setted x");
     clientSocket.emit("fetchAllUsers"); //to set all_users
@@ -36,6 +38,31 @@ function Home() {
       // dispatch(setOnlineUsers(null));
     };
   }, []);
+  useEffect(() => {
+    let fetchNotifications = async () => {
+      try {
+        if (userAuth) {
+          let response = await fetch(
+            `${backendUrl}/api/notifications/${userAuth._id}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
+          let json = await response.json();
+          if (response.status == 200) {
+            console.log("current notifications:", json.all_notifications);
+            dispatch(intializeNotification(json.all_notifications));
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        
+      }
+    };
+    fetchNotifications();
+  }, [userAuth]);
+
   return (
     <>
       <Navbar></Navbar>
