@@ -70,7 +70,7 @@ function Home() {
   }, [userAuth]);
 useEffect(()=>{
   console.log("groups changed!");
-  alert("groups changed!",groups)
+  // alert("groups changed!",groups)
 },[groups]);
   return (
     <>
