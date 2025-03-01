@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
 import CloseIcon from "@mui/icons-material/Close";
 import { Typography } from "@mui/material";
-import AccountInfo from "./accountInfo";
+import AccountInfo from "./AccountInfo";
 import {  setaccountInfoToggle } from "../../../redux/features/accountInfoToggle";
 function ChatHeader() {
     let selectedUser = useSelector((store) => {
