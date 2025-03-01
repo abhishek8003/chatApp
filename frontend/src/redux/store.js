@@ -18,6 +18,10 @@ import notificationReducer from "./features/notifications";
 import groupReducer from "./features/groups";
 import selectGroupReducer from "./features/selectedGroup"
 import groupChatReducer from "./features/groupChats"
+import accountInfoToggleReducer from "./features/accountInfoToggle"
+import groupInfoToggleReducer from "./features/groupInfoToggle"
+import accountDetailViewReducer from "./features/accountDetailView";
+import groupDetailViewReducer from "./features/groupDetailView";
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -38,7 +42,11 @@ const store=configureStore({
         notification:notificationReducer,
         groups:groupReducer,
         groupChat:groupChatReducer,
-        selectedGroup:selectGroupReducer
+        selectedGroup:selectGroupReducer,
+        accountInfoToggle:accountInfoToggleReducer,
+        groupInfoToggle:groupInfoToggleReducer,
+        accountDetailView:accountDetailViewReducer,
+        groupDetailView:groupDetailViewReducer
     }
 });
 export default store;

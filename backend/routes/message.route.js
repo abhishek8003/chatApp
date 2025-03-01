@@ -20,6 +20,8 @@ message_router.get("/:id", isAuthenticated, async (req, res, next) => {
         });
 
         res.status(200).send({ allMessages: messages });
+
+
     } catch (error) {
         console.log(error);
         res.status(500).send({ message: error.message })
@@ -53,7 +55,7 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                 text: message_text,
                 image: image
             });
-            let notification_image=image?image.cloud_url:"";
+            let notification_image = image ? image.cloud_url : "";
             let notificationToBeSaved = new chatNotification({
                 createdAt: new Date(Date.now()),
                 senderId: senderId,

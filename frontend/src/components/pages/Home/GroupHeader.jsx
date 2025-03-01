@@ -1,14 +1,20 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
 import CloseIcon from "@mui/icons-material/Close";
 import { Typography } from "@mui/material";
 import { setSelectedGroup } from "../../../redux/features/selectedGroup";
+import { setGroupInfoToggle } from "../../../redux/features/groupInfoToggle";
+import GroupInfo from "./GroupInfo";
 function GroupHeader() {
-    let selectedGroup = useSelector((store) => {
-        return store.selectedGroup;
-      });
-      let dispatch=useDispatch();
+  let selectedGroup = useSelector((store) => {
+    return store.selectedGroup;
+  });
+  let dispatch = useDispatch();
+  let targetElement = useRef();
+  useEffect(() => {
+    console.log(targetElement.current);
+  }, [targetElement]);
   return (
     <div
       className="chat-head-main"
@@ -21,8 +27,8 @@ function GroupHeader() {
     >
       <div
         style={{
-        //   width: "301px",
-        //   border: "2px solid red",
+          //   width: "301px",
+          //   border: "2px solid red",
           padding: "0.5rem",
         }}
       >
@@ -30,7 +36,12 @@ function GroupHeader() {
           style={{
             display: "flex",
             color: "black",
+            // border: "2px solid red",
           }}
+          onClick={() => {
+            dispatch(setGroupInfoToggle());
+          }}
+          ref={targetElement}
         >
           <Typography
             variant="h6"
@@ -74,6 +85,7 @@ function GroupHeader() {
           }}
         ></CloseIcon>
       </div>
+      <GroupInfo targetElement={targetElement}></GroupInfo>
     </div>
   );
 }

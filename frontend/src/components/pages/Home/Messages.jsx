@@ -16,6 +16,7 @@ import { setGroups } from "../../../redux/features/groups";
 import GroupHeader from "./GroupHeader";
 import GroupBody from "./GroupBody";
 import { setGroupChat } from "../../../redux/features/groupChats";
+import AccountInfo from "./accountInfo";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -66,6 +67,7 @@ function Messages() {
   }, [selectedUser]);
   useEffect(() => {
     if (selectedGroup) {
+      dispatch(setGroupChat(null));
       dispatch(setGettingChats(true));
       let fetchChats = async () => {
         try {
@@ -107,7 +109,6 @@ function Messages() {
       {selectedUser ? (
         <>
           <ChatHeader></ChatHeader>
-
           {gettingChats ? (
             <ChatbodySkeltion></ChatbodySkeltion>
           ) : (

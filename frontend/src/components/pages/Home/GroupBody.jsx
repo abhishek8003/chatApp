@@ -19,11 +19,12 @@ function GroupBody() {
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
   };
-
+  
   useEffect(() => {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
-  }, [groupChat.groupMessages]);
+  }, [groupChat?.groupMessages]);
 
+  
   return (
     <Box
       ref={chatContainer}

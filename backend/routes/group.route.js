@@ -31,8 +31,11 @@ group_route.get("/group/:group_id", isAuthenticated, async (req, res, next) => {
     try {
         let groupId = req.params.group_id;
         let completeGroup = await Group.findById(groupId).populate(["groupAdmin", "groupMembers", { path: "groupMessages", populate: "senderId" }]);
-
+        // setTimeout(()=>{
+        //     res.status(200).send({ group: completeGroup });
+        // },5000)
         res.status(200).send({ group: completeGroup });
+        
     } catch (error) {
         console.log(error);
         res.status(500).send({ message: error.message })

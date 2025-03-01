@@ -30,6 +30,7 @@ import {
   deleteNotificationOfGroup,
   deleteNotificationOfUser,
 } from "../../../redux/features/notifications";
+import { setGroupChat } from "../../../redux/features/groupChats";
 
 function Sidebar() {
   let [loadingUserFriends, setloadingUserFriends] = useState(true);

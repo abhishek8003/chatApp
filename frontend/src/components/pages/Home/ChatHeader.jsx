@@ -1,18 +1,22 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
 import CloseIcon from "@mui/icons-material/Close";
 import { Typography } from "@mui/material";
+import AccountInfo from "./accountInfo";
+import {  setaccountInfoToggle } from "../../../redux/features/accountInfoToggle";
 function ChatHeader() {
     let selectedUser = useSelector((store) => {
         return store.selectedUser;
       });
       let dispatch=useDispatch();
+      let anchorElement=useRef();
   return (
     <div
       className="chat-head-main"
       style={{
         border: "2px solid brown",
+        position:"relative",
         // padding: "10px",
         display: "flex",
         justifyContent: "space-between",
@@ -29,6 +33,12 @@ function ChatHeader() {
           style={{
             display: "flex",
             color: "black",
+            // border: "2px solid red",
+          }}
+          ref={anchorElement}
+          onClick={()=>{
+            console.log("tiiiajfajfaimfpamsf");
+            dispatch(setaccountInfoToggle());
           }}
         >
           <Typography
@@ -49,8 +59,10 @@ function ChatHeader() {
               flexGrow: "1",
               height: "70px",
               display: "flex",
+            
               alignItems: "center",
             }}
+           
           >
             {selectedUser.fullName}
           </Typography>
@@ -58,7 +70,7 @@ function ChatHeader() {
       </div>
       <div
         style={{
-          // border: "2px solid red",
+         
           padding: "0.5rem",
         }}
         onClick={() => {
@@ -73,6 +85,7 @@ function ChatHeader() {
           }}
         ></CloseIcon>
       </div>
+      <AccountInfo targetElement={anchorElement}></AccountInfo>
     </div>
   );
 }

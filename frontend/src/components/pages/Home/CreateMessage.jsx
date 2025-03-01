@@ -58,6 +58,7 @@ function CreateMessage() {
             local_url: "",
             cloud_url: imgTempUrl,
           },
+          createdAt:new Date(Date.now())
         })
       );
 
@@ -128,7 +129,8 @@ function CreateMessage() {
           selectedGroup:selectedGroup._id,
           messageBody:{
             messageText:text,
-            messageImage:previewUrl
+            messageImage:previewUrl,
+            createdAt:new Date(Date.now())
           }
         });
         let response = await fetch(
