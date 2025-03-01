@@ -16,7 +16,7 @@ import { setGroups } from "../../../redux/features/groups";
 import GroupHeader from "./GroupHeader";
 import GroupBody from "./GroupBody";
 import { setGroupChat } from "../../../redux/features/groupChats";
-import AccountInfo from "./accountInfo";
+import AccountInfo from "./AccountInfo";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
