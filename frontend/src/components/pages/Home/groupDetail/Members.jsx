@@ -6,7 +6,7 @@ import { backendContext } from "../../../../BackendProvider";
 import toast from "react-hot-toast";
 import { socketContext } from "../../../../SocketProvider";
 import { setaddGroupMemberToggle } from "../../../../redux/features/addGroupMemberToggle";
-import AddGroupMembers from "../../../addGroupMembers";
+import AddGroupMembers from "../../../AddGroupMembers";
 
 function Members() {
   const groupChat = useSelector((store) => store.groupChat);
