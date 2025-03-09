@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const express = require("express");
 const http = require("http");
 const User = require("./models/users");
+const Group = require("./models/group")
 const app = express();
 const http_server = http.createServer(app);
 const io_server = new Server(http_server, {
@@ -90,20 +91,56 @@ io_server.on("connection", (clientSocket) => {
         }
     });
     clientSocket.on("joinGroups", (data) => {
-        console.log("group to be jooined:", data.groups,);
+        console.log("group to be joined:", data.groups);
+
         let user = JSON.parse(clientSocket.handshake.query.user);
-        let userWithSocket = online_users.find((e) => {
-            if (e._id == user._id) {
-                return true
-            }
-        });
-        let groupsToBeJoined = data.groups;
-        let socketID = userWithSocket?.socketId;
+        console.log("Requesting User who wanna join a group:", user);
+        let userWithSocket = online_users.find((e) => e._id === user._id);
+
+        if (!userWithSocket) {
+            console.log("User not found in online users:", user._id);
+            return;
+        }
+
+        let socketID = userWithSocket.socketId;
+        let socket = io_server.sockets.sockets.get(socketID);
+
+        if (socket) {
+            data.groups.forEach((g) => {
+                if (!g.pastMembers?.includes(user._id)) {
+                    console.log(`User ${user._id} joining group: ${g._id}`);
+                    socket.join(g._id);
+                }
+                else {
+                    console.log("Fuck u");
+
+                }
+                // console.log(`User ${user._id} joining group: ${g._id}`);
+                // socket.join(g._id);
+            });
+        } else {
+            console.log("Socket not found for user:", user._id);
+        }
+    });
+    clientSocket.on("joinGroupWithID", (data) => {
+        console.log("group to be joined:", data.group);
+        let user = JSON.parse(clientSocket.handshake.query.user);
+        console.log("Requesting User who wanna join a group:", user);
+        let userWithSocket = online_users.find((e) => e._id === user._id);
+        if (!userWithSocket) {
+            console.log("User not found in online users:", user._id);
+            return;
+        }
+        let socketID = userWithSocket.socketId;
         let socket = io_server.sockets.sockets.get(socketID);
         if (socket) {
-            groupsToBeJoined.forEach((g) => socket.join(g._id));
+            console.log(`User ${user._id} joining group: ${data.group._id}`);
+            socket.join(data.group._id);
+        } else {
+            console.log("Socket not found for user:", user._id);
         }
-    })
+    });
+
     clientSocket.on("addedNewGroup", (data) => {
         console.log(data.newGroup);
         let newGroup = data.newGroup;
@@ -135,10 +172,9 @@ io_server.on("connection", (clientSocket) => {
         // Emit the event to the room
         io_server.to(roomID).emit("createNewGroup", { newGroup: data.newGroup });
     });
-    clientSocket.on("addGroupMessage", async(data) => {
+    clientSocket.on("addGroupMessage", async (data) => {
         let user = JSON.parse(clientSocket.handshake.query.user);
         let completeUser = online_users.find((u) => { if (u._id == user._id) { return true } });
-
         console.log(data.messageBody);
         console.log(data.selectedGroup);
         let roomID = data.selectedGroup;
@@ -166,9 +202,67 @@ io_server.on("connection", (clientSocket) => {
                     public_id: '',
                 }
             })
-            
+
         }
     })
+    clientSocket.on("memberKick", async (info) => {
+        let targetMemberEmail = info.memberEmail;
+        let targetGroupId = info.groupId;
+        let roomId = targetGroupId;
+        // let targetGroup=await Group.findById(targetGroupId);
+
+        console.log("room ID:", roomId);
+        console.log("target GROUP:", targetGroupId);
+        let targetMemberWithSocket = online_users.find((e) => e.email.toString() === targetMemberEmail.toString());
+        console.log(targetMemberWithSocket)
+        // Notify all members in the group
+        io_server.to(roomId).emit("gotKickedFromGroup", {
+            groupId: targetGroupId,
+            memberId: targetMemberWithSocket._id
+        });
+
+        if (targetMemberWithSocket) {
+            let socket = io_server.sockets.sockets.get(targetMemberWithSocket.socketId);
+            if (socket) {
+                socket.leave(roomId);
+                console.log(`User ${targetMemberWithSocket._id} wtih socket ID ${targetMemberWithSocket.socketId} removed from group ${targetGroupId}`);
+                if (!socket.rooms.has(roomId)) {
+                    console.log(`User ${targetMemberWithSocket._id} successfully left room ${targetGroupId}`);
+                } else {
+                    console.log(`User ${targetMemberWithSocket._id} is still in room ${targetGroupId}`);
+                }
+            } else {
+                console.log(`Socket not found for user ${targetMemberWithSocket._id}`);
+            }
+        } else {
+            console.log(`User ${targetMember._id} is not online.`);
+        }
+    });
+    // { groupId, memberId }
+    clientSocket.on("memberAdd", async (data) => {
+        console.log(data.groupId);
+        console.log(data.members);
+
+        // Extracting the target members' IDs
+        let targetMembersIDs = data.members.map((e) => e._id);
+
+        // Extracting emails of members
+        // let targetMembersEmails = data.members.map((e) => e.email);
+        // Finding online members
+        let targetMembersWithSocket = online_users.filter((e) =>
+            targetMembersIDs.includes(e._id.toString())
+        );
+        console.log("Online members:", targetMembersWithSocket);
+        let socketIDs = targetMembersWithSocket.map((e) => e.socketId)
+        console.log("Socket Ids:", socketIDs);
+        let targetGroup = await Group.findById(data.groupId);
+
+        io_server.to(socketIDs).emit("gotAddedToGroup", {
+            group: targetGroup,
+            member: targetMembersIDs
+        })
+    });
+
     clientSocket.on("disconnect", () => {
         console.log("A user disconnected with Socket id:", clientSocket.id);
         online_users = online_users.filter((u) => u !== user);

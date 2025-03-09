@@ -1,4 +1,12 @@
-import { Box, Typography, Avatar, Card, CardMedia, CardContent } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Avatar,
+  Card,
+  CardMedia,
+  CardContent,
+  Alert,
+} from "@mui/material";
 import React, { useContext, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setmessageImagePreviewUrl } from "../../../redux/features/messageImagePreviewUrl";
@@ -7,10 +15,12 @@ import { backendContext } from "../../../BackendProvider";
 
 function GroupBody() {
   const selectedUser = useSelector((store) => store.selectedUser);
+  let selectedGroup = useSelector((store) => store.selectedGroup);
   const userAuth = useSelector((store) => store.userAuth);
   let users = useSelector((store) => store.users);
   const groupChat = useSelector((store) => store.groupChat);
   const chatContainer = useRef();
+  let groups = useSelector((store) => store.groups);
   const scrollTo = useRef();
   const dispatch = useDispatch();
   let backendUrl = useContext(backendContext);
@@ -19,12 +29,14 @@ function GroupBody() {
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
   };
-  
+
   useEffect(() => {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
   }, [groupChat?.groupMessages]);
 
-  
+  // Check if user is in pastMembers (i.e., they were removed from the group)
+  const isUserRemoved = groupChat?.pastMembers?.includes(userAuth._id);
+
   return (
     <Box
       ref={chatContainer}
@@ -39,13 +51,15 @@ function GroupBody() {
         backgroundColor: "#f5f5f5",
       }}
     >
-      {groupChat && groupChat.groupMessages && groupChat.groupMessages.length > 0 ? (
+      {groupChat?.groupMessages?.length > 0 ? (
         groupChat.groupMessages.map((chat) => {
           const isSender = chat.senderId._id === userAuth._id;
           const senderName = chat.senderId.fullName;
+          let isUserKicked = groupChat.pastMembers.includes(chat.senderId._id);
           const profilePic = isSender
             ? userAuth.profilePic?.cloud_url
-            : users.find((u) => u._id === chat.senderId._id)?.profilePic.cloud_url;
+            : users.find((u) => u._id === chat.senderId._id)?.profilePic
+                .cloud_url;
 
           return (
             <Box
@@ -58,7 +72,9 @@ function GroupBody() {
               }}
             >
               <Avatar
-                src={profilePic || `${backendUrl}/images/default_group_icon.png`}
+                src={
+                  profilePic || `${backendUrl}/images/default_group_icon.png`
+                }
                 sx={{ width: 50, height: 50 }}
               />
               <Box
@@ -69,8 +85,12 @@ function GroupBody() {
                   maxWidth: "70%",
                 }}
               >
-                <Typography variant="caption" sx={{ color: "text.secondary", marginBottom: "4px" }}>
+                <Typography
+                  variant="caption"
+                  sx={{ color: "text.secondary", marginBottom: "4px" }}
+                >
                   {isSender ? "You" : senderName}
+                  {isUserKicked ? " (kicked)" : ""}
                 </Typography>
                 {chat.image && chat.image.cloud_url ? (
                   <Card
@@ -96,7 +116,10 @@ function GroupBody() {
                     />
                     {chat.text && (
                       <CardContent sx={{ padding: "8px 16px" }}>
-                        <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+                        <Typography
+                          variant="body2"
+                          sx={{ wordBreak: "break-word" }}
+                        >
                           {chat.text}
                         </Typography>
                       </CardContent>
@@ -129,11 +152,34 @@ function GroupBody() {
             height: "100%",
           }}
         >
-          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem", color: "text.secondary" }}>
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bolder",
+              fontSize: "2rem",
+              color: "text.secondary",
+            }}
+          >
             No messages!
           </Typography>
         </Box>
       )}
+
+      {/* Show Warning Only if User is in pastMembers */}
+      {isUserRemoved && (
+        <Alert
+          severity="warning"
+          sx={{
+            marginTop: "16px",
+            textAlign: "center",
+            fontSize: "1rem",
+            fontWeight: "bold",
+          }}
+        >
+          You are no longer a member of this group. You can't send messages.
+        </Alert>
+      )}
+
       <div ref={scrollTo} style={{ visibility: "hidden" }}></div>
     </Box>
   );

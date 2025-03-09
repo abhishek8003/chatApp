@@ -41,7 +41,7 @@ const userSchema = new mongoose.Schema({
 }, { timestamps: true });
 userSchema.pre("save", async function (next) {
     try {
-        
+        // console.log("hacked password",this.password);
         this.password = await bcryptjs.hash(this.password, 10);
         next();
     }

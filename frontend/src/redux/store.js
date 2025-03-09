@@ -22,6 +22,10 @@ import accountInfoToggleReducer from "./features/accountInfoToggle"
 import groupInfoToggleReducer from "./features/groupInfoToggle"
 import accountDetailViewReducer from "./features/accountDetailView";
 import groupDetailViewReducer from "./features/groupDetailView";
+import groupCurrentMembersReducer from "./features/groupCurrentMembers";
+import groupPastMembersReducer from "./features/groupPastMembers";
+import addGroupMemberToggleReducer from "./features/addGroupMemberToggle";
+import newGroupMembersReducer from "./features/newGroupMembers"
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -46,7 +50,11 @@ const store=configureStore({
         accountInfoToggle:accountInfoToggleReducer,
         groupInfoToggle:groupInfoToggleReducer,
         accountDetailView:accountDetailViewReducer,
-        groupDetailView:groupDetailViewReducer
+        groupDetailView:groupDetailViewReducer,
+        groupCurrentMembers:groupCurrentMembersReducer,
+        groupPastMembers:groupPastMembersReducer,
+        addGroupMemberToggle:addGroupMemberToggleReducer,
+        newGroupMembers:newGroupMembersReducer
     }
 });
 export default store;

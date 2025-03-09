@@ -41,6 +41,15 @@ const groupSchema = new mongoose.Schema({
         ],
         default: []
     },
+    pastMembers: {
+        type: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "user"
+            }
+        ],
+        default: []
+    },
     groupMessages: {
         type: [
             {

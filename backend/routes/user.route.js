@@ -42,7 +42,6 @@ user_router.post("/:user_id/addFriends", async (req, res) => {
         }
         let friendIds = newFriends.map(friend => friend._id);
         console.log("Friend IDs:", friendIds);
-
         let currentUser = await User.findById(userId);
         if (!currentUser) {
             return res.status(404).json({ message: "User not found" });
@@ -58,7 +57,6 @@ user_router.post("/:user_id/addFriends", async (req, res) => {
             { $addToSet: { friends: userId } }
         );
         res.status(200).json({ message: "Friends added successfully!" });
-
     } catch (error) {
         console.error("Error adding friends:", error);
         res.status(500).json({ message: error.message });

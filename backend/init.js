@@ -1,5 +1,10 @@
 const mongoose = require("mongoose");
 const { ObjectId } = require('mongodb')
+// mongoose.connect("mongodb+srv://abhishekagarwal8005:xHECgtijtTlYpS2k@cluster0.rhdgo.mongodb.net/chatApp?retryWrites=true&w=majority&appName=Cluster0").then(() => {
+//     console.log("connected to mongoDB");
+// }).catch((err) => {
+//     console.log(err);
+// });
 mongoose.connect("mongodb://127.0.0.1:27017/chatApp").then(() => {
     console.log("connected to mongoDB");
 }).catch((err) => {
@@ -15,13 +20,13 @@ async function insertUsers(db) {
     for (let i = 1; i <= 100; i++) {
       users.push({
         _id: new ObjectId(),
-        username: `testingoi${i}`,
-        email: `user${i}@example.com`,
-        fullName: `testing ${i}`,
+        username: `abhishek${i}`,
+        email: `abhishek${i}@example.com`,
+        fullName: `abhishek-${i}`,
         password: passwordHash,
         profilePic: {
           local_url: '',
-          cloud_url: '"https://chatapp-q0p1.onrender.com/images/default_user.png"',
+          cloud_url: 'https://chatapp-q0p1.onrender.com/images/default_user.png',
           public_id: '',
           _id: new ObjectId()
         },

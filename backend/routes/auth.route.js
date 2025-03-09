@@ -8,7 +8,6 @@ const userSchema = require("../schema/userSchema");
 const upload_profile_pics = require("../storage/localConfig/profilePicslocal");
 const My_SECRET = "mysecret1";
 const cloudinary = require("../storage/cloudConfig/cloud");
-
 const { validate_user, isAuthenticated } = require("../middlewares");
 const { io_server } = require("../socket");
 auth_router.post("/login", validate_user, async (req, res, next) => {

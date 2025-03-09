@@ -17,6 +17,8 @@ import GroupHeader from "./GroupHeader";
 import GroupBody from "./GroupBody";
 import { setGroupChat } from "../../../redux/features/groupChats";
 import AccountInfo from "./AccountInfo";
+import { setgroupCurrentMembers } from "../../../redux/features/groupCurrentMembers";
+import { setgroupPastMembers } from "../../../redux/features/groupPastMembers";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -37,6 +39,9 @@ function Messages() {
     return store.messageImagePreviewReducer;
   });
   let backendUrl = useContext(backendContext);
+  let userAuth = useSelector((store) => {
+    return store.userAuth;
+  });
   let clientSocket = useContext(socketContext);
   useEffect(() => {
     if (selectedUser) {
@@ -82,6 +87,18 @@ function Messages() {
           if (response.status === 200) {
             console.log(json.group);
             dispatch(setGroupChat(json.group));
+            let pastMembers = json.group?.pastMembers || [];
+            let pastMembersPopulated = users.filter((user) =>
+              pastMembers.includes(user._id)
+            );
+            if (pastMembers.includes(userAuth._id)) {
+              pastMembersPopulated.push(userAuth);
+            }
+            let currentMembers = json.group?.groupMembers.filter(
+              (member) => !pastMembers.includes(member._id)
+            );
+            dispatch(setgroupPastMembers(pastMembersPopulated));
+            dispatch(setgroupCurrentMembers(currentMembers));
           }
         } catch (error) {
           console.log(error);

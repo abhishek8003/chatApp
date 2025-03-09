@@ -12,8 +12,23 @@ import {
   updateFriends,
 } from "./redux/features/friends";
 import { addNotification } from "./redux/features/notifications";
-import { addGroup } from "./redux/features/groups";
-import { updateGroupChat } from "./redux/features/groupChats";
+import {
+  addGroup,
+  addMemberInGroups,
+  removeMemberFromGroups,
+} from "./redux/features/groups";
+import {
+  addMemberInGroupChat,
+  removeMemberFromGroupChat,
+  setGroupChat,
+  updateGroupChat,
+} from "./redux/features/groupChats";
+import {
+  addMemberInSelectedGroup,
+  removeMemberFromSelectedGroup,
+} from "./redux/features/selectedGroup";
+import { removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
+import { addgroupPastMembers } from "./redux/features/groupPastMembers";
 
 const socketContext = createContext();
 
@@ -26,6 +41,7 @@ function SocketProvider({ children }) {
   const userAuth = useSelector((store) => store.userAuth);
   const selectedUser = useSelector((store) => store.selectedUser);
   const isLoggedIn = !!userAuth;
+  const users = useSelector((store) => store.users);
 
   const [clientSocket, setClientSocket] = useState(null);
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
@@ -80,6 +96,60 @@ function SocketProvider({ children }) {
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
 
+  useEffect(() => {
+    if (!clientSocket) {
+      return;
+    }
+    clientSocket.on("gotKickedFromGroup", (data) => {
+      if (selectedGroup?._id === data.groupId.toString() && clientSocket) {
+        console.log(data.groupId);
+        console.log(data.memberId);
+        dispatch(removeMemberFromGroups(data)); //we just sending group ID and member ID
+        dispatch(removeMemberFromGroupChat(data)); //we just sending group ID and member ID
+        dispatch(removeMemberFromSelectedGroup(data)); ////we just sending group ID and member ID
+        let targetMember = users.find((e) => {
+          if (e._id == data.memberId) {
+            return true;
+          }
+        });
+        if (!targetMember) {
+          if (userAuth._id == data.memberId) {
+            targetMember = userAuth;
+          }
+        }
+        dispatch(removegroupCurrentMembers(targetMember));
+        dispatch(addgroupPastMembers(targetMember));
+      }
+    });
+    clientSocket.on("gotAddedToGroup", (data) => {
+      if (clientSocket) {
+        console.log("You were added to Group:", data.group);
+        console.log("Your details:", data.member);
+        dispatch(
+          addMemberInGroups({
+            groupId: data.group_id,
+            member: userAuth,
+          })
+        ); //we just sending group ID and member ID
+        dispatch(
+          addMemberInGroupChat({
+            groupId: data.group_id,
+            member: userAuth,
+          })
+        );
+        dispatch(
+          addMemberInSelectedGroup({
+            groupId: data.group_id,
+            member: userAuth,
+          })
+        );
+        console.log("selectedGroup:", selectedGroup);
+        console.log("groupChat:", groupChat);
+        console.log("groups:", groups);
+        clientSocket.emit("joinGroupWithID", { group: data.group });
+      }
+    });
+  }, [userAuth, users, selectedGroup,groups,groupChat]);
   // Handle live messages and notifications
   useEffect(() => {
     if (!clientSocket) return;
@@ -149,8 +219,10 @@ function SocketProvider({ children }) {
     if (!clientSocket) return;
 
     clientSocket.on("recieveGroupMessageLive", (data) => {
-      console.log("Received group message:", data);
-      dispatch(updateGroupChat(data));
+      if (selectedGroup?._id === data.receiverId.toString()) {
+        console.log("Received group message:", data);
+        dispatch(updateGroupChat(data));
+      }
     });
     clientSocket.on("addGroupNotification", (message) => {
       if (selectedGroup && message.receiverId == selectedGroup._id) {

@@ -464,7 +464,7 @@ function Sidebar() {
               </div>
             );
           })}
-          {/* Add the "hi" div here */}
+      
           <CreateDm></CreateDm>
           <div
             style={{
@@ -472,7 +472,7 @@ function Sidebar() {
               height: "70px",
               alignItems: "center",
               justifyContent: "center",
-              border: "2px solid red",
+              border: "2px solid black",
               fontSize: "1.5rem",
             }}
             onClick={() => {
@@ -494,7 +494,7 @@ function Sidebar() {
               height: "70px",
               alignItems: "center",
               justifyContent: "center",
-              border: "2px solid red",
+              border: "2px solid black",
               fontSize: "1.5rem",
             }}
             onClick={() => {
@@ -520,5 +520,4 @@ function Sidebar() {
     </Box>
   );
 }
-
 export default Sidebar;

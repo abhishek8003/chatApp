@@ -1,5 +1,5 @@
 import { Box, Button, TextField } from "@mui/material";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import SendIcon from "@mui/icons-material/Send";
@@ -58,7 +58,7 @@ function CreateMessage() {
             local_url: "",
             cloud_url: imgTempUrl,
           },
-          createdAt:new Date(Date.now())
+          createdAt: new Date(Date.now()),
         })
       );
 
@@ -111,6 +111,24 @@ function CreateMessage() {
       }
     }
     if (selectedGroup) {
+      try {
+        if (selectedGroup.pastMembers.includes(userAuth._id)) {
+          // alert("BRO Its not member!")
+          console.log("BUG selected Group:",selectedGroup)
+          throw new Error("You are not a member of this group");
+        }
+      } catch (error) {
+        toast.error(error.message);
+        setMessageText("");
+        inputFile.current.value = "";
+        setSendingMessage(false);
+        setPreview(false);
+        setPreviewUrl(null);
+        return ;
+      }
+      // alert("BRO !")
+      
+
       let file = myForm.messageFile && myForm.messageFile.files[0];
       console.log(text);
       console.log(file);
@@ -125,13 +143,13 @@ function CreateMessage() {
         formData.append("messageImage", file);
       }
       try {
-        clientSocket.emit("addGroupMessage",{
-          selectedGroup:selectedGroup._id,
-          messageBody:{
-            messageText:text,
-            messageImage:previewUrl,
-            createdAt:new Date(Date.now())
-          }
+        clientSocket.emit("addGroupMessage", {
+          selectedGroup: selectedGroup._id,
+          messageBody: {
+            messageText: text,
+            messageImage: previewUrl,
+            createdAt: new Date(Date.now()),
+          },
         });
         let response = await fetch(
           `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
@@ -159,6 +177,7 @@ function CreateMessage() {
       }
     }
   };
+
   return (
     <>
       <Box sx={{ width: "fit-content" }}>

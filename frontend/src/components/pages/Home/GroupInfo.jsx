@@ -34,12 +34,13 @@ function GroupInfo({ targetElement }) {
     >
       {/* {!targetElement?"Target is not defined":"Target is defined"} */}
       
-      <Typography sx={{ p: 2, display:"flex", minHeight:"300px", width:"350px"}}>
+      <Typography sx={{ p: 2, display:"flex", minHeight:"300px", width:"350px", maxHeight:"350px"}}>
 
         <GroupInfoNav></GroupInfoNav>
         <Box sx={{
           border:"2px solid grey",
           flexGrow:"1",
+          overflow:"auto"
         }}>
           {groupDetailView == "overview" ? <Overview></Overview> : ""}
           {groupDetailView == "settings" ? <Settings></Settings>: ""}

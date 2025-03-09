@@ -1,18 +1,48 @@
 import { createSlice } from "@reduxjs/toolkit";
-const initialState = [];
+
+const initialState = {
+    groupMessages: [],
+    groupMembers: [],
+    pastMembers: []
+};
+
 const groupChatSlice = createSlice({
     name: "groupChat",
-    initialState: initialState,
+    initialState,
     reducers: {
         setGroupChat: (state, action) => {
-            state = action.payload;
-            return state;
+            return action.payload; // Correct way to replace state
         },
         updateGroupChat: (state, action) => {
-            // Use Immer (built into Redux Toolkit) to "mutate" the state immutably
-            state.groupMessages.push(action.payload); // Append the payload to the array
+            state.groupMessages.push(action.payload); // Ensure state has groupMessages
+        },
+        removeMemberFromGroupChat: (state, action) => {
+            return {
+                ...state,
+                groupMembers: state.groupMembers.filter(
+                    (memberId) => memberId !== action.payload.memberId
+                ),
+                pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
+            };
+        },
+        addMemberInGroupChat: (state, action) => {
+            
+            return {
+                ...state,
+                groupMembers:  [...state.groupMembers, action.payload.member],
+                pastMembers: state.pastMembers.filter((e)=>{
+                    if(e!=action.payload.member._id){
+                        return true;
+                    }
+                    return false;
+                }),
+                // currentMembers: state.currentMembers.includes(memberId)
+                //     ? state.currentMembers 
+                //     : [...state.currentMembers, action.payload.member._id] 
+            };
         }
     }
 });
+
 export default groupChatSlice.reducer;
-export const { setGroupChat,updateGroupChat } = groupChatSlice.actions;
+export const { setGroupChat, updateGroupChat, removeMemberFromGroupChat,addMemberInGroupChat } = groupChatSlice.actions;
