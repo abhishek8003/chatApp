@@ -34,7 +34,7 @@ const groupSlice = createSlice({
             return state.map((group) => {
                 console.log("in target Gropu:",group);
                 if (group._id === action.payload.groupId) {
-                    alert("GROPS UPD")
+                    // alert("GROPS UPD")
                     return {
                         ...group,
                         groupMembers: [...group.groupMembers, action.payload.member._id],
