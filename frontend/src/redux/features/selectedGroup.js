@@ -13,14 +13,15 @@ const selectedGroupSlice = createSlice({
             console.log("selected group updated!");
 
             if (!state) return state; // Ensure state is not null
-
-            return {
-                ...state,
-                groupMembers: state.groupMembers.filter(
-                    (memberId) => memberId !== action.payload.memberId
-                ),
-                pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
-            };
+            if (state._id == action.payload.groupId) {
+                return {
+                    ...state,
+                    groupMembers: state.groupMembers.filter(
+                        (memberId) => memberId !== action.payload.memberId
+                    ),
+                    pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
+                };
+            }
         },
         addMemberInSelectedGroup: (state, action) => {
             if (state?.groupMembers && state?.pastMembers) {

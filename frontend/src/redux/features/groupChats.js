@@ -17,21 +17,23 @@ const groupChatSlice = createSlice({
             state.groupMessages.push(action.payload); // Ensure state has groupMessages
         },
         removeMemberFromGroupChat: (state, action) => {
-            return {
-                ...state,
-                groupMembers: state.groupMembers.filter(
-                    (memberId) => memberId !== action.payload.memberId
-                ),
-                pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
-            };
+            if (state._id == action.payload.groupId) {
+                return {
+                    ...state,
+                    groupMembers: state.groupMembers.filter(
+                        (memberId) => memberId !== action.payload.memberId
+                    ),
+                    pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
+                };
+            }
         },
         addMemberInGroupChat: (state, action) => {
-            
+
             return {
                 ...state,
-                groupMembers:  [...state.groupMembers, action.payload.member],
-                pastMembers: state.pastMembers.filter((e)=>{
-                    if(e!=action.payload.member._id){
+                groupMembers: [...state.groupMembers, action.payload.member],
+                pastMembers: state.pastMembers.filter((e) => {
+                    if (e != action.payload.member._id) {
                         return true;
                     }
                     return false;
@@ -45,4 +47,4 @@ const groupChatSlice = createSlice({
 });
 
 export default groupChatSlice.reducer;
-export const { setGroupChat, updateGroupChat, removeMemberFromGroupChat,addMemberInGroupChat } = groupChatSlice.actions;
+export const { setGroupChat, updateGroupChat, removeMemberFromGroupChat, addMemberInGroupChat } = groupChatSlice.actions;

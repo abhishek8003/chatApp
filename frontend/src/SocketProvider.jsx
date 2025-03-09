@@ -101,7 +101,8 @@ function SocketProvider({ children }) {
       return;
     }
     clientSocket.on("gotKickedFromGroup", (data) => {
-      if (selectedGroup?._id === data.groupId.toString() && clientSocket) {
+      // if (selectedGroup?._id === data.groupId.toString() && clientSocket) {
+      if (clientSocket) {
         console.log(data.groupId);
         console.log(data.memberId);
         dispatch(removeMemberFromGroups(data)); //we just sending group ID and member ID
