@@ -220,16 +220,20 @@ io_server.on("connection", (clientSocket) => {
 
         if (targetMemberWithSocket) {
             let socket = io_server.sockets.sockets.get(targetMemberWithSocket.socketId);
-            // io_server.to(roomId).emit("gotKickedFromGroup", {
-            //     groupId: targetGroupId,
-            //     memberId: targetMemberWithSocket._id
-            // });
-            clientSocket.broadcast.emit("gotKickedFromGroup", {
+            io_server.to(roomId).emit("gotKickedFromGroup", {
                 groupId: targetGroupId,
                 memberId: targetMemberWithSocket._id
             });
+            // clientSocket.broadcast.emit("gotKickedFromGroup", {
+            //     groupId: targetGroupId,
+            //     memberId: targetMemberWithSocket._id
+            // });
             if (socket) {
-                socket.leave(roomId);
+                await new Promise((resolve,reject)=>{
+                    socket.leave(roomId,()=>{
+                        resolve();
+                    })
+                })
                 console.log(`User ${targetMemberWithSocket._id} wtih socket ID ${targetMemberWithSocket.socketId} removed from group ${targetGroupId}`);
                 if (!socket.rooms.has(roomId)) {
                     console.log(`User ${targetMemberWithSocket._id} successfully left room ${targetGroupId}`);
@@ -247,6 +251,62 @@ io_server.on("connection", (clientSocket) => {
         }
     });
     // { groupId, memberId }
+    // clientSocket.on("memberKick", async (info) => {
+    //     try {
+    //         const targetMemberEmail = info.memberEmail.toLowerCase();
+    //         const targetGroupId = info.groupId.toString();
+    //         const roomId = targetGroupId;
+
+    //         // Find target member with case-insensitive email match
+    //         const targetMemberWithSocket = online_users.find(u => 
+    //             u.email.toLowerCase() === targetMemberEmail
+    //         );
+
+    //         if (!targetMemberWithSocket) {
+    //             console.log(`User ${targetMemberEmail} not found online`);
+    //             return;
+    //         }
+
+    //         // Notify all group members including kicked user
+    //         io_server.to(roomId).emit("gotKickedFromGroup", {
+    //             groupId: targetGroupId,
+    //             memberId: targetMemberWithSocket._id.toString()
+    //         });
+
+    //         // Handle socket room removal
+    //         const targetSocket = io_server.sockets.sockets.get(
+    //             targetMemberWithSocket.socketId
+    //         );
+
+    //         if (targetSocket) {
+    //             // Leave room and verify
+    //             await new Promise(resolve => {
+    //                 targetSocket.leave(roomId, () => {
+    //                     console.log(`User ${targetMemberWithSocket._id} left room ${roomId}`);
+    //                     resolve();
+    //                 });
+    //             });
+
+    //             // Additional cleanup for kicked user
+    //             if (targetMemberWithSocket._id === user._id) {
+    //                 io_server.to(targetSocket.id).emit("forceGroupRefresh");
+    //             }
+    //         }
+
+    //         // Update other group members
+    //         io_server.to(roomId).emit("groupMembersUpdated", {
+    //             groupId: targetGroupId,
+    //             action: "remove",
+    //             memberId: targetMemberWithSocket._id.toString()
+    //         });
+
+    //     } catch (error) {
+    //         console.error("Kick error:", error);
+    //         io_server.to(clientSocket.id).emit("kickError", {
+    //             message: "Failed to process kick"
+    //         });
+    //     }
+    // });
     clientSocket.on("memberAdd", async (data) => {
         console.log(data.groupId);
         console.log(data.members);
