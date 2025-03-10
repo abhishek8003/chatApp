@@ -220,6 +220,14 @@ io_server.on("connection", (clientSocket) => {
 
         if (targetMemberWithSocket) {
             let socket = io_server.sockets.sockets.get(targetMemberWithSocket.socketId);
+            // io_server.to(roomId).emit("gotKickedFromGroup", {
+            //     groupId: targetGroupId,
+            //     memberId: targetMemberWithSocket._id
+            // });
+            clientSocket.broadcast.emit("gotKickedFromGroup", {
+                groupId: targetGroupId,
+                memberId: targetMemberWithSocket._id
+            });
             if (socket) {
                 socket.leave(roomId);
                 console.log(`User ${targetMemberWithSocket._id} wtih socket ID ${targetMemberWithSocket.socketId} removed from group ${targetGroupId}`);
@@ -228,13 +236,12 @@ io_server.on("connection", (clientSocket) => {
                 } else {
                     console.log(`User ${targetMemberWithSocket._id} is still in room ${targetGroupId}`);
                 }
+                
             } else {
                 console.log(`Socket not found for user ${targetMemberWithSocket._id}`);
+                throw new Error("socket not found!");
             }
-            io_server.to(roomId).emit("gotKickedFromGroup", {
-                groupId: targetGroupId,
-                memberId: targetMemberWithSocket._id
-            });
+           
         } else {
             console.log(`User ${targetMember._id} is not online.`);
         }

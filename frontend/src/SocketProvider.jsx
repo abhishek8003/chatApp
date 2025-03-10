@@ -102,6 +102,7 @@ function SocketProvider({ children }) {
     }
     clientSocket.on("gotKickedFromGroup", (data) => {
       // if (selectedGroup?._id === data.groupId.toString() && clientSocket) {
+      // alert("got kick request")
       if (clientSocket) {
         console.log(data.groupId);
         console.log(data.memberId);
