@@ -9,10 +9,11 @@ const groupCurrentMembersSlice = createSlice({
             
         },
         addgroupCurrentMembers: (state, action) => {
-            return [
-                ...state.filter(e => e._id !== action.payload._id), 
-                action.payload
-            ];
+            // return [
+            //     ...state.filter(e => e._id !== action.payload._id), 
+            //     action.payload
+            // ];
+            return state?._id===action.payload._id?state:[...state,action.payload._id]
         },
         removegroupCurrentMembers(state,action){
             return state.filter((f)=>{
