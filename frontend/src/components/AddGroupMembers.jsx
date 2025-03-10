@@ -100,7 +100,7 @@ function AddGroupMembers() {
       try {
         console.log("Members to be added:", selectedMembers);
 
-        clientSocket.emit("memberAdd", { groupId:selectedGroup._id, members:selectedMembers });
+        clientSocket?.emit("memberAdd", { groupId:selectedGroup._id, members:selectedMembers });
 
         const response = await fetch(
           `${backendUrl}/api/groups/${selectedGroup._id}/addMembers`,
@@ -164,8 +164,8 @@ function AddGroupMembers() {
   useEffect(() => {
     const getAllUsers = async () => {
       try {
-        clientSocket.emit("fetchAllUsers");
-        clientSocket.on("getAllUsersExceptMe", (users) => {
+        clientSocket?.emit("fetchAllUsers");
+        clientSocket?.on("getAllUsersExceptMe", (users) => {
           dispatch(setUsers(users));
         });
       } catch (error) {

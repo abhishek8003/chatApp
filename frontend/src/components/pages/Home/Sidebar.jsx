@@ -127,7 +127,7 @@ function Sidebar() {
         } else {
           toast.error(json.message);
         }
-        clientSocket.emit("fetchAllUsers");
+        clientSocket?.emit("fetchAllUsers");
       } catch (error) {
         toast.error(error.message);
         console.log(error);

@@ -55,7 +55,7 @@ function Navbar() {
       if (response.status === 200) {
         console.log(userAuth);
 
-        clientSocket.emit("deleteOnlineUser", userAuth);
+        clientSocket?.emit("deleteOnlineUser", userAuth);
         dispatch(setUser(null));
         dispatch(setSelectedGroup(null));
         dispatch(setSelectedUser(null))

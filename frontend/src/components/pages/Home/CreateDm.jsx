@@ -73,7 +73,7 @@ function CreateDm() {
             body: JSON.stringify(selectedFriends),
           }
         );
-        clientSocket.emit("sendFriend", {target:selectedFriends,newFriend:userAuth._id});
+        clientSocket?.emit("sendFriend", {target:selectedFriends,newFriend:userAuth._id});
         const json = await response.json();
         if (response.status === 200) {
           dispatch(addFriends(selectedFriends));
@@ -97,8 +97,8 @@ function CreateDm() {
   useEffect(() => {
     const getAllUsers = async () => {
       try {
-        clientSocket.emit("fetchAllUsers");
-        clientSocket.on("getAllUsersExceptMe", (users) => {
+        clientSocket?.emit("fetchAllUsers");
+        clientSocket?.on("getAllUsersExceptMe", (users) => {
           dispatch(setUsers(users));
         });
       } catch (error) {
@@ -110,7 +110,7 @@ function CreateDm() {
     getAllUsers();
 
     return () => {
-      clientSocket.off("getAllUsersExceptMe");
+      clientSocket?.off("getAllUsersExceptMe");
     };
   }, [clientSocket]);
 

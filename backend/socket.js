@@ -216,10 +216,7 @@ io_server.on("connection", (clientSocket) => {
         let targetMemberWithSocket = online_users.find((e) => e.email.toString() === targetMemberEmail.toString());
         console.log(targetMemberWithSocket)
         // Notify all members in the group
-        io_server.to(roomId).emit("gotKickedFromGroup", {
-            groupId: targetGroupId,
-            memberId: targetMemberWithSocket._id
-        });
+        
 
         if (targetMemberWithSocket) {
             let socket = io_server.sockets.sockets.get(targetMemberWithSocket.socketId);
@@ -234,6 +231,10 @@ io_server.on("connection", (clientSocket) => {
             } else {
                 console.log(`Socket not found for user ${targetMemberWithSocket._id}`);
             }
+            io_server.to(roomId).emit("gotKickedFromGroup", {
+                groupId: targetGroupId,
+                memberId: targetMemberWithSocket._id
+            });
         } else {
             console.log(`User ${targetMember._id} is not online.`);
         }

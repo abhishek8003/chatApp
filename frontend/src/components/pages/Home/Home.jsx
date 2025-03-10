@@ -28,16 +28,16 @@ function Home() {
   let backendUrl = useContext(backendContext);
   useEffect(() => {
     console.log("setted x");
-    clientSocket.emit("fetchAllUsers"); //to set all_users
+    clientSocket?.emit("fetchAllUsers"); //to set all_users
 
-    clientSocket.on("getOnlineUsers", (onlineUsers) => {
+    clientSocket?.on("getOnlineUsers", (onlineUsers) => {
       console.log("online:");
       console.log(onlineUsers);
       dispatch(setOnlineUsers(onlineUsers));
     });
     return () => {
-      clientSocket.off("getOnlineUsers");
-      clientSocket.off("fetchAllUsers");
+      clientSocket?.off("getOnlineUsers");
+      clientSocket?.off("fetchAllUsers");
       // dispatch(setOnlineUsers(null));
       console.log("home unmouted!")
     };

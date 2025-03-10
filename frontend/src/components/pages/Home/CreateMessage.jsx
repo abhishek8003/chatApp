@@ -62,7 +62,7 @@ function CreateMessage() {
         })
       );
 
-      clientSocket.emit("sendMessage", {
+      clientSocket?.emit("sendMessage", {
         senderId: userAuth._id,
         recieverId: selectedUser._id,
         message_text: text,
@@ -146,7 +146,7 @@ function CreateMessage() {
         formData.append("messageImage", file);
       }
       try {
-        clientSocket.emit("addGroupMessage", {
+        clientSocket?.emit("addGroupMessage", {
           selectedGroup: selectedGroup._id,
           messageBody: {
             messageText: text,

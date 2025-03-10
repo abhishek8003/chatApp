@@ -37,7 +37,7 @@ function Members() {
           memberId=userAuth._id;
         }
       }
-      clientSocket.emit("memberKick", { groupId, memberEmail });
+      clientSocket?.emit("memberKick", { groupId, memberEmail });
 
       const response = await fetch(
         `${backendUrl}/api/groups/${groupId}/deleteMember/${memberId}`,

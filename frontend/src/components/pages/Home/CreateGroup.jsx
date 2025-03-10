@@ -85,7 +85,7 @@ function CreateGroup() {
           dispatch(addGroup(json.newGroup));
           dispatch(changeGroupBox());
           toast.success(json.message);
-          clientSocket.emit("addedNewGroup",{newGroup:json.newGroup})
+          clientSocket?.emit("addedNewGroup",{newGroup:json.newGroup})
         }
       } catch (error) {
         toast.error(error.message);
@@ -101,8 +101,8 @@ function CreateGroup() {
   useEffect(() => {
     const getAllUsers = async () => {
       try {
-        clientSocket.emit("fetchAllUsers");
-        clientSocket.on("getAllUsersExceptMe", (users) => {
+        clientSocket?.emit("fetchAllUsers");
+        clientSocket?.on("getAllUsersExceptMe", (users) => {
           dispatch(setUsers(users));
         });
       } catch (error) {
@@ -114,7 +114,7 @@ function CreateGroup() {
     getAllUsers();
 
     return () => {
-      clientSocket.off("getAllUsersExceptMe");
+      clientSocket?.off("getAllUsersExceptMe");
     };
   }, [clientSocket]);
 
