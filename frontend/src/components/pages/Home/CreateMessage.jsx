@@ -117,6 +117,9 @@ function CreateMessage() {
           console.log("BUG selected Group:",selectedGroup)
           throw new Error("You are not a member of this group");
         }
+        else{
+          console.log("TEST selected Group:",selectedGroup)
+        }
       } catch (error) {
         toast.error(error.message);
         setMessageText("");

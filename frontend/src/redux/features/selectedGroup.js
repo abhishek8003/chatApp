@@ -19,7 +19,9 @@ const selectedGroupSlice = createSlice({
                     groupMembers: state.groupMembers.filter(
                         (memberId) => memberId !== action.payload.memberId
                     ),
-                    pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
+                    
+                    pastMembers: state.pastMembers.includes(action.payload.memberId) ? state.pastMembers : [...state.pastMembers, action.payload.memberId] 
+                    // Fix mutation
                 };
             }
         },
