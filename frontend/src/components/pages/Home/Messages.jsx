@@ -118,7 +118,7 @@ function Messages() {
       };
       fetchChats();
     }
-  }, [selectedGroup]);
+  }, [selectedGroup?._id]);
 
   let dispatch = useDispatch();
 
