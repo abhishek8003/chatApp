@@ -107,6 +107,7 @@ function SocketProvider({ children }) {
         console.log(data.groupId);
         console.log(data.memberId);
         dispatch(removeMemberFromSelectedGroup(data)); ////we just sending group ID and member ID
+        
         dispatch(removeMemberFromGroups(data)); //we just sending group ID and member ID
         dispatch(removeMemberFromGroupChat(data)); //we just sending group ID and member ID
         let targetMember = users.find((e) => {

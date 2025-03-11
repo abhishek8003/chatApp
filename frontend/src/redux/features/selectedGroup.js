@@ -11,20 +11,20 @@ const selectedGroupSlice = createSlice({
         },
         removeMemberFromSelectedGroup: (state, action) => {
             console.log("selected group updated!");
-
-            if (!state) return state; // Ensure state is not null
-            if (state._id == action.payload.groupId) {
+            if (state._id === action.payload.groupId) {
                 return {
                     ...state,
                     groupMembers: state.groupMembers.filter(
                         (memberId) => memberId !== action.payload.memberId
                     ),
-                    
-                    pastMembers: state.pastMembers.includes(action.payload.memberId) ? state.pastMembers : [...state.pastMembers, action.payload.memberId] 
-                    // Fix mutation
+                    pastMembers: state.pastMembers.includes(action.payload.memberId)
+                        ? state.pastMembers
+                        : [...state.pastMembers, action.payload.memberId],
                 };
             }
-        },
+            return state; // No changes if groupId doesn't match
+        }
+        ,
         addMemberInSelectedGroup: (state, action) => {
             if (state?.groupMembers && state?.pastMembers) {
                 return {
