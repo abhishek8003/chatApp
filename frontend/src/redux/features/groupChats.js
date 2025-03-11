@@ -23,15 +23,15 @@ const groupChatSlice = createSlice({
                     groupMembers: state.groupMembers.filter(
                         (memberId) => memberId !== action.payload.memberId
                     ),
-                    pastMembers: [...state.pastMembers, action.payload.memberId] // Fix mutation
+                    pastMembers: state.pastMembers.includes(action.payload.memberId) ? [...state.pastMembers] : [...state.pastMembers, action.payload.memberId] // Fix mutation
                 };
             }
         },
         addMemberInGroupChat: (state, action) => {
-
+            let alreadyMemberOfGroup=state.groupMembers.find(member => member._id === action.payload.member._id);
             return {
                 ...state,
-                groupMembers: [...state.groupMembers, action.payload.member],
+                groupMembers: alreadyMemberOfGroup?state.groupMembers:[...state.groupMembers,action.payload.member],
                 pastMembers: state.pastMembers.filter((e) => {
                     if (e != action.payload.member._id) {
                         return true;

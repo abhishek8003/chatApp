@@ -9,16 +9,15 @@ const groupPastMembersSlice = createSlice({
             return state;
         },
         addgroupPastMembers: (state, action) => {
-            // return [
-            //     ...state.filter(e => e._id !== action.payload._id), 
-            //     action.payload
-            // ];
-            return state.filter((e)=>{
-                if(e._id===action.payload._id){
+            let alreadyExists=state.find((e)=>{
+                if(e._id==action.payload._id){
+                    return true;
+                }
+                else{
                     return false;
                 }
-                return true;
             })
+            return alreadyExists?state:[...state,action.payload]
         },
         removegroupPastMembers(state,action){
             return state.filter((f)=>{

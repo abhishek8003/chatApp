@@ -31,9 +31,18 @@ import {
   addgroupPastMembers,
   removegroupPastMembers,
 } from "../redux/features/groupPastMembers";
-import { addMemberInGroups, removeMemberFromGroups } from "../redux/features/groups";
-import { addMemberInGroupChat, removeMemberFromGroupChat } from "../redux/features/groupChats";
-import { addMemberInSelectedGroup, removeMemberFromSelectedGroup } from "../redux/features/selectedGroup";
+import {
+  addMemberInGroups,
+  removeMemberFromGroups,
+} from "../redux/features/groups";
+import {
+  addMemberInGroupChat,
+  removeMemberFromGroupChat,
+} from "../redux/features/groupChats";
+import {
+  addMemberInSelectedGroup,
+  removeMemberFromSelectedGroup,
+} from "../redux/features/selectedGroup";
 
 function AddGroupMembers() {
   let [groupImgPreview, setgroupImgPreview] = useState("");
@@ -59,7 +68,7 @@ function AddGroupMembers() {
   let selectedGroup = useSelector((store) => {
     return store.selectedGroup;
   });
-  let groups=useSelector((store)=>store.groups)
+  let groups = useSelector((store) => store.groups);
   const handleSelectingNewMembers = (newMember) => {
     if (
       !selectedMembers.find((e) => {
@@ -100,7 +109,10 @@ function AddGroupMembers() {
       try {
         console.log("Members to be added:", selectedMembers);
 
-        clientSocket?.emit("memberAdd", { groupId:selectedGroup._id, members:selectedMembers });
+        clientSocket?.emit("memberAdd", {
+          groupId: selectedGroup._id,
+          members: selectedMembers,
+        });
 
         const response = await fetch(
           `${backendUrl}/api/groups/${selectedGroup._id}/addMembers`,
@@ -113,36 +125,42 @@ function AddGroupMembers() {
             body: JSON.stringify(selectedMembers),
           }
         );
-        
+
         const data = await response.json();
         if (response.status === 200) {
           toast.success(data.message);
-          console.log("UPDATED GROUP WITH NEW MEMBERS",data.group);
-          console.log("GRoups:",groups);
-          
+          console.log("UPDATED GROUP WITH NEW MEMBERS", data.group);
+          console.log("GRoups:", groups);
+
           selectedMembers.forEach((m) => {
             dispatch(
               addMemberInGroups({
                 groupId: selectedGroup._id,
-                member:m
+                member: m,
               })
             ); //we just sending group ID and member
             dispatch(
               addMemberInGroupChat({
                 groupId: selectedGroup._id,
-                member:m
+                member: m,
               })
             ); //we just sending group ID and member
             dispatch(
               addMemberInSelectedGroup({
                 groupId: selectedGroup._id,
-                member:m
+                member: m,
               })
             ); ////we just sending group ID and member
           });
+          console.log("users:", users);
+          console.log("POPULATED selected members:", selectedMembers);
 
-          dispatch(addgroupCurrentMembers(selectedMembers));
-          dispatch(removegroupPastMembers(selectedMembers));
+  
+
+          selectedMembers.forEach((m) => {
+            dispatch(addgroupCurrentMembers(m));
+            dispatch(removegroupPastMembers(m));
+          });
         } else {
           console.log(data.message);
           toast.error(data.message);

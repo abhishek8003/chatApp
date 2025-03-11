@@ -47,10 +47,7 @@ function Members() {
       }
       
       clientSocket?.emit("memberKick", { groupId, memberEmail });
-      dispatch(removeMemberFromSelectedGroup({
 
-      })); 
-      
       const response = await fetch(
         `${backendUrl}/api/groups/${groupId}/deleteMember/${memberId}`,
         {

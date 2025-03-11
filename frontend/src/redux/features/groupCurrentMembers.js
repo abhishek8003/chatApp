@@ -13,9 +13,13 @@ const groupCurrentMembersSlice = createSlice({
             //     ...state.filter(e => e._id !== action.payload._id), 
             //     action.payload
             // ];
-            return state?._id===action.payload._id?state:[...state,action.payload._id]
+            // return state._id===action.payload._id?state:[...state,action.payload]
+            let alreadyExists=state.find(member => member._id === action.payload._id);
+            return alreadyExists?state:[...state,action.payload]
         },
         removegroupCurrentMembers(state,action){
+            console.log(action.payload);
+            
             return state.filter((f)=>{
                 if(f._id && (f?._id!=action.payload._id)){
                     return true

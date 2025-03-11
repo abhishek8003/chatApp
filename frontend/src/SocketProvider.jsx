@@ -27,8 +27,8 @@ import {
   addMemberInSelectedGroup,
   removeMemberFromSelectedGroup,
 } from "./redux/features/selectedGroup";
-import { removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
-import { addgroupPastMembers } from "./redux/features/groupPastMembers";
+import { addgroupCurrentMembers, removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
+import { addgroupPastMembers, removegroupPastMembers } from "./redux/features/groupPastMembers";
 
 const socketContext = createContext();
 
@@ -103,33 +103,36 @@ function SocketProvider({ children }) {
     clientSocket.on("gotKickedFromGroup", (data) => {
       if (clientSocket) {
         console.log(data.groupId);
-        console.log(data.memberId);
-        dispatch(removeMemberFromSelectedGroup(data)); ////we just sending group ID and member ID
-
-        dispatch(removeMemberFromGroups(data)); //we just sending group ID and member ID
-        dispatch(removeMemberFromGroupChat(data)); //we just sending group ID and member ID
-        let targetMember = users.find((e) => {
-          if (e._id == data.memberId) {
-            return true;
+        console.log(data.member);
+        dispatch(removeMemberFromSelectedGroup({
+          groupId:data.groupId,
+          memberId:data.member._id
+        })); ////we just sending group ID and member ID
+        dispatch(removeMemberFromGroups({
+          groupId:data.groupId,
+          memberId:data.member._id
+        })); //we just sending group ID and member ID
+        dispatch(removeMemberFromGroupChat(
+          {
+            groupId:data.groupId,
+            memberId:data.member._id
           }
-        });
-        if (!targetMember) {
-          if (userAuth._id == data.memberId) {
-            targetMember = userAuth;
-          }
-        }
-        dispatch(removegroupCurrentMembers(targetMember));
-        dispatch(addgroupPastMembers(targetMember));
+        )); //we just sending group ID and member ID
+      
+        console.log("TARGETED MEMBER POPULATED",data.member);
+        
+        dispatch(removegroupCurrentMembers(data.member));
+        dispatch(addgroupPastMembers(data.member));
         console.log("updated selected GROUP without", selectedGroup);
         console.log("updated  GROUPs without", groups);
         console.log("updated  GROUP chats without", groupChat);
       }
     });
     clientSocket.on("gotAddedToGroup", async (data) => {
+      // alert("You got added!");
       if (clientSocket) {
         console.log("You were added to Group:", data.group);
         console.log("Your details:", data.member);
-
         dispatch(
           addMemberInGroups({
             groupId: data.group._id,
@@ -148,6 +151,8 @@ function SocketProvider({ children }) {
             member: userAuth,
           })
         );
+        dispatch(addgroupCurrentMembers(userAuth));
+        dispatch(removegroupPastMembers(userAuth))
         //we just sending group ID and member ID
 
         clientSocket.emit("joinGroupWithID", { group: data.group });

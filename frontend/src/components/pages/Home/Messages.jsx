@@ -78,7 +78,7 @@ function Messages() {
       };
       fetchChats();
     }
-  }, [selectedUser]);
+  }, [selectedUser?._id]);
   useEffect(() => {
     if (selectedGroup) {
       dispatch(setGroupChat(null));

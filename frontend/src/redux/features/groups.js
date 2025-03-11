@@ -76,6 +76,7 @@ const groupSlice = createSlice({
         addMemberInGroups: (state, action) => {
             console.log("FUCKUED CALLED");
             
+            
             return state.map((group) => {
                 console.log("CALLED FOR GROUP IN GROUPS");
                 console.log(group._id);
@@ -97,7 +98,6 @@ const groupSlice = createSlice({
                         return true;
                     }
                     console.log("value not allowed");
-                    
                     return false;
                   })
                 };
