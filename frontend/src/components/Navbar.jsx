@@ -87,7 +87,7 @@ function Navbar() {
               </Typography>
             </NavLink>
             <NavLink style={{ color: "white", textDecoration: "none" }}>
-              <Typography variant="h6">Chatify</Typography>
+              <Typography variant="h6">Nexus ChatApp</Typography>
             </NavLink>
           </Box>
           {userAuth ? (
