@@ -85,6 +85,7 @@ function Messages() {
   useEffect(() => {
     if (selectedGroup) {
       // dispatch(setGroupChat(null));
+      
       dispatch(setGettingChats(true));
       let fetchChats = async () => {
         try {

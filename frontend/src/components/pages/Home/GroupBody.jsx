@@ -7,7 +7,7 @@ import {
   CardContent,
   Alert,
 } from "@mui/material";
-import React, { useContext, useEffect, useRef } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setmessageImagePreviewUrl } from "../../../redux/features/messageImagePreviewUrl";
 import { messageImagePreviewToggle } from "../../../redux/features/messageImagePreview";
@@ -21,11 +21,9 @@ function GroupBody() {
   const scrollTo = useRef();
   const dispatch = useDispatch();
   const backendUrl = useContext(backendContext);
+  let selectedGroup=useSelector((store)=>store.selectedGroup);
 
-  const handleImagePreview = (imageUrl) => {
-    dispatch(setmessageImagePreviewUrl(imageUrl));
-    dispatch(messageImagePreviewToggle());
-  };
+  // Check if the user is in pastMembers
 
   useEffect(() => {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
@@ -74,8 +72,13 @@ function GroupBody() {
         backgroundColor: "#f5f5f5",
       }}
     >
-      {groupChat?.groupMessages?.length > 0 ? (
+      {/* Show alert if the user was kicked */}
+    
+
+      { groupChat?.groupMessages?.length > 0 ? (
+        <>{
         groupChat.groupMessages.map((chat, index) => {
+          let isKicked=selectedGroup.pastMembers.includes(chat.senderId._id);
           const isSender = chat.senderId._id === userAuth._id;
           const senderName = chat.senderId.fullName;
           const profilePic = isSender
@@ -129,7 +132,7 @@ function GroupBody() {
                 >
                   {/* Sender Name */}
                   <Typography variant="caption" sx={{ color: "text.secondary", marginBottom: "4px" }}>
-                    {isSender ? "You" : senderName}
+                    {isSender ? "You" : senderName}&nbsp;{isKicked?"(Kicked)":null}
                   </Typography>
 
                   {/* Image Message */}
@@ -219,15 +222,33 @@ function GroupBody() {
                   )}
                 </Box>
               </Box>
+            
+              
             </React.Fragment>
           );
-        })
+          {
+            selectedGroup.pastMembers.includes(userAuth._id)?<>
+            <p>You are not a member now!</p>
+            </>:null
+            
+          }
+        })}
+        {
+          selectedGroup.pastMembers.includes(userAuth._id)?
+          <>
+           <Alert severity="warning">You were kicked by Admin!</Alert>
+          </>:null
+        }
+        
+        </>
       ) : (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem", color: "text.secondary" }}>
-            No messages!
-          </Typography>
-        </Box>
+        (
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+            <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem", color: "text.secondary" }}>
+              No messages!
+            </Typography>
+          </Box>
+        )
       )}
 
       <div ref={scrollTo} style={{ visibility: "hidden" }}></div>
