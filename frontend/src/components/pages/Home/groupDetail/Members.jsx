@@ -7,6 +7,11 @@ import toast from "react-hot-toast";
 import { socketContext } from "../../../../SocketProvider";
 import { setaddGroupMemberToggle } from "../../../../redux/features/addGroupMemberToggle";
 import AddGroupMembers from "../../../AddGroupMembers";
+import { removeMemberFromGroups } from "../../../../redux/features/groups";
+import { removeMemberFromGroupChat } from "../../../../redux/features/groupChats";
+import { removegroupCurrentMembers } from "../../../../redux/features/groupCurrentMembers";
+import { addgroupPastMembers } from "../../../../redux/features/groupPastMembers";
+import { removeMemberFromSelectedGroup } from "../../../../redux/features/selectedGroup";
 
 function Members() {
   const groupChat = useSelector((store) => store.groupChat);
@@ -14,31 +19,38 @@ function Members() {
   const users = useSelector((store) => store.users);
   const backendUrl = useContext(backendContext);
   const clientSocket = useContext(socketContext);
-  let currentMembers=useSelector((store)=>{
+  let currentMembers = useSelector((store) => {
     return store.groupCurrentMembers;
   });
-  let pastMembers=useSelector((store)=>{
+  let pastMembers = useSelector((store) => {
     return store.groupPastMembers;
   });
-  let dispatch=useDispatch();
-  let [newMembers,setNewMembers]=useState([]);
-  
+  let dispatch = useDispatch();
+  let [newMembers, setNewMembers] = useState([]);
+
   const handleKickMember = async (groupId, memberEmail) => {
     try {
-      let memberId=users.find((e)=>{
-        if(e.email==memberEmail){
+      let targetMember;
+      let member = users.find((e) => {
+        if (e.email == memberEmail) {
           return true;
         }
       });
-      memberId=memberId?._id;
+      targetMember=member;
+      let memberId = member?._id;
 
-      if(!memberId){
-        if(userAuth.email==memberEmail){
-          memberId=userAuth._id;
+
+      if (!memberId) {
+        if (userAuth.email == memberEmail) {
+          memberId = userAuth._id;
         }
       }
+      
       clientSocket?.emit("memberKick", { groupId, memberEmail });
+      dispatch(removeMemberFromSelectedGroup({
 
+      })); 
+      
       const response = await fetch(
         `${backendUrl}/api/groups/${groupId}/deleteMember/${memberId}`,
         {
@@ -47,6 +59,7 @@ function Members() {
         }
       );
       const data = await response.json();
+
       if (response.status === 200) {
         toast.success(data.message);
       } else {
@@ -85,7 +98,6 @@ function Members() {
           justifyContent: "center",
           alignItems: "center",
           // border:"2px solid red"
-          
         }}
       >
         <Typography variant="h6">
@@ -107,13 +119,14 @@ function Members() {
           variant="outlined"
           startIcon={<PersonAddIcon />}
           sx={{ textTransform: "none", width: "100%", mx: "auto" }}
-          onClick={() => {dispatch(setaddGroupMemberToggle())}}
+          onClick={() => {
+            dispatch(setaddGroupMemberToggle());
+          }}
         >
           Add Members
         </Button>
-        <AddGroupMembers></AddGroupMembers>  
+        <AddGroupMembers></AddGroupMembers>
       </Box>
-
 
       {/* Admin Section */}
       {groupChat?.groupAdmin?._id && (
@@ -208,7 +221,9 @@ function Members() {
                     variant="contained"
                     color="error"
                     size="small"
-                    onClick={() => handleKickMember(groupChat._id, member.email)}
+                    onClick={() =>
+                      handleKickMember(groupChat._id, member.email)
+                    }
                   >
                     Kick
                   </Button>
@@ -263,7 +278,8 @@ function Members() {
                       alt="Past Member Profile"
                     />
                   </Box>
-                  {userAuth._id==pastMember._id?"You":pastMember.fullName} <strong>(Removed)</strong>
+                  {userAuth._id == pastMember._id ? "You" : pastMember.fullName}{" "}
+                  <strong>(Removed)</strong>
                 </Box>
               </Box>
             ))}

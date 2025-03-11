@@ -123,28 +123,40 @@ function SocketProvider({ children }) {
         dispatch(addgroupPastMembers(targetMember));
       }
     });
-    clientSocket.on("gotAddedToGroup", (data) => {
+    clientSocket.on("gotAddedToGroup", async(data) => {
       if (clientSocket) {
         console.log("You were added to Group:", data.group);
         console.log("Your details:", data.member);
-        dispatch(
-          addMemberInGroups({
-            groupId: data.group_id,
-            member: userAuth,
-          })
-        ); //we just sending group ID and member ID
-        dispatch(
-          addMemberInGroupChat({
-            groupId: data.group_id,
-            member: userAuth,
-          })
-        );
-        dispatch(
-          addMemberInSelectedGroup({
-            groupId: data.group_id,
-            member: userAuth,
-          })
-        );
+        await new Promise((resolve,reject)=>{
+          dispatch(
+            addMemberInGroups({
+              groupId: data.group_id,
+              member: userAuth,
+            })
+          );
+          resolve();
+        })
+        await new Promise((resolve,reject)=>{
+          dispatch(
+            addMemberInGroupChat({
+              groupId: data.group_id,
+              member: userAuth,
+            })
+          );
+          resolve();
+        })
+        await new Promise((resolve,reject)=>{
+          dispatch(
+            addMemberInSelectedGroup({
+              groupId: data.group_id,
+              member: userAuth,
+            })
+          );
+          resolve();
+        })
+        //we just sending group ID and member ID
+        
+       
         console.log("selectedGroup:", selectedGroup);
         console.log("groupChat:", groupChat);
         console.log("groups:", groups);

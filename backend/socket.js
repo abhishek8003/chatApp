@@ -220,14 +220,11 @@ io_server.on("connection", (clientSocket) => {
 
         if (targetMemberWithSocket) {
             let socket = io_server.sockets.sockets.get(targetMemberWithSocket.socketId);
-            io_server.to(roomId).emit("gotKickedFromGroup", {
+            
+            io_server.emit("gotKickedFromGroup", {
                 groupId: targetGroupId,
                 memberId: targetMemberWithSocket._id
             });
-            // clientSocket.broadcast.emit("gotKickedFromGroup", {
-            //     groupId: targetGroupId,
-            //     memberId: targetMemberWithSocket._id
-            // });
             if (socket) {
                 await new Promise((resolve,reject)=>{
                     socket.leave(roomId,()=>{
@@ -247,7 +244,7 @@ io_server.on("connection", (clientSocket) => {
             }
            
         } else {
-            console.log(`User ${targetMember._id} is not online.`);
+            console.log(`User ${targetMemberWithSocket._id} is not online.`);
         }
     });
     // { groupId, memberId }
