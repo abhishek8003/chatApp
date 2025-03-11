@@ -35,6 +35,9 @@ function Messages() {
   let groups = useSelector((store) => {
     return store.groups;
   });
+  let groupChat=useSelector((store)=>{
+    return store.groupChat
+  })
   let messageImagePreview = useSelector((store) => {
     return store.messageImagePreviewReducer;
   });
@@ -43,6 +46,12 @@ function Messages() {
     return store.userAuth;
   });
   let clientSocket = useContext(socketContext);
+  useEffect(()=>{
+    console.log("selectedGroup:", selectedGroup);
+    console.log("groupChat:", groupChat);
+    console.log("groups:", groups);
+   
+  },[selectedGroup,groupChat,groups,])
   useEffect(() => {
     if (selectedUser) {
       dispatch(setGettingChats(true));

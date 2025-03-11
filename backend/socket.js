@@ -239,12 +239,14 @@ io_server.on("connection", (clientSocket) => {
                 }
                 
             } else {
-                console.log(`Socket not found for user ${targetMemberWithSocket._id}`);
+                let user=await Users.find({email:targetMemberEmail});
+                console.log(`Socket not found for user ${user._id}`);
                 throw new Error("socket not found!");
             }
            
         } else {
-            console.log(`User ${targetMemberWithSocket._id} is not online.`);
+            let user=await Users.find({email:targetMemberEmail});
+            console.log(`User ${user._id} is not online.`);
         }
     });
     // { groupId, memberId }

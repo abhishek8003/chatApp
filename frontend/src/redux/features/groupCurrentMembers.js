@@ -17,7 +17,7 @@ const groupCurrentMembersSlice = createSlice({
         },
         removegroupCurrentMembers(state,action){
             return state.filter((f)=>{
-                if(f._id!=action.payload._id){
+                if(f._id && (f?._id!=action.payload._id)){
                     return true
                 }
                 return false;

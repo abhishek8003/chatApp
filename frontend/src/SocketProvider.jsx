@@ -101,13 +101,11 @@ function SocketProvider({ children }) {
       return;
     }
     clientSocket.on("gotKickedFromGroup", (data) => {
-      // if (selectedGroup?._id === data.groupId.toString() && clientSocket) {
-      // alert("got kick request")
       if (clientSocket) {
         console.log(data.groupId);
         console.log(data.memberId);
         dispatch(removeMemberFromSelectedGroup(data)); ////we just sending group ID and member ID
-        
+
         dispatch(removeMemberFromGroups(data)); //we just sending group ID and member ID
         dispatch(removeMemberFromGroupChat(data)); //we just sending group ID and member ID
         let targetMember = users.find((e) => {
@@ -122,49 +120,40 @@ function SocketProvider({ children }) {
         }
         dispatch(removegroupCurrentMembers(targetMember));
         dispatch(addgroupPastMembers(targetMember));
+        console.log("updated selected GROUP without", selectedGroup);
+        console.log("updated  GROUPs without", groups);
+        console.log("updated  GROUP chats without", groupChat);
       }
     });
-    clientSocket.on("gotAddedToGroup", async(data) => {
+    clientSocket.on("gotAddedToGroup", async (data) => {
       if (clientSocket) {
         console.log("You were added to Group:", data.group);
         console.log("Your details:", data.member);
-        await new Promise((resolve,reject)=>{
-          dispatch(
-            addMemberInGroups({
-              groupId: data.group_id,
-              member: userAuth,
-            })
-          );
-          resolve();
-        })
-        await new Promise((resolve,reject)=>{
-          dispatch(
-            addMemberInGroupChat({
-              groupId: data.group_id,
-              member: userAuth,
-            })
-          );
-          resolve();
-        })
-        await new Promise((resolve,reject)=>{
-          dispatch(
-            addMemberInSelectedGroup({
-              groupId: data.group_id,
-              member: userAuth,
-            })
-          );
-          resolve();
-        })
+
+        dispatch(
+          addMemberInGroups({
+            groupId: data.group._id,
+            member: userAuth,
+          })
+        );
+        dispatch(
+          addMemberInGroupChat({
+            groupId: data.group._id,
+            member: userAuth,
+          })
+        );
+        dispatch(
+          addMemberInSelectedGroup({
+            groupId: data.group._id,
+            member: userAuth,
+          })
+        );
         //we just sending group ID and member ID
-        
-       
-        console.log("selectedGroup:", selectedGroup);
-        console.log("groupChat:", groupChat);
-        console.log("groups:", groups);
+
         clientSocket.emit("joinGroupWithID", { group: data.group });
       }
     });
-  }, [userAuth, users, selectedGroup,groups,groupChat]);
+  }, [userAuth, users, selectedGroup, groups, groupChat]);
   // Handle live messages and notifications
   useEffect(() => {
     if (!clientSocket) return;

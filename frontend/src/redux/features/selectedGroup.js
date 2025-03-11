@@ -11,7 +11,7 @@ const selectedGroupSlice = createSlice({
         },
         removeMemberFromSelectedGroup: (state, action) => {
             console.log("selected group updated!");
-            if (state._id === action.payload.groupId) {
+            if (state&&state._id === action.payload.groupId) {
                 return {
                     ...state,
                     groupMembers: state.groupMembers.filter(
@@ -25,28 +25,42 @@ const selectedGroupSlice = createSlice({
             return state; // No changes if groupId doesn't match
         }
         ,
+        // addMemberInSelectedGroup: (state, action) => {
+        //     if (state?.groupMembers && state?.pastMembers) {
+        //         return {
+        //             ...state,
+        //             groupMembers: [...state.groupMembers, action.payload.member._id],
+        //             pastMembers: state.pastMembers.filter((e) => {
+        //                 console.log("e:", e);
+        //                 console.log("member._id", action.payload.member._id);
+        //                 if (e != action.payload.member._id) {
+        //                     return true;
+        //                 }
+        //                 return false;
+        //             }),
+
+        //         };
+        //     }
+        //     else {
+        //         return state;
+        //     }
+        // },
         addMemberInSelectedGroup: (state, action) => {
             if (state?.groupMembers && state?.pastMembers) {
-                return {
-                    ...state,
-                    groupMembers: [...state.groupMembers, action.payload.member._id],
-                    pastMembers: state.pastMembers.filter((e) => {
-                        console.log("e:", e);
-                        console.log("member._id", action.payload.member._id);
-
-
-                        if (e != action.payload.member._id) {
-                            return true;
-                        }
-                        return false;
-                    }),
-
-                };
+              const memberId = action.payload.member._id;
+              
+              return {
+                ...state,
+                // Prevent duplicate group members
+                groupMembers: state.groupMembers.includes(memberId)
+                  ? state.groupMembers
+                  : [...state.groupMembers, memberId],
+                // Simplified pastMembers filter
+                pastMembers: state.pastMembers.filter(id => id !== memberId),
+              };
             }
-            else {
-                return state;
-            }
-        }
+            return state;
+          }
 
     }
 });
