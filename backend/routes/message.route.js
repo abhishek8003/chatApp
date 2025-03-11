@@ -21,7 +21,6 @@ message_router.get("/:id", isAuthenticated, async (req, res, next) => {
 
         res.status(200).send({ allMessages: messages });
 
-
     } catch (error) {
         console.log(error);
         res.status(500).send({ message: error.message })

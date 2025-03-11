@@ -19,6 +19,8 @@ import { setGroupChat } from "../../../redux/features/groupChats";
 import AccountInfo from "./AccountInfo";
 import { setgroupCurrentMembers } from "../../../redux/features/groupCurrentMembers";
 import { setgroupPastMembers } from "../../../redux/features/groupPastMembers";
+import { setSelectedUser } from "../../../redux/features/selectedUser";
+import { setSelectedGroup } from "../../../redux/features/selectedGroup";
 function Messages() {
   let selectedUser = useSelector((store) => {
     return store.selectedUser;
@@ -54,6 +56,7 @@ function Messages() {
   },[selectedGroup,groupChat,groups,])
   useEffect(() => {
     if (selectedUser) {
+      // dispatch(setChats([]));
       dispatch(setGettingChats(true));
       let fetchChats = async () => {
         try {
@@ -81,7 +84,7 @@ function Messages() {
   }, [selectedUser?._id]);
   useEffect(() => {
     if (selectedGroup) {
-      dispatch(setGroupChat(null));
+      // dispatch(setGroupChat(null));
       dispatch(setGettingChats(true));
       let fetchChats = async () => {
         try {
@@ -119,6 +122,15 @@ function Messages() {
       fetchChats();
     }
   }, [selectedGroup?._id]);
+
+  useEffect(() => {
+    if (selectedUser) dispatch(setSelectedGroup(null));
+  }, [selectedUser]);
+
+  // Clear selectedUser when switching to group chats
+  useEffect(() => {
+    if (selectedGroup) dispatch(setSelectedUser(null));
+  }, [selectedGroup]);
 
   let dispatch = useDispatch();
 

@@ -14,16 +14,13 @@ import { messageImagePreviewToggle } from "../../../redux/features/messageImageP
 import { backendContext } from "../../../BackendProvider";
 
 function GroupBody() {
-  const selectedUser = useSelector((store) => store.selectedUser);
-  let selectedGroup = useSelector((store) => store.selectedGroup);
   const userAuth = useSelector((store) => store.userAuth);
-  let users = useSelector((store) => store.users);
+  const users = useSelector((store) => store.users);
   const groupChat = useSelector((store) => store.groupChat);
   const chatContainer = useRef();
-  let groups = useSelector((store) => store.groups);
   const scrollTo = useRef();
   const dispatch = useDispatch();
-  let backendUrl = useContext(backendContext);
+  const backendUrl = useContext(backendContext);
 
   const handleImagePreview = (imageUrl) => {
     dispatch(setmessageImagePreviewUrl(imageUrl));
@@ -34,8 +31,34 @@ function GroupBody() {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
   }, [groupChat?.groupMessages]);
 
-  // Check if user is in pastMembers (i.e., they were removed from the group)
-  const isUserRemoved = groupChat?.pastMembers?.includes(userAuth._id);
+  const formatTime = (date) =>
+    new Date(date).toLocaleTimeString("en-IN", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+    });
+
+  const formatDate = (date) => {
+    const messageDate = new Date(date);
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+
+    if (messageDate.toDateString() === today.toDateString()) {
+      return "Today";
+    } else if (messageDate.toDateString() === yesterday.toDateString()) {
+      return "Yesterday";
+    } else {
+      return messageDate.toLocaleDateString("en-IN", {
+        weekday: "short",
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+  };
+
+  let lastDate = null;
 
   return (
     <Box
@@ -52,132 +75,159 @@ function GroupBody() {
       }}
     >
       {groupChat?.groupMessages?.length > 0 ? (
-        groupChat.groupMessages.map((chat) => {
+        groupChat.groupMessages.map((chat, index) => {
           const isSender = chat.senderId._id === userAuth._id;
           const senderName = chat.senderId.fullName;
-          let isUserKicked = groupChat.pastMembers.includes(chat.senderId._id);
           const profilePic = isSender
             ? userAuth.profilePic?.cloud_url
-            : users.find((u) => u._id === chat.senderId._id)?.profilePic
-                .cloud_url;
+            : users.find((u) => u._id === chat.senderId._id)?.profilePic.cloud_url;
+
+          const currentMessageDate = formatDate(chat.createdAt);
+          const showDate = currentMessageDate !== lastDate;
+          lastDate = currentMessageDate;
 
           return (
-            <Box
-              key={chat._id}
-              sx={{
-                display: "flex",
-                gap: "8px",
-                flexDirection: isSender ? "row-reverse" : "row",
-                marginBottom: "16px",
-              }}
-            >
-              <Avatar
-                src={
-                  profilePic || `${backendUrl}/images/default_group_icon.png`
-                }
-                sx={{ width: 50, height: 50 }}
-              />
+            <React.Fragment key={chat._id}>
+              {/* Date Separator */}
+              {showDate && (
+                <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
+                  <Typography
+                    sx={{
+                      backgroundColor: "#e1e1e1",
+                      color: "#555",
+                      fontSize: "0.85rem",
+                      padding: "4px 12px",
+                      borderRadius: "16px",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    {currentMessageDate}
+                  </Typography>
+                </Box>
+              )}
+
               <Box
                 sx={{
                   display: "flex",
-                  flexDirection: "column",
-                  alignItems: isSender ? "flex-end" : "flex-start",
-                  maxWidth: "70%",
+                  gap: "8px",
+                  flexDirection: isSender ? "row-reverse" : "row",
+                  alignItems: "flex-end",
+                  marginBottom: "12px",
                 }}
               >
-                <Typography
-                  variant="caption"
-                  sx={{ color: "text.secondary", marginBottom: "4px" }}
+                <Avatar
+                  src={profilePic || `${backendUrl}/images/default_group_icon.png`}
+                  sx={{ width: 40, height: 40 }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: isSender ? "flex-end" : "flex-start",
+                    maxWidth: "70%",
+                  }}
                 >
-                  {isSender ? "You" : senderName}
-                  {isUserKicked ? " (kicked)" : ""}
-                </Typography>
-                {chat.image && chat.image.cloud_url ? (
-                  <Card
-                    sx={{
-                      borderRadius: "12px",
-                      boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                      "&:hover": {
-                        boxShadow: "0 6px 8px rgba(0, 0, 0, 0.15)",
-                      },
-                    }}
-                  >
-                    <CardMedia
-                      component="img"
-                      image={chat.image.cloud_url}
-                      alt="Chat Image"
+                  {/* Sender Name */}
+                  <Typography variant="caption" sx={{ color: "text.secondary", marginBottom: "4px" }}>
+                    {isSender ? "You" : senderName}
+                  </Typography>
+
+                  {/* Image Message */}
+                  {chat.image && chat.image.cloud_url ? (
+                    <Box
                       sx={{
-                        width: "100%",
-                        height: "auto",
-                        borderRadius: "12px 12px 0 0",
-                        cursor: "pointer",
+                        backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
+                        padding: "6px",
+                        borderRadius: "12px",
+                        boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                        maxWidth: "250px",
                       }}
-                      onClick={() => handleImagePreview(chat.image.cloud_url)}
-                    />
-                    {chat.text && (
-                      <CardContent sx={{ padding: "8px 16px" }}>
-                        <Typography
-                          variant="body2"
-                          sx={{ wordBreak: "break-word" }}
-                        >
-                          {chat.text}
-                        </Typography>
-                      </CardContent>
-                    )}
-                  </Card>
-                ) : (
-                  <Box
-                    sx={{
-                      backgroundColor: isSender ? "#1976d2" : "#ffffff",
-                      color: isSender ? "#ffffff" : "#000000",
-                      padding: "8px 16px",
-                      borderRadius: "12px",
-                      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                      wordBreak: "break-word",
-                    }}
-                  >
-                    <Typography variant="body1">{chat.text}</Typography>
-                  </Box>
-                )}
+                    >
+                      <Card
+                        sx={{
+                          borderRadius: "12px",
+                          boxShadow: "none",
+                        }}
+                      >
+                        <CardMedia
+                          component="img"
+                          image={chat.image.cloud_url}
+                          alt="Chat Image"
+                          sx={{
+                            width: "100%",
+                            height: "auto",
+                            borderRadius: "12px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleImagePreview(chat.image.cloud_url)}
+                        />
+                      </Card>
+
+                      {/* Text below image */}
+                      {chat.text && (
+                        <CardContent sx={{ padding: "4px 8px" }}>
+                          <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+                            {chat.text}
+                          </Typography>
+                        </CardContent>
+                      )}
+
+                      {/* Timestamp for Image */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "right",
+                          color: "#808080",
+                          fontSize: "0.75rem",
+                          marginTop: "4px",
+                        }}
+                      >
+                        {formatTime(chat.createdAt)}
+                      </Typography>
+                    </Box>
+                  ) : (
+                    /* Text Message */
+                    <Box
+                      sx={{
+                        backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
+                        color: isSender ? "#000000" : "#000000",
+                        padding: "8px 16px",
+                        borderRadius: "12px",
+                        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+                        wordBreak: "break-word",
+                        position: "relative",
+                        maxWidth: "250px",
+                      }}
+                    >
+                      <Typography variant="body1">{chat.text}</Typography>
+
+                      {/* Timestamp for Text */}
+                      <Typography
+                        variant="caption"
+                        sx={{
+                          display: "block",
+                          textAlign: "right",
+                          color: "#808080",
+                          fontSize: "0.75rem",
+                          marginTop: "4px",
+                        }}
+                      >
+                        {formatTime(chat.createdAt)}
+                      </Typography>
+                    </Box>
+                  )}
+                </Box>
               </Box>
-            </Box>
+            </React.Fragment>
           );
         })
       ) : (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100%",
-          }}
-        >
-          <Typography
-            variant="h6"
-            sx={{
-              fontWeight: "bolder",
-              fontSize: "2rem",
-              color: "text.secondary",
-            }}
-          >
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem", color: "text.secondary" }}>
             No messages!
           </Typography>
         </Box>
-      )}
-
-      {/* Show Warning Only if User is in pastMembers */}
-      {isUserRemoved && (
-        <Alert
-          severity="warning"
-          sx={{
-            marginTop: "16px",
-            textAlign: "center",
-            fontSize: "1rem",
-            fontWeight: "bold",
-          }}
-        >
-          You are no longer a member of this group. You can't send messages.
-        </Alert>
       )}
 
       <div ref={scrollTo} style={{ visibility: "hidden" }}></div>

@@ -58,6 +58,7 @@ notification_router.delete("/", isAuthenticated,
                 });
                 console.log(result);
             }
+            res.status(200).json({ message: "Notifications deleted successfully" });
 
         } catch (error) {
             console.log(error);

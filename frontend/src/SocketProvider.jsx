@@ -165,16 +165,18 @@ function SocketProvider({ children }) {
 
     clientSocket.on("recieveMessageLive", (newMessage) => {
       if (selectedUser?._id === newMessage.senderId.toString()) {
-        console.log("Received new message");
+        console.log("Received new message:",newMessage);
         dispatch(
           updateChats({
             senderId: newMessage.senderId,
+            isGroupChat: false,
             receiverId: newMessage.receiverId,
             text: newMessage.text,
             image: {
               local_url: "",
               cloud_url: newMessage.image ? newMessage.image : null,
             },
+            createdAt:newMessage.createdAt
           })
         );
       }
