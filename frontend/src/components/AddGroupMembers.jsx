@@ -125,7 +125,6 @@ function AddGroupMembers() {
             body: JSON.stringify(selectedMembers),
           }
         );
-
         const data = await response.json();
         if (response.status === 200) {
           toast.success(data.message);
@@ -154,9 +153,6 @@ function AddGroupMembers() {
           });
           console.log("users:", users);
           console.log("POPULATED selected members:", selectedMembers);
-
-  
-
           selectedMembers.forEach((m) => {
             dispatch(addgroupCurrentMembers(m));
             dispatch(removegroupPastMembers(m));

@@ -39,8 +39,8 @@ app.use("/api/groups",group_route)
 app.use("/api/notifications",notification_router);
 app.get("*",(req,res,next)=>{
     res.redirect(process.env.frontendURL);
-})
+});
 http_server.listen(process.env.PORT || 5000, () => {
     console.log(`Server is running on ${process.env.PORT || 5000}...`);
 
-})
+});

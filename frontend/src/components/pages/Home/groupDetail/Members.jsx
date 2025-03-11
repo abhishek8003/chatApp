@@ -36,16 +36,15 @@ function Members() {
           return true;
         }
       });
-      targetMember=member;
+      targetMember = member;
       let memberId = member?._id;
-
 
       if (!memberId) {
         if (userAuth.email == memberEmail) {
           memberId = userAuth._id;
         }
       }
-      
+
       clientSocket?.emit("memberKick", { groupId, memberEmail });
 
       const response = await fetch(
@@ -103,27 +102,30 @@ function Members() {
       </Box>
 
       {/* Add Members Button */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "5px",
-          border: "1px solid gray",
-          margin: "0.5rem 0px",
-        }}
-      >
-        <Button
-          variant="outlined"
-          startIcon={<PersonAddIcon />}
-          sx={{ textTransform: "none", width: "100%", mx: "auto" }}
-          onClick={() => {
-            dispatch(setaddGroupMemberToggle());
+      {
+        (groupChat?.groupAdmin?._id==userAuth._id)?
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "5px",
+            border: "1px solid gray",
+            margin: "0.5rem 0px",
           }}
         >
-          Add Members
-        </Button>
-        <AddGroupMembers></AddGroupMembers>
-      </Box>
+          <Button
+            variant="outlined"
+            startIcon={<PersonAddIcon />}
+            sx={{ textTransform: "none", width: "100%", mx: "auto" }}
+            onClick={() => {
+              dispatch(setaddGroupMemberToggle());
+            }}
+          >
+            Add Members
+          </Button>
+          <AddGroupMembers></AddGroupMembers>
+        </Box>:null
+      }
 
       {/* Admin Section */}
       {groupChat?.groupAdmin?._id && (
