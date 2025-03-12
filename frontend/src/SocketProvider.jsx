@@ -67,6 +67,7 @@ function SocketProvider({ children }) {
         console.log("Connected to socket server");
         if (!isInitialConnect.current) {
           // Force full page reload on reconnect
+          toast.success("Reconnected!")
           window.location.reload();
         }
         isInitialConnect.current = false;
