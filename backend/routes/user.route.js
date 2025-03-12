@@ -11,10 +11,7 @@ user_router.get("/", isAuthenticated, async (req, res, next) => {
             _id: { $ne: req.user._id }
         });
         // console.log(allUsers);
-        setTimeout(() => {
-            res.status(200).json({ users: allUsers });
-        }, 1000)
-
+        res.status(200).json({ users: allUsers });
     }
     catch (err) {
         console.log(err);
