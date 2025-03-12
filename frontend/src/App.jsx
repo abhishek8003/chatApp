@@ -81,7 +81,7 @@ function App() {
             <Route
               path="/"
               element={
-                userAuth ? <Home numberOfRetry={retry}></Home> : <Navigate to="/signup"></Navigate>
+                userAuth ? <Home></Home> : <Navigate to="/signup"></Navigate>
               }
             ></Route>
             <Route
@@ -108,6 +108,7 @@ function App() {
             ></Route>
           </Routes>
         </BrowserRouter>
+        <p>{retry}</p>
       </>
     );
   }

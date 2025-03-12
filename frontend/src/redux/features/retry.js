@@ -5,7 +5,7 @@ const retrySlice = createSlice({
     initialState: initialState,
     reducers: {
         increaseRetry: (state) => {
-            return state++;
+            return state+1;
         }
     }
 });
