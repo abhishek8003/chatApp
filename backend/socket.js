@@ -7,7 +7,9 @@ const app = express();
 const http_server = http.createServer(app);
 const io_server = new Server(http_server, {
     cors: { origin: `${process.env.frontendURL}` },
-    maxHttpBufferSize: 1e8
+    maxHttpBufferSize: 1e8,
+    pingInterval: 5000,  // Ping every 5 seconds
+    pingTimeout: 5000    // Disconnect if no response within 5 seconds
 });
 const ChatNotification = require("./models/chatNotification")
 const GroupNotification = require("./models/groupNotification");
@@ -31,7 +33,9 @@ io_server.on("connection", (clientSocket) => {
     }
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
-
+    // clientSocket.on("heartbeat", (data) => {
+    //     console.log(`Received heartbeat from ${data.userId}`);
+    // });
     clientSocket.on("deleteOnlineUser", (data) => {
         console.log(data);
 
@@ -277,7 +281,6 @@ io_server.on("connection", (clientSocket) => {
             member: targetMembersIDs
         });
     });
-
 
     clientSocket.on("disconnect", () => {
         console.log("A user disconnected with Socket id:", clientSocket.id);
