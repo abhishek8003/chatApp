@@ -50,6 +50,7 @@ function SocketProvider({ children }) {
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
   const prevGroupsRef = useRef([]);
   let retry=useSelector((store)=>store.retry);
+  let [refresh,setRefresh]=useState(0);
   
   // Initialize socket connection
   useEffect(() => {
@@ -65,10 +66,11 @@ function SocketProvider({ children }) {
 
       socket.on("connect", () => {
         console.log("Connected to socket server");
-        if(retry!=0){
+        if(refresh>0){
           toast.success("Reconnected successfully!");
           dispatch(increaseRetry());
         }
+        setRefresh(refresh+1);
       });
 
       socket.on("disconnect", (reason) => {
