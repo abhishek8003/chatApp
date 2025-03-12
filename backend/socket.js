@@ -26,7 +26,7 @@ io_server.on("connection", (clientSocket) => {
         let existingUserIndex = online_users.findIndex((u) => u._id.toString() === user._id.toString());
         if (existingUserIndex !== -1) {
             console.log("User is reconnected with new Socket Id:", clientSocket.id)
-            clientSocket.emit("reconnect_notify","You got reconnected!");
+            clientSocket.emit("reconnectedSuccess","You got reconnected!");
             online_users[existingUserIndex].socketId = clientSocket.id; // Update socket ID
         } else {
             online_users.push(user);

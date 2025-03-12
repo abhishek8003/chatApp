@@ -76,21 +76,13 @@ function SocketProvider({ children }) {
         console.error("Socket connection error:", error);
         toast.error("Unable to connect to server! Retrying...");
       });
+      socket.on("reconnectedSuccess",()=>{
+        toast.success("Reconnected");
+      })
   
       socket.on("reconnect_attempt", () => {
         console.log("Attempting to reconnect...");
       });
-  
-      // socket.on("reconnect", () => {
-      //   alert("recconexteasf");
-      //   console.log("Reconnected to socket server");
-      //   toast.success("Reconnected successfully!");
-      //   setClientSocket(socket);
-      // });
-      // socket.on("reconnect_notify", (data) => {
-      //   toast.success(data);
-      // });
-  
       socket.on("reconnect_failed", () => {
         console.log("Reconnection failed.");
         toast.error("Failed to reconnect. Please check your network.");
