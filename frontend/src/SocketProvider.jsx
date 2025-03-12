@@ -5,7 +5,7 @@ import { setOnlineUsers } from "./redux/features/onlineUsers";
 import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
 import { updateChats } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
-import { updateSelectedUser } from "./redux/features/selectedUser";
+import { setSelectedUser, updateSelectedUser } from "./redux/features/selectedUser";
 import {
   addFriends,
   addNewFriend,
@@ -26,6 +26,7 @@ import {
 import {
   addMemberInSelectedGroup,
   removeMemberFromSelectedGroup,
+  setSelectedGroup,
 } from "./redux/features/selectedGroup";
 import { addgroupCurrentMembers, removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
 import { addgroupPastMembers, removegroupPastMembers } from "./redux/features/groupPastMembers";
@@ -63,7 +64,13 @@ function SocketProvider({ children }) {
 
       socket.on("connect", () => {
         console.log("Connected to socket server");
-        if(retry){
+        if(retry.current){
+          if(selectedGroup){
+            dispatch(setSelectedGroup(selectedGroup))
+          }
+          if(selectedUser){
+            dispatch(setSelectedUser(selectedUser))
+          }
           toast.success("Reconnected successfully!");
         }
         retry.current++;
