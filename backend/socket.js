@@ -18,9 +18,16 @@ io_server.on("connection", (clientSocket) => {
     console.log("A user joined with Socket id:", clientSocket.id);
 
     let user = JSON.parse(clientSocket.handshake.query.user);
-    user.socketId = clientSocket.id;
     if (user) {
-        online_users = [...online_users, user];
+        user.socketId = clientSocket.id;
+        // Check if the user is already in online_users (reconnection case)
+        let existingUserIndex = online_users.findIndex((u) => u._id.toString() === user._id.toString());
+        if (existingUserIndex !== -1) {
+            console.log("User is reconnected with new Socket Id:", clientSocket.id)
+            online_users[existingUserIndex].socketId = clientSocket.id; // Update socket ID
+        } else {
+            online_users.push(user);
+        }
     }
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
@@ -33,6 +40,7 @@ io_server.on("connection", (clientSocket) => {
     });
     clientSocket.on("sendFriend", async (data) => {
         console.log(data);
+        let targetSocketId;
         let onlineUsersIds = online_users.map(e => e._id);
         let newFriend = await User.findById(data.newFriend);
         data.target.forEach((target) => {
@@ -216,18 +224,18 @@ io_server.on("connection", (clientSocket) => {
         let targetMemberWithSocket = online_users.find((e) => e.email.toString() === targetMemberEmail.toString());
         console.log(targetMemberWithSocket)
         // Notify all members in the group
-        
+
 
         if (targetMemberWithSocket) {
             let socket = io_server.sockets.sockets.get(targetMemberWithSocket.socketId);
-            
+
             io_server.emit("gotKickedFromGroup", {
                 groupId: targetGroupId,
                 member: targetMemberWithSocket
             });
             if (socket) {
-                await new Promise((resolve,reject)=>{
-                    socket.leave(roomId,()=>{
+                await new Promise((resolve, reject) => {
+                    socket.leave(roomId, () => {
                         resolve();
                     })
                 })
@@ -237,19 +245,19 @@ io_server.on("connection", (clientSocket) => {
                 } else {
                     console.log(`User ${targetMemberWithSocket._id} is still in room ${targetGroupId}`);
                 }
-                
+
             } else {
-                let user=await Users.find({email:targetMemberEmail});
+                let user = await Users.find({ email: targetMemberEmail });
                 console.log(`Socket not found for user ${user._id}`);
                 throw new Error("socket not found!");
             }
-           
+
         } else {
-            let user=await Users.find({email:targetMemberEmail});
+            let user = await Users.find({ email: targetMemberEmail });
             console.log(`User ${user._id} is not online.`);
         }
     });
-   
+
     clientSocket.on("memberAdd", async (data) => {
         console.log(data.groupId);
         console.log(data.members);
@@ -270,14 +278,14 @@ io_server.on("connection", (clientSocket) => {
         });
     });
 
+
     clientSocket.on("disconnect", () => {
         console.log("A user disconnected with Socket id:", clientSocket.id);
-        online_users = online_users.filter((u) => u !== user);
-        io_server.emit("getOnlineUsers", online_users);
+        if (user && user._id) {
+            online_users = online_users.filter((u) => u._id !== user._id);
+            io_server.emit("getOnlineUsers", online_users);
+        }
     });
-    clientSocket.on("reconnect", () => {
-        console.log(`User reconnected: ${socket.id}`);
-      });
 });
 
 module.exports = { http_server, app, io_server };

@@ -55,7 +55,7 @@ function SocketProvider({ children }) {
         query: { user: JSON.stringify(userAuth) },
         reconnection: true, // Enables automatic reconnection
         reconnectionAttempts: Infinity, // Keep trying indefinitely
-        reconnectionDelay: 3000, // Try to reconnect every 3 seconds
+        reconnectionDelay: 1000, // Try to reconnect every 1 seconds
       });
 
       setClientSocket(socket);
@@ -66,7 +66,7 @@ function SocketProvider({ children }) {
 
       socket.on("disconnect", (reason) => {
         console.log(`Disconnected from socket server: ${reason}`);
-        setClientSocket(null);
+        // setClientSocket(null);
   
         // Notify user
         toast.error("Connection lost! Trying to reconnect...");
@@ -84,6 +84,7 @@ function SocketProvider({ children }) {
       socket.on("reconnect", () => {
         console.log("Reconnected to socket server");
         toast.success("Reconnected successfully!");
+        setClientSocket(socket);
       });
   
       socket.on("reconnect_failed", () => {
@@ -115,8 +116,15 @@ function SocketProvider({ children }) {
 
       // Cleanup on unmount
       return () => {
+        
+        socket.off("getOnlineUsers");
+        socket.off("createNewGroup");
+        socket.off("addFriend");
+        socket.off("newUserRegistered");
+        
         console.log("Socket requested disconnection!");
         socket.disconnect();
+
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
