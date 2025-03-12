@@ -28,7 +28,10 @@ function GroupBody() {
   useEffect(() => {
     scrollTo.current?.scrollIntoView({ behavior: "smooth" });
   }, [groupChat?.groupMessages]);
-
+  const handleImagePreview = (imageUrl) => {
+    dispatch(setmessageImagePreviewUrl(imageUrl));
+    dispatch(messageImagePreviewToggle());
+  };
   const formatTime = (date) =>
     new Date(date).toLocaleTimeString("en-IN", {
       hour: "numeric",
