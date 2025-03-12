@@ -81,15 +81,15 @@ function SocketProvider({ children }) {
         console.log("Attempting to reconnect...");
       });
   
-      socket.on("reconnect", () => {
-        alert("recconexteasf");
-        console.log("Reconnected to socket server");
-        toast.success("Reconnected successfully!");
-        setClientSocket(socket);
-      });
-      socket.on("reconnect_notify", (data) => {
-        toast.success(data);
-      });
+      // socket.on("reconnect", () => {
+      //   alert("recconexteasf");
+      //   console.log("Reconnected to socket server");
+      //   toast.success("Reconnected successfully!");
+      //   setClientSocket(socket);
+      // });
+      // socket.on("reconnect_notify", (data) => {
+      //   toast.success(data);
+      // });
   
       socket.on("reconnect_failed", () => {
         console.log("Reconnection failed.");
