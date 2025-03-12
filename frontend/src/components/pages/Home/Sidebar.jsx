@@ -181,7 +181,7 @@ function Sidebar() {
     return () => {
       console.log("sidebar unmouted");
     };
-  }, []);
+  }, [clientSocket]);
   let groups = useSelector((store) => {
     return store.groups;
   });

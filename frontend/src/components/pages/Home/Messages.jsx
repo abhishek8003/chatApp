@@ -81,7 +81,7 @@ function Messages() {
       };
       fetchChats();
     }
-  }, [selectedUser?._id]);
+  }, [selectedUser?._id,clientSocket]);
   useEffect(() => {
     if (selectedGroup) {
       // dispatch(setGroupChat(null));
@@ -122,7 +122,7 @@ function Messages() {
       };
       fetchChats();
     }
-  }, [selectedGroup?._id]);
+  }, [selectedGroup?._id,clientSocket]);
 
   useEffect(() => {
     if (selectedUser) dispatch(setSelectedGroup(null));
