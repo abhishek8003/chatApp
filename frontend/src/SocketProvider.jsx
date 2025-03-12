@@ -82,9 +82,13 @@ function SocketProvider({ children }) {
       });
   
       socket.on("reconnect", () => {
+        alert("recconexteasf");
         console.log("Reconnected to socket server");
         toast.success("Reconnected successfully!");
         setClientSocket(socket);
+      });
+      socket.on("reconnect_notify", (data) => {
+        toast.success(data);
       });
   
       socket.on("reconnect_failed", () => {
