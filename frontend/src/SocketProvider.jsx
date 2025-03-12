@@ -67,9 +67,6 @@ function SocketProvider({ children }) {
 
       socket.on("disconnect", (reason) => {
         console.log(`Disconnected from socket server: ${reason}`);
-        // setClientSocket(null);
-  
-        // Notify user
         toast.error("Connection lost! Trying to reconnect...");
       });
   
@@ -91,9 +88,6 @@ function SocketProvider({ children }) {
       socket.on("error", (error) => {
         console.error("Socket error:", error);
       });
-    //   setInterval(() => {
-    //     socket.emit("heartbeat", { userId: myUserId });
-    // }, 3000); // Every 3 seconds
 
       socket.on("getOnlineUsers", (onlineUsers) => {
         console.log("Online users:", onlineUsers);
