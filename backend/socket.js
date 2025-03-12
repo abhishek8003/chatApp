@@ -23,15 +23,20 @@ io_server.on("connection", (clientSocket) => {
     if (user) {
         user.socketId = clientSocket.id;
         // Check if the user is already in online_users (reconnection case)
-        let existingUserIndex = online_users.findIndex((u) => u._id.toString() === user._id.toString());
-        if (existingUserIndex !== -1) {
-            console.log("User is reconnected with new Socket Id:", clientSocket.id)
-            clientSocket.emit("reconnectedSuccess","You got reconnected!");
-            online_users[existingUserIndex].socketId = clientSocket.id; // Update socket ID
-        } else {
-            online_users.push(user);
-        }
+        // let existingUserIndex = online_users.findIndex((u) => u._id.toString() === user._id.toString());
+        
+        
+        // if (existingUserIndex !== -1) {
+        //     console.log("User is reconnected with new Socket Id:", clientSocket.id)
+        //     clientSocket.emit("reconnectedSuccess","You got reconnected!");
+        //     online_users[existingUserIndex].socketId = clientSocket.id; // Update socket ID
+        // } else {
+        //     // online_users.push(user);
+        // }
     }
+    console.log("TEST online users:",online_users);
+    
+    online_users.push(user);
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
     // clientSocket.on("heartbeat", (data) => {
