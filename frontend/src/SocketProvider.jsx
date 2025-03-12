@@ -31,6 +31,7 @@ import {
 import { addgroupCurrentMembers, removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
 import { addgroupPastMembers, removegroupPastMembers } from "./redux/features/groupPastMembers";
 import toast from "react-hot-toast";
+import { increaseRetry } from "./redux/features/retry";
 
 const socketContext = createContext();
 
@@ -48,8 +49,8 @@ function SocketProvider({ children }) {
   const [clientSocket, setClientSocket] = useState(null);
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
   const prevGroupsRef = useRef([]);
-  let retry=useRef(0);
-
+  let retry=useSelector((store)=>store.retry);
+  
   // Initialize socket connection
   useEffect(() => {
     if (isLoggedIn) {
@@ -64,10 +65,10 @@ function SocketProvider({ children }) {
 
       socket.on("connect", () => {
         console.log("Connected to socket server");
-        if(retry.current){
+        if(retry!=0){
           toast.success("Reconnected successfully!");
         }
-        retry.current++;
+        dispatch(increaseRetry());
       });
 
       socket.on("disconnect", (reason) => {
@@ -122,7 +123,7 @@ function SocketProvider({ children }) {
 
       };
     }
-  }, [isLoggedIn, backendUrl, userAuth, dispatch]);
+  }, [isLoggedIn, backendUrl, userAuth, dispatch,retry]);
 
   useEffect(() => {
     if (!clientSocket) {

@@ -26,6 +26,7 @@ function App() {
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
+  let retry=useSelector((store)=>store.retry);
   // let clientSocket=useContext(socketContext);
   let [isLoadingCheckAuth, setLoadingCheckAuth] = useState(true);
   // console.log(clientSocket);
@@ -80,7 +81,7 @@ function App() {
             <Route
               path="/"
               element={
-                userAuth ? <Home></Home> : <Navigate to="/signup"></Navigate>
+                userAuth ? <Home numberOfRetry={retry}></Home> : <Navigate to="/signup"></Navigate>
               }
             ></Route>
             <Route
