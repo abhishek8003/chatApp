@@ -64,7 +64,7 @@ function App() {
       }
     };
     checkAuth();
-  }, []);
+  }, [retry]);
 
   if (isLoadingCheckAuth) {
     return (
