@@ -67,8 +67,8 @@ function SocketProvider({ children }) {
         console.log("Connected to socket server");
         if(retry!=0){
           toast.success("Reconnected successfully!");
+          dispatch(increaseRetry());
         }
-        dispatch(increaseRetry());
       });
 
       socket.on("disconnect", (reason) => {
