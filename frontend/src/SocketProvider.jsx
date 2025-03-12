@@ -66,10 +66,10 @@ function SocketProvider({ children }) {
         console.log("Connected to socket server");
         if(retry.current){
           if(selectedGroup){
-            dispatch(setSelectedGroup(selectedGroup))
+            dispatch(setSelectedGroup({...selectedGroup}))
           }
           if(selectedUser){
-            dispatch(setSelectedUser(selectedUser))
+            dispatch(setSelectedUser({...selectedUser}))
           }
           toast.success("Reconnected successfully!");
         }
