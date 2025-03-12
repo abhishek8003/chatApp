@@ -126,7 +126,7 @@ function SocketProvider({ children }) {
 
       };
     }
-  }, [isLoggedIn, backendUrl, userAuth, dispatch,retry,refresh]);
+  }, [isLoggedIn, backendUrl, userAuth, dispatch,retry]);
 
   useEffect(() => {
     if (!clientSocket) {
