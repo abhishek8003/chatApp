@@ -20,9 +20,9 @@ function Home() {
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
-  let groups=useSelector((store)=>{
-    return store.groups
-  })
+  let groups = useSelector((store) => {
+    return store.groups;
+  });
   let dispatch = useDispatch();
   let clientSocket = useContext(socketContext);
   let backendUrl = useContext(backendContext);
@@ -39,13 +39,12 @@ function Home() {
       clientSocket?.off("getOnlineUsers");
       clientSocket?.off("fetchAllUsers");
       // dispatch(setOnlineUsers(null));
-      console.log("home unmouted!")
+      console.log("home unmouted!");
     };
   }, []);
   useEffect(() => {
     let fetchNotifications = async () => {
       console.log("fetching notifications...");
-      
       try {
         if (userAuth) {
           let response = await fetch(
@@ -58,20 +57,25 @@ function Home() {
           let json = await response.json();
           if (response.status == 200) {
             console.log("current notifications:", json.all_notifications);
-            dispatch(intializeNotification(json.all_notifications));
+            let filteredNotification = json.all_notifications.filter((e) => {
+              if (e.senderId != userAuth._id) {
+                return true;
+              }
+              return false;
+            });
+            dispatch(intializeNotification(filteredNotification));
           }
         }
       } catch (error) {
         console.log(error);
-        
       }
     };
     fetchNotifications();
   }, [userAuth]);
-useEffect(()=>{
-  console.log("groups changed!");
-  // alert("groups changed!",groups)
-},[groups]);
+  useEffect(() => {
+    console.log("groups changed!");
+    // alert("groups changed!",groups)
+  }, [groups]);
   return (
     <>
       <Navbar></Navbar>

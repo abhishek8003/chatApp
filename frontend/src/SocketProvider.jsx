@@ -192,7 +192,7 @@ function SocketProvider({ children }) {
     });
 
     clientSocket.on("addNotification", async (message) => {
-      if (selectedUser && message.senderId == selectedUser._id) {
+      if (selectedUser && message.senderId.toString() == selectedUser._id.toString()) {
         console.log(message.senderId);
         console.log(selectedUser._id);
         notificationSound.current.play().catch((error) => {
@@ -203,14 +203,7 @@ function SocketProvider({ children }) {
 
       dispatch(addNotification(message));
       console.log("New notification:", message);
-      let response = fetch(`${backendUrl}/api/notifications/${userAuth._id}`, {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(message),
-      });
+     
       // Play notification sound
       notificationSound.current.play().catch((error) => {
         console.error("Audio play failed:", error);
@@ -236,7 +229,7 @@ function SocketProvider({ children }) {
       }
     });
     clientSocket.on("addGroupNotification", (message) => {
-      if (selectedGroup && message.receiverId == selectedGroup._id) {
+      if (selectedGroup && message.receiverId.toString() == selectedGroup._id.toString()) {
         console.log(message.receiverId);
         console.log(selectedGroup._id);
         if (message.senderId == userAuth._id) {

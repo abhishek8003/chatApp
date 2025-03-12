@@ -52,13 +52,14 @@ function Sidebar() {
   });
   let clientSocket = useContext(socketContext);
   let backendUrl = useContext(backendContext);
-  let handleSelectUser = (user) => {
+  let handleSelectUser = async (user) => {
     console.log(userAuth);
     dispatch(deleteNotificationOfUser(user));
     let targetUserNotifications = notifications.filter((e) => {
       if (e.senderId == user._id && e.recieverId == userAuth._id) {
         return true;
       }
+      return false;
     });
     console.log("targetUserNotifications:", targetUserNotifications);
 
@@ -68,8 +69,16 @@ function Sidebar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(targetUserNotifications[0]),
-    });
+      body: JSON.stringify(targetUserNotifications[0]),//we sennded only one notification as we just need senderID and reciever ID in backend
+    })
+      .then((result) => {
+        console.log(
+          "nootification for current target chat wiped successfully!"
+        );
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
     dispatch(setSelectedUser(null));
     dispatch(setSelectedGroup(null));
     console.log("selecting a user", user);
@@ -81,6 +90,7 @@ function Sidebar() {
       if (e.receiverId == group._id) {
         return true;
       }
+      return false;
     });
     console.log("targetGroupNotifications:", targetGroupNotifications);
     let response = fetch(`${backendUrl}/api/notifications/`, {
@@ -89,8 +99,16 @@ function Sidebar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(targetGroupNotifications[0]),
-    });
+      body: JSON.stringify(targetGroupNotifications[0]),//we sennded only one notification as we just need senderID and reciever ID in backend
+    })
+      .then((result) => {
+        console.log(
+          "nootification for current target grouped wiped successfully!"
+        );
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
     dispatch(setSelectedUser(null));
     dispatch(setSelectedGroup(null));
     console.log("selecting a group", group);
@@ -137,7 +155,7 @@ function Sidebar() {
     };
     let getAllGroups = async () => {
       console.log("fetching groups.....");
-      
+
       dispatch(intializeGroups([]));
       try {
         let response = await fetch(`${backendUrl}/api/groups/${userAuth._id}`, {
@@ -160,15 +178,13 @@ function Sidebar() {
     };
     getAllFriends();
     getAllGroups();
-    return ()=>{
+    return () => {
       console.log("sidebar unmouted");
-      
-    }
+    };
   }, []);
   let groups = useSelector((store) => {
     return store.groups;
   });
-  
 
   return (
     <Box
@@ -464,7 +480,7 @@ function Sidebar() {
               </div>
             );
           })}
-      
+
           <CreateDm></CreateDm>
           <div
             style={{
