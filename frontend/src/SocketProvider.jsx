@@ -29,6 +29,7 @@ import {
 } from "./redux/features/selectedGroup";
 import { addgroupCurrentMembers, removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
 import { addgroupPastMembers, removegroupPastMembers } from "./redux/features/groupPastMembers";
+import toast from "react-hot-toast";
 
 const socketContext = createContext();
 
@@ -52,6 +53,9 @@ function SocketProvider({ children }) {
     if (isLoggedIn) {
       const socket = io(backendUrl, {
         query: { user: JSON.stringify(userAuth) },
+        reconnection: true, // Enables automatic reconnection
+        reconnectionAttempts: Infinity, // Keep trying indefinitely
+        reconnectionDelay: 3000, // Try to reconnect every 3 seconds
       });
 
       setClientSocket(socket);
@@ -60,11 +64,32 @@ function SocketProvider({ children }) {
         console.log("Connected to socket server");
       });
 
-      socket.on("disconnect", () => {
-        console.log("Disconnected from socket server");
+      socket.on("disconnect", (reason) => {
+        console.log(`Disconnected from socket server: ${reason}`);
         setClientSocket(null);
+  
+        // Notify user
+        toast.error("Connection lost! Trying to reconnect...");
       });
-
+  
+      socket.on("connect_error", (error) => {
+        console.error("Socket connection error:", error);
+        toast.error("Unable to connect to server! Retrying...");
+      });
+  
+      socket.on("reconnect_attempt", () => {
+        console.log("Attempting to reconnect...");
+      });
+  
+      socket.on("reconnect", () => {
+        console.log("Reconnected to socket server");
+        toast.success("Reconnected successfully!");
+      });
+  
+      socket.on("reconnect_failed", () => {
+        console.log("Reconnection failed.");
+        toast.error("Failed to reconnect. Please check your network.");
+      });
       socket.on("newUserRegistered", (newUser) => {
         dispatch(addNewUser(newUser));
       });
