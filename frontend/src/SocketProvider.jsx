@@ -62,6 +62,7 @@ function SocketProvider({ children }) {
 
       socket.on("connect", () => {
         console.log("Connected to socket server");
+        toast.success("Connected successfully!");
       });
 
       socket.on("disconnect", (reason) => {
@@ -76,10 +77,6 @@ function SocketProvider({ children }) {
         console.error("Socket connection error:", error);
         toast.error("Unable to connect to server! Retrying...");
       });
-      socket.on("reconnectedSuccess",()=>{
-        toast.success("Reconnected");
-      })
-  
       socket.on("reconnect_attempt", () => {
         console.log("Attempting to reconnect...");
       });
