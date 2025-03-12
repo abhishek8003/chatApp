@@ -275,6 +275,9 @@ io_server.on("connection", (clientSocket) => {
         online_users = online_users.filter((u) => u !== user);
         io_server.emit("getOnlineUsers", online_users);
     });
+    clientSocket.on("reconnect", () => {
+        console.log(`User reconnected: ${socket.id}`);
+      });
 });
 
 module.exports = { http_server, app, io_server };
