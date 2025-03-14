@@ -44,15 +44,20 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
             let message_time=req.body.messageTime;
             let image;
             if (req.file) {
-                console.log(req.file);
-                let responseFromCloud = await cloudinary.uploader.upload(req.file.path, {
-                    folder: "chatApp/messageImages"
-                });
-                console.log(responseFromCloud);
+                // console.log(req.file);
+                // let responseFromCloud = await cloudinary.uploader.upload(req.file.path, {
+                //     folder: "chatApp/messageImages"
+                // });
+                // console.log(responseFromCloud);
+                // image = {
+                //     local_url: req.file.path,
+                //     cloud_url: responseFromCloud.url,
+                //     public_id: responseFromCloud.public_id
+                // }
                 image = {
                     local_url: req.file.path,
-                    cloud_url: responseFromCloud.url,
-                    public_id: responseFromCloud.public_id
+                    cloud_url: req.file.path,
+                    public_id: ""
                 }
             }
             console.log("MESSAGE IN DATA TIME:",message_time);
