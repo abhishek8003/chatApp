@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const express = require("express");
 const http = require("http");
+const mongoose = require("mongoose");
 const User = require("./models/users");
 const Group = require("./models/group")
 const app = express();
@@ -13,6 +14,7 @@ const io_server = new Server(http_server, {
 });
 const ChatNotification = require("./models/chatNotification")
 const GroupNotification = require("./models/groupNotification");
+const Message = require("./models/messages");
 
 let online_users = [];
 
@@ -23,8 +25,8 @@ io_server.on("connection", (clientSocket) => {
     if (user) {
         user.socketId = clientSocket.id;
     }
-    console.log("TEST online users:",online_users);
-    
+    console.log("TEST online users:", online_users);
+
     online_users.push(user);
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
@@ -65,6 +67,8 @@ io_server.on("connection", (clientSocket) => {
     clientSocket.on("sendMessage", async (messageBody) => {
         console.log("messageBOdy", messageBody);
         console.log("onlineUSersss", online_users.length);
+        console.log("MESSAGE TIME:",messageBody.createdAt);
+        
         if (online_users.find((u) => {
             if (u._id == messageBody.recieverId) { return u; }
         }
@@ -78,12 +82,22 @@ io_server.on("connection", (clientSocket) => {
             // let sender=await User.findById(messageBody.senderId);
 
             io_server.to(reciever.socketId).emit("recieveMessageLive", {
-                createdAt: new Date(Date.now()),
                 senderId: messageBody.senderId,
-                recieverId: messageBody.recieverId,
+                receiverId: messageBody.recieverId,
                 text: messageBody.message_text,
                 image: messageBody.message_image,
-                isGroupChat: false
+                isGroupChat: false,
+                status:"sent",
+                createdAt: messageBody.createdAt,
+            });
+            clientSocket.emit("messageSent", {
+                createdAt: messageBody.time,
+                senderId: messageBody.senderId,
+                receiverId: messageBody.recieverId,
+                text: messageBody.message_text,
+                image: messageBody.message_image,
+                isGroupChat: false,
+                status: "sent"
             });
             io_server.to(reciever.socketId).emit("addNotification", {
                 createdAt: new Date(Date.now()),
@@ -92,6 +106,31 @@ io_server.on("connection", (clientSocket) => {
                 text: messageBody.message_text,
                 image: messageBody.message_image,
                 isGroupChat: false
+            });
+        }
+    });
+
+    clientSocket.on("messagesSeenByUser", async (Targetuser) => {
+        console.log("MESSAGES GOT SEEN");
+        let sender;
+        try {
+            sender = JSON.parse(clientSocket.handshake.query.user);
+        } catch (error) {
+            console.error("Error parsing user:", error);
+            return;
+        }
+        let senderId = sender._id;
+        let receiverId = Targetuser._id;
+        console.log("senderId:", senderId);
+        console.log("receiverId:", receiverId);
+        // Check if receiver is online
+        let receiverWithSocket = online_users.find(r => r._id == receiverId);
+        if (receiverWithSocket) {
+            let socket = receiverWithSocket.socketId;
+            io_server.to(socket).emit("allMesssagesReaded", {
+                senderId: senderId,
+                isGroupChat: false,
+                status: "seen"
             });
         }
     });

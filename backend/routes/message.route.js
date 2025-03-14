@@ -18,6 +18,13 @@ message_router.get("/:id", isAuthenticated, async (req, res, next) => {
             ],
             isGroupChat: false // Exclude group chats
         });
+        await Message.updateMany({
+            senderId: receiverId, // Only messages from the receiver
+            receiverId: senderId, // Sent to the logged-in user
+            status: { $ne: "seen" } // Only update unseen messages
+        }, {
+            $set: { status: "seen" }
+        });
 
         res.status(200).send({ allMessages: messages });
 
@@ -34,6 +41,7 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
             let senderId = req.user._id
             let receiverId = req.params.id;
             let message_text = req.body.messageText;
+            let message_time=req.body.messageTime;
             let image;
             if (req.file) {
                 console.log(req.file);
@@ -47,16 +55,18 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                     public_id: responseFromCloud.public_id
                 }
             }
-
+            console.log("MESSAGE IN DATA TIME:",message_time);
             const newMessage = new Message({
                 senderId,
                 receiverId,
                 text: message_text,
-                image: image
+                image: image,
+                createdAt:message_time,
+                status:"delivered"
             });
             let notification_image = image ? image.cloud_url : "";
             let notificationToBeSaved = new chatNotification({
-                createdAt: new Date(Date.now()),
+                createdAt: message_time,
                 senderId: senderId,
                 recieverId: receiverId,
                 text: message_text,
@@ -71,9 +81,29 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                 console.log(err);
             }
             const result = await newMessage.save();
-            console.log(result);
+            console.log("messeage saved in database:",result);
             res.status(200).json({ newMessage: result });
             //todo socket IO thing
+
+        } catch (error) {
+            console.log(error);
+            res.status(500).send({ message: error.message })
+        }
+    });
+message_router.put("/:id", isAuthenticated,
+    async (req, res, next) => {
+        try {
+            let status=req.body.status;
+            let senderId=req.user._id;
+            let receiverId=req.params._id;
+            await Message.updateMany({
+                senderId: receiverId, // Only messages from the receiver
+                receiverId: senderId, // Sent to the logged-in user
+                status: { $ne: "seen" } // Only update unseen messages
+            }, {
+                $set: { status: status }
+            });
+            res.json({message:"Seen status updated to databse also!"});
 
         } catch (error) {
             console.log(error);

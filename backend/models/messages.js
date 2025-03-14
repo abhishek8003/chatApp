@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 const messageSchema = new mongoose.Schema({
-    isGroupChat:{
-        type:Boolean,
-        required:true,
-        default:false
+    isGroupChat: {
+        type: Boolean,
+        required: true,
+        default: false
     },
     senderId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:"user",
-        required:true
+        ref: "user",
+        required: true
     },
     receiverId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref:"user",
-        required:true
+        ref: "user",
+        required: true
     },
     text: {
         type: String
@@ -21,18 +21,28 @@ const messageSchema = new mongoose.Schema({
     image: {
         type: {
             local_url: {
-                type:String,
+                type: String,
 
             },
-            cloud_url:{
-                type:String,
-                
+            cloud_url: {
+                type: String,
+
             },
-            public_id:{
-                type:String
-            } 
+            public_id: {
+                type: String
+            }
         }
+    },
+    status: {
+        type: String,
+        enum: [ "delivered", "seen"],
+        required:true,
+        default: "sent"
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
-},{timestamps:true});
-const message=mongoose.model("message",messageSchema);
-module.exports=message;
+});
+const message = mongoose.model("message", messageSchema);
+module.exports = message;

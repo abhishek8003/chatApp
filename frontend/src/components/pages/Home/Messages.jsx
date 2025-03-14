@@ -58,6 +58,7 @@ function Messages() {
     if (selectedUser) {
       // dispatch(setChats([]));
       dispatch(setGettingChats(true));
+      
       let fetchChats = async () => {
         try {
           let response = await fetch(
@@ -71,6 +72,7 @@ function Messages() {
           if (response.status === 200) {
             console.log(json.allMessages);
             dispatch(setChats(json.allMessages));
+            clientSocket?.emit("messagesSeenByUser",(selectedUser));//selectedUser is target user
           }
         } catch (error) {
           console.log(error);

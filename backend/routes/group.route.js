@@ -38,6 +38,7 @@ group_route.get("/group/:group_id", isAuthenticated, async (req, res, next) => {
         //     res.status(200).send({ group: completeGroup });
         // },5000)
         res.status(200).send({ group: completeGroup });
+        
 
     } catch (error) {
         console.log(error);

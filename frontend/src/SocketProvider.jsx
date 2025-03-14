@@ -3,9 +3,16 @@ import { io } from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/features/onlineUsers";
 import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
-import { updateChats } from "./redux/features/Chats";
+import {
+  changeStatus,
+  changeStatusOfAll,
+  updateChats,
+} from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
-import { setSelectedUser, updateSelectedUser } from "./redux/features/selectedUser";
+import {
+  setSelectedUser,
+  updateSelectedUser,
+} from "./redux/features/selectedUser";
 import {
   addFriends,
   addNewFriend,
@@ -28,8 +35,14 @@ import {
   removeMemberFromSelectedGroup,
   setSelectedGroup,
 } from "./redux/features/selectedGroup";
-import { addgroupCurrentMembers, removegroupCurrentMembers } from "./redux/features/groupCurrentMembers";
-import { addgroupPastMembers, removegroupPastMembers } from "./redux/features/groupPastMembers";
+import {
+  addgroupCurrentMembers,
+  removegroupCurrentMembers,
+} from "./redux/features/groupCurrentMembers";
+import {
+  addgroupPastMembers,
+  removegroupPastMembers,
+} from "./redux/features/groupPastMembers";
 import toast from "react-hot-toast";
 import { increaseRetry } from "./redux/features/retry";
 
@@ -50,7 +63,7 @@ function SocketProvider({ children }) {
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
   const prevGroupsRef = useRef([]);
   const isInitialConnect = useRef(true); // Add this line
-  
+
   // Initialize socket connection
   useEffect(() => {
     if (isLoggedIn) {
@@ -67,7 +80,7 @@ function SocketProvider({ children }) {
         console.log("Connected to socket server");
         if (!isInitialConnect.current) {
           // Force full page reload on reconnect
-          toast.success("Reconnected!")
+          toast.success("Reconnected!");
           window.location.reload();
         }
         isInitialConnect.current = false;
@@ -77,7 +90,7 @@ function SocketProvider({ children }) {
         console.log(`Disconnected from socket server: ${reason}`);
         toast.error("Connection lost! Trying to reconnect...");
       });
-  
+
       socket.on("connect_error", (error) => {
         console.error("Socket connection error:", error);
         toast.error("Unable to connect to server! Retrying...");
@@ -111,22 +124,64 @@ function SocketProvider({ children }) {
         console.log("New group created:", data.newGroup);
         dispatch(addGroup(data.newGroup));
       });
+      socket.on("messageSent", (message) => {
+        console.log("Message was sent succesfuly!:", message);
+        dispatch(changeStatus(message));
+      });
 
       // Cleanup on unmount
       return () => {
-        
         socket.off("getOnlineUsers");
         socket.off("createNewGroup");
         socket.off("addFriend");
         socket.off("newUserRegistered");
-        
+
         console.log("Socket requested disconnection!");
         socket.disconnect();
-
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
+  useEffect(() => {
+    if (!clientSocket) {
+      return;
+    }
+    clientSocket.on("allMesssagesReaded", async (data) => {
+      console.log("Message was readed succesfully by User ID:", data.senderId);
+      let senderId = userAuth._id;
+      let receiverId = data.senderId; //data.senderId is actually reciver in current user
+      let isGroupChat = data.isGroupChat;
+      console.log("senderId", senderId);
+      console.log("receiverId:", receiverId);
+      console.log("isGroupChat:", data.isGroupChat);
+      dispatch(
+        changeStatusOfAll({
+          senderId,
+          receiverId: receiverId,
+          isGroupChat,
+          status: data.status,
+        })
+      );
 
+      const response = await fetch(`${backendUrl}/api/chats/${selectedUser._id}`, {
+        method: "PUT",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ status: data.status }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+      }
+
+      const result = await response.json();
+      console.log(result);
+    });
+    return (()=>{
+      clientSocket?.off("allMesssagesReaded");
+    })
+  },[selectedUser]);
   useEffect(() => {
     if (!clientSocket) {
       return;
@@ -135,23 +190,27 @@ function SocketProvider({ children }) {
       if (clientSocket) {
         console.log(data.groupId);
         console.log(data.member);
-        dispatch(removeMemberFromSelectedGroup({
-          groupId:data.groupId,
-          memberId:data.member._id
-        })); ////we just sending group ID and member ID
-        dispatch(removeMemberFromGroups({
-          groupId:data.groupId,
-          memberId:data.member._id
-        })); //we just sending group ID and member ID
-        dispatch(removeMemberFromGroupChat(
-          {
-            groupId:data.groupId,
-            memberId:data.member._id
-          }
-        )); //we just sending group ID and member ID
-      
-        console.log("TARGETED MEMBER POPULATED",data.member);
-        
+        dispatch(
+          removeMemberFromSelectedGroup({
+            groupId: data.groupId,
+            memberId: data.member._id,
+          })
+        ); ////we just sending group ID and member ID
+        dispatch(
+          removeMemberFromGroups({
+            groupId: data.groupId,
+            memberId: data.member._id,
+          })
+        ); //we just sending group ID and member ID
+        dispatch(
+          removeMemberFromGroupChat({
+            groupId: data.groupId,
+            memberId: data.member._id,
+          })
+        ); //we just sending group ID and member ID
+
+        console.log("TARGETED MEMBER POPULATED", data.member);
+
         dispatch(removegroupCurrentMembers(data.member));
         dispatch(addgroupPastMembers(data.member));
         console.log("updated selected GROUP without", selectedGroup);
@@ -183,7 +242,7 @@ function SocketProvider({ children }) {
           })
         );
         dispatch(addgroupCurrentMembers(userAuth));
-        dispatch(removegroupPastMembers(userAuth))
+        dispatch(removegroupPastMembers(userAuth));
         //we just sending group ID and member ID
 
         clientSocket.emit("joinGroupWithID", { group: data.group });
@@ -196,7 +255,7 @@ function SocketProvider({ children }) {
 
     clientSocket.on("recieveMessageLive", (newMessage) => {
       if (selectedUser?._id === newMessage.senderId.toString()) {
-        console.log("Received new message:",newMessage);
+        console.log("Received new message:", newMessage);
         dispatch(
           updateChats({
             senderId: newMessage.senderId,
@@ -207,9 +266,14 @@ function SocketProvider({ children }) {
               local_url: "",
               cloud_url: newMessage.image ? newMessage.image : null,
             },
-            createdAt:newMessage.createdAt
+            createdAt: newMessage.createdAt,
           })
         );
+
+        console.log("i will tell sender that message was reicived!");
+
+        clientSocket.emit("messagesSeenByUser", selectedUser); //selectedUser is target user
+        console.log("i  told sender that message was reicived!");
       }
     });
 
@@ -223,7 +287,10 @@ function SocketProvider({ children }) {
     });
 
     clientSocket.on("addNotification", async (message) => {
-      if (selectedUser && message.senderId.toString() == selectedUser._id.toString()) {
+      if (
+        selectedUser &&
+        message.senderId.toString() == selectedUser._id.toString()
+      ) {
         console.log(message.senderId);
         console.log(selectedUser._id);
         notificationSound.current.play().catch((error) => {
@@ -234,7 +301,7 @@ function SocketProvider({ children }) {
 
       dispatch(addNotification(message));
       console.log("New notification:", message);
-     
+
       // Play notification sound
       notificationSound.current.play().catch((error) => {
         console.error("Audio play failed:", error);
@@ -260,7 +327,10 @@ function SocketProvider({ children }) {
       }
     });
     clientSocket.on("addGroupNotification", (message) => {
-      if (selectedGroup && message.receiverId.toString() == selectedGroup._id.toString()) {
+      if (
+        selectedGroup &&
+        message.receiverId.toString() == selectedGroup._id.toString()
+      ) {
         console.log(message.receiverId);
         console.log(selectedGroup._id);
         if (message.senderId == userAuth._id) {

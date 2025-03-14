@@ -3,7 +3,11 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import SendIcon from "@mui/icons-material/Send";
-import { setChats, updateChats } from "../../../redux/features/Chats";
+import {
+  changeStatus,
+  setChats,
+  updateChats,
+} from "../../../redux/features/Chats";
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
@@ -21,7 +25,9 @@ function CreateMessage() {
   let chats = useSelector((store) => {
     return store.chats;
   });
-
+  let onlineUsers = useSelector((store) => {
+    return store.onlineUsers;
+  });
   let [preview, setPreview] = useState(false);
   let [previewUrl, setPreviewUrl] = useState("");
   let [messageText, setMessageText] = useState("");
@@ -46,8 +52,10 @@ function CreateMessage() {
   let form = useRef();
   let handleSendMessage = async (myForm) => {
     setSendingMessage(true);
+    const time = new Date(Date.now()).toISOString(); // Set time once
     let text = myForm.newMessage.value;
     let imgTempUrl = previewUrl;
+
     if (selectedUser) {
       dispatch(
         updateChats({
@@ -58,7 +66,9 @@ function CreateMessage() {
             local_url: "",
             cloud_url: imgTempUrl,
           },
-          createdAt: new Date(Date.now()),
+          createdAt: time,
+          status: "pending",
+          isGroupChat: false,
         })
       );
 
@@ -67,8 +77,21 @@ function CreateMessage() {
         recieverId: selectedUser._id,
         message_text: text,
         message_image: imgTempUrl,
+        createdAt: time,
       });
-      setPreview(false);
+      dispatch(
+        changeStatus({
+          senderId: userAuth._id,
+          receiverId: selectedUser._id,
+          text: text,
+          image: {
+            local_url: "",
+            cloud_url: imgTempUrl,
+          },
+          createdAt: time,
+          status: "sent",
+        })
+      );
       console.log(`logged socket after emiting:`, clientSocket);
 
       let file = myForm.messageFile && myForm.messageFile.files[0];
@@ -84,6 +107,10 @@ function CreateMessage() {
       if (file) {
         formData.append("messageImage", file);
       }
+      formData.append("messageTime", time);
+      setPreview(false);
+      setMessageText("");
+      inputFile.current.value = "";
       try {
         let response = await fetch(
           `${backendUrl}/api/chats/${selectedUser._id}`,
@@ -95,12 +122,21 @@ function CreateMessage() {
         );
         let json = await response.json();
         if (response.status === 200) {
-          console.log(json.newMessage);
+          console.log("After saving to database:", json.newMessage);
           // dispatch(setChats([...chats, json.newMessage]));
-          setMessageText("");
-          inputFile.current.value = "";
+          // setMessageText("");
+          // inputFile.current.value = "";
+          // setPreview(false);
+          let receiverStatus = onlineUsers.find((u) => {
+            if (u._id == json.newMessage.receiverId) {
+              return true;
+            }
+            return false;
+          });
+          if (!receiverStatus) {
+            dispatch(changeStatus(json.newMessage));
+          }
           setSendingMessage(false);
-          setPreview(false);
           setPreviewUrl(null);
         }
       } catch (error) {
@@ -114,11 +150,10 @@ function CreateMessage() {
       try {
         if (selectedGroup.pastMembers.includes(userAuth._id)) {
           // alert("BRO Its not member!")
-          console.log("BUG selected Group:",selectedGroup)
+          console.log("BUG selected Group:", selectedGroup);
           throw new Error("You are not a member of this group");
-        }
-        else{
-          console.log("TEST selected Group:",selectedGroup)
+        } else {
+          console.log("TEST selected Group:", selectedGroup);
         }
       } catch (error) {
         toast.error(error.message);
@@ -127,10 +162,9 @@ function CreateMessage() {
         setSendingMessage(false);
         setPreview(false);
         setPreviewUrl(null);
-        return ;
+        return;
       }
       // alert("BRO !")
-      
 
       let file = myForm.messageFile && myForm.messageFile.files[0];
       console.log(text);
@@ -180,7 +214,47 @@ function CreateMessage() {
       }
     }
   };
-
+  useEffect(() => {
+    if (chats && selectedUser) {
+      let targetChats = chats.filter((c) => {
+        if (
+          c.senderId == userAuth._id &&
+          c.receiverId == selectedUser._id &&
+          c.status == "sent"
+        ) {
+          return true;
+        }
+        return false;
+      });
+      let targetChats2 = chats.filter((c) => {
+        if (
+          c.senderId == userAuth._id &&
+          c.receiverId == selectedUser._id &&
+          c.status == "delivered"
+        ) {
+          return true;
+        }
+        return false;
+      });
+      console.log("THEY GOT BROKE", targetChats);
+      let receiverStatus = onlineUsers.find((e) => {
+        if (e._id == selectedUser._id) {
+          return true;
+        }
+        return false;
+      });
+      if (!receiverStatus) {
+        targetChats.forEach((chat) => {
+          dispatch(changeStatus({ ...chat, status: "delivered" })); //jbb offline hoga
+        });
+      }
+      if (receiverStatus) {
+        targetChats2.forEach((chat) => {
+          dispatch(changeStatus({ ...chat, status: "sent" })); //jb online hoga
+        });
+      }
+    }
+  }, [onlineUsers, selectedUser]);
   return (
     <>
       <Box sx={{ width: "fit-content" }}>
