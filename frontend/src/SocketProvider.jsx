@@ -138,25 +138,22 @@ function SocketProvider({ children }) {
         socket.off("addFriend");
         socket.off("newUserRegistered");
         console.log("Socket requested disconnection!");
+        socket.disconnect();
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
   useEffect(() => {
     if (!clientSocket) return;
     let keepAliveInterval;
+    console.log("UPLOAD STATUS".uploading);
     if (uploading) {
-      // Send a keep-alive signal every 4 seconds to prevent disconnection
       keepAliveInterval = setInterval(() => {
         console.log("Sending keep-alive ping...");
-        clientSocket.emit("keepAlive"); // Notify the server that the user is active
-      }, 1000);
-    } else {
-      clearInterval(keepAliveInterval);
+        clientSocket.emit("keepAlive");
+      }, 1100);
     }
-  
     return () => clearInterval(keepAliveInterval);
   }, [clientSocket, uploading]);
-  
   useEffect(() => {
     if (!clientSocket) {
       return;
