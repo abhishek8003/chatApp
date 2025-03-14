@@ -50,6 +50,7 @@ import { uploadingToggle } from "./redux/features/uploading";
 const socketContext = createContext();
 
 function SocketProvider({ children }) {
+  let keepAliveInterval = useRef();
   const dispatch = useDispatch();
   const groups = useSelector((store) => store.groups);
   const selectedGroup = useSelector((store) => store.selectedGroup);
@@ -126,7 +127,6 @@ function SocketProvider({ children }) {
         console.log("New group created:", data.newGroup);
         dispatch(addGroup(data.newGroup));
       });
-      
 
       // Cleanup on unmount
       return () => {
@@ -139,7 +139,7 @@ function SocketProvider({ children }) {
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
-  useEffect(()=>{
+  useEffect(() => {
     if (!clientSocket) return;
     clientSocket.on("messageSent", (message) => {
       console.log("Message was sent succesfuly!:", message);
@@ -147,23 +147,20 @@ function SocketProvider({ children }) {
       console.log("Uploading:", uploading);
       dispatch(uploadingToggle(false));
     });
-  },[clientSocket,uploading])
+  }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) return;
-    let keepAliveInterval;
-    console.log("UPLOAD STATUS",uploading);
+    console.log("UPLOAD STATUS", uploading);
     if (uploading) {
-      keepAliveInterval = setInterval(() => {
+      keepAliveInterval.current = setInterval(() => {
         console.log("Sending keep-alive ping...");
         clientSocket.emit("keepAlive");
       }, 500);
-    }
-    else{
-      clearInterval(keepAliveInterval);
+    } else {
+      clearInterval(keepAliveInterval.current);
       clientSocket.off("keepAlive");
     }
-    
-  }, [clientSocket, uploading]);
+  }, [clientSocket, uploading, keepAliveInterval]);
   useEffect(() => {
     if (!clientSocket) {
       return;
