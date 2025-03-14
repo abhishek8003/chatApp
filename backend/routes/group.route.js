@@ -67,21 +67,21 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             return res.status(401).json({ message: "You are not a member of this grup anymore!" });
         }
         if (req.file) {
-            // console.log(req.file);
-            // let responseFromCloud = await cloudinary.uploader.upload(req.file.path, {
-            //     folder: "chatApp/messageImages"
-            // });
-            // console.log(responseFromCloud);
-            // image = {
-            //     local_url: req.file.path,
-            //     cloud_url: responseFromCloud.url,
-            //     public_id: responseFromCloud.public_id
-            // };
+            console.log(req.file);
+            let responseFromCloud = await cloudinary.uploader.upload(req.file.path, {
+                folder: "chatApp/messageImages"
+            });
+            console.log(responseFromCloud);
             image = {
                 local_url: req.file.path,
-                cloud_url: req.file.path,
-                public_id: ""
-            }
+                cloud_url: responseFromCloud.url,
+                public_id: responseFromCloud.public_id
+            };
+            // image = {
+            //     local_url: req.file.path,
+            //     cloud_url: req.file.path,
+            //     public_id: ""
+            // }
         }
 
         const newMessage = new Message({
