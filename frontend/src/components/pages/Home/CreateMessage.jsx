@@ -79,19 +79,19 @@ function CreateMessage() {
         message_image: imgTempUrl,
         createdAt: time,
       });
-      dispatch(
-        changeStatus({
-          senderId: userAuth._id,
-          receiverId: selectedUser._id,
-          text: text,
-          image: {
-            local_url: "",
-            cloud_url: imgTempUrl,
-          },
-          createdAt: time,
-          status: "sent",
-        })
-      );
+      // dispatch(
+      //   changeStatus({
+      //     senderId: userAuth._id,
+      //     receiverId: selectedUser._id,
+      //     text: text,
+      //     image: {
+      //       local_url: "",
+      //       cloud_url: imgTempUrl,
+      //     },
+      //     createdAt: time,
+      //     status: "sent",
+      //   })
+      // );
       console.log(`logged socket after emiting:`, clientSocket);
 
       let file = myForm.messageFile && myForm.messageFile.files[0];
