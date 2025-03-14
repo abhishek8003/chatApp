@@ -4,8 +4,8 @@ const uploadingSlice = createSlice({
     name: "uploading",
     initialState: initialState,
     reducers: {
-        uploadingToggle: (state) => {
-            return !state;
+        uploadingToggle: (state,action) => {
+            return action.payload;
         }
     }
 });

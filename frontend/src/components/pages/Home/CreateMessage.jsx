@@ -73,7 +73,7 @@ function CreateMessage() {
           isGroupChat: false,
         })
       );
-      dispatch(uploadingToggle());//make uploading true
+      dispatch(uploadingToggle(true));//make uploading true
       clientSocket?.emit("sendMessage", {
         senderId: userAuth._id,
         recieverId: selectedUser._id,

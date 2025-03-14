@@ -144,8 +144,8 @@ function SocketProvider({ children }) {
     clientSocket.on("messageSent", (message) => {
       console.log("Message was sent succesfuly!:", message);
       dispatch(changeStatus(message));
-      console.log("Message was sent succesfuly!:", uploading);
-      dispatch(uploadingToggle());
+      console.log("Uploading:", uploading);
+      dispatch(uploadingToggle(false));
     });
   },[clientSocket,uploading])
   useEffect(() => {
@@ -159,8 +159,10 @@ function SocketProvider({ children }) {
       }, 500);
     }
     else{
-      clearInterval(keepAliveInterval)
+      clearInterval(keepAliveInterval);
+      clientSocket.off("keepAlive");
     }
+    
   }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) {
