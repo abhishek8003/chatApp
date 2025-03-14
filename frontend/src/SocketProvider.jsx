@@ -147,14 +147,24 @@ function SocketProvider({ children }) {
     if (!clientSocket) {
       return;
     }
-    clientSocket.on("disconnect", (reason) => {
-      if (uploading) {
-        console.log("Ignoring disconnect due to active upload");
-        return;
-      }
-      console.log(`Disconnected from socket server: ${reason}`);
-      toast.error("Connection lost! Trying to reconnect...");
-    });
+    // clientSocket.on("disconnect", (reason) => {
+    //   if (uploading) {
+    //     console.log("Ignoring disconnect due to active upload");
+    //     return;
+    //   }
+    //   console.log(`Disconnected from socket server: ${reason}`);
+    //   toast.error("Connection lost! Trying to reconnect...");
+    // });
+    if(!uploading){
+      clientSocket.on("disconnect", (reason) => {
+        console.log(`Disconnected from socket server: ${reason}`);
+        toast.error("Connection lost! Trying to reconnect...");
+      });
+    }
+    else{
+      toast.success("Uploadig so prevented disconnection");
+      clientSocket.off("disconnect");
+    }
   }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) {
