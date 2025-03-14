@@ -144,23 +144,60 @@ function SocketProvider({ children }) {
     clientSocket.on("messageSent", (message) => {
       console.log("Message was sent succesfuly!:", message);
       dispatch(changeStatus(message));
-      console.log("Uploading:", uploading);
       dispatch(uploadingToggle(false));
     });
-  }, [clientSocket, uploading]);
+  }, [clientSocket]);
+  // useEffect(() => {
+  //   if (!clientSocket) return;
+  //   console.log("UPLOAD STATUS", uploading);
+  //   console.log("keepAliveInterval.current",keepAliveInterval.current);
+  //   let temp;
+  //   if (uploading) {
+  //     console.log("keep ALIVE MUST FIRED AS UPLOAD TRUE");
+  //    temp = setInterval(() => {
+  //       console.log("Sending keep-alive ping...");
+  //       clientSocket.emit("keepAlive");
+  //     },800);
+  //     console.log("INTERVAL VALUE MUST BE",temp);
+  //     keepAliveInterval.current=temp;
+  //     console.log("keepAliveInterval.current VALUE MUST BE",keepAliveInterval.current);
+  //   } else {
+  //     console.log("KEEP ALIVE MUT STOP NOW!");
+  //     console.log(keepAliveInterval.current);
+  //     clearInterval(keepAliveInterval.current);
+  //     keepAliveInterval.current=null;
+  //   }
+  // }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) return;
-    console.log("UPLOAD STATUS", uploading);
+  
+    const intervalCleanup = () => {
+      if (keepAliveInterval.current) {
+        console.log("Clearing existing interval:", keepAliveInterval.current);
+        clearInterval(keepAliveInterval.current);
+        keepAliveInterval.current = null;
+      }
+    };
+  
     if (uploading) {
+      console.log("Starting keepAlive interval");
+      intervalCleanup(); // Clear any existing interval first
+      
       keepAliveInterval.current = setInterval(() => {
         console.log("Sending keep-alive ping...");
         clientSocket.emit("keepAlive");
-      }, 900);
+      }, 800);
+  
+      console.log("New interval ID:", keepAliveInterval.current);
     } else {
-      clearInterval(keepAliveInterval.current);
-      clientSocket.off("keepAlive");
+      console.log("Stopping keepAlive interval");
+      intervalCleanup();
     }
-  }, [clientSocket, uploading]);
+  
+    // Cleanup when component unmounts or dependencies change
+    return intervalCleanup;
+  }, [clientSocket, uploading]); // Keep these dependencies
+  
   useEffect(() => {
     if (!clientSocket) {
       return;

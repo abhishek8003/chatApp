@@ -25,9 +25,9 @@ const chatsSlice = createSlice({
         changeStatusOfAll: (state, action) => {
             return state.map((message) =>{
                 
-                console.log("message.senderId:",message.senderId);
-                console.log("message.receiverId:",message.receiverId);
-                console.log("message.isGroupChat:",message.isGroupChat);
+                // console.log("message.senderId:",message.senderId);
+                // console.log("message.receiverId:",message.receiverId);
+                // console.log("message.isGroupChat:",message.isGroupChat);
                 
                 return (message.senderId === action.payload.senderId &&
                     message.receiverId === action.payload.receiverId &&
