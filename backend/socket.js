@@ -31,7 +31,7 @@ io_server.on("connection", (clientSocket) => {
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
     clientSocket.on("keepAlive", () => {
-        console.log(`Received keepAlive from ${socket.id}`);
+        console.log(`Received keepAlive from ${clientSocket.id}`);
     });
     clientSocket.on("deleteOnlineUser", (data) => {
         console.log(data);

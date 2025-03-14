@@ -45,6 +45,7 @@ import {
 } from "./redux/features/groupPastMembers";
 import toast from "react-hot-toast";
 import { increaseRetry } from "./redux/features/retry";
+import { uploadingToggle } from "./redux/features/uploading";
 
 const socketContext = createContext();
 
@@ -145,7 +146,7 @@ function SocketProvider({ children }) {
   useEffect(() => {
     if (!clientSocket) return;
     let keepAliveInterval;
-    console.log("UPLOAD STATUS".uploading);
+    console.log("UPLOAD STATUS",uploading);
     if (uploading) {
       keepAliveInterval = setInterval(() => {
         console.log("Sending keep-alive ping...");
