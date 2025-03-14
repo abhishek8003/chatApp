@@ -30,7 +30,9 @@ io_server.on("connection", (clientSocket) => {
     online_users.push(user);
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
-
+    clientSocket.on("keepAlive", () => {
+        console.log(`Received keepAlive from ${socket.id}`);
+    });
     clientSocket.on("deleteOnlineUser", (data) => {
         console.log(data);
 
@@ -67,8 +69,8 @@ io_server.on("connection", (clientSocket) => {
     clientSocket.on("sendMessage", async (messageBody) => {
         console.log("messageBOdy", messageBody);
         console.log("onlineUSersss", online_users.length);
-        console.log("MESSAGE TIME:",messageBody.createdAt);
-        
+        console.log("MESSAGE TIME:", messageBody.createdAt);
+
         if (online_users.find((u) => {
             if (u._id == messageBody.recieverId) { return u; }
         }
@@ -87,7 +89,7 @@ io_server.on("connection", (clientSocket) => {
                 text: messageBody.message_text,
                 image: messageBody.message_image,
                 isGroupChat: false,
-                status:"sent",
+                status: "sent",
                 createdAt: messageBody.createdAt,
             });
             clientSocket.emit("messageSent", {
