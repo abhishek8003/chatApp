@@ -163,7 +163,7 @@ function SocketProvider({ children }) {
           console.log("Sending keep-alive ping...");
           clientSocket.emit("keepAlive");
           
-        }, 5000);
+        }, 2000);
       console.log("New interval ID:", keepAliveInterval.current);
     } else {
       console.log("Stopping keepAlive interval");
