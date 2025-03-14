@@ -87,10 +87,10 @@ function SocketProvider({ children }) {
         isInitialConnect.current = false;
       });
 
-      // socket.on("disconnect", (reason) => {
-      //   console.log(`Disconnected from socket server: ${reason}`);
-      //   toast.error("Connection lost! Trying to reconnect...");
-      // });
+      socket.on("disconnect", (reason) => {
+        console.log(`Disconnected from socket server: ${reason}`);
+        toast.error("Connection lost! Trying to reconnect...");
+      });
 
       socket.on("connect_error", (error) => {
         console.error("Socket connection error:", error);
@@ -137,9 +137,7 @@ function SocketProvider({ children }) {
         socket.off("createNewGroup");
         socket.off("addFriend");
         socket.off("newUserRegistered");
-
         console.log("Socket requested disconnection!");
-        socket.disconnect();
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
