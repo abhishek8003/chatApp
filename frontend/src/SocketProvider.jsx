@@ -126,11 +126,7 @@ function SocketProvider({ children }) {
         console.log("New group created:", data.newGroup);
         dispatch(addGroup(data.newGroup));
       });
-      socket.on("messageSent", (message) => {
-        console.log("Message was sent succesfuly!:", message);
-        dispatch(changeStatus(message));
-        dispatch(uploadingToggle());
-      });
+      
 
       // Cleanup on unmount
       return () => {
@@ -143,6 +139,15 @@ function SocketProvider({ children }) {
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
+  useEffect(()=>{
+    if (!clientSocket) return;
+    clientSocket.on("messageSent", (message) => {
+      console.log("Message was sent succesfuly!:", message);
+      dispatch(changeStatus(message));
+      console.log("Message was sent succesfuly!:", uploading);
+      dispatch(uploadingToggle());
+    });
+  },[clientSocket,uploading])
   useEffect(() => {
     if (!clientSocket) return;
     let keepAliveInterval;
