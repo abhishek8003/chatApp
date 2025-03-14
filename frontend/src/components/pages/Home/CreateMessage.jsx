@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
 import { setGroupChat } from "../../../redux/features/groupChats";
+import { uploadingToggle } from "../../../redux/features/uploading";
 function CreateMessage() {
   let selectedGroup = useSelector((store) => {
     return store.selectedGroup;
@@ -32,6 +33,7 @@ function CreateMessage() {
   let [previewUrl, setPreviewUrl] = useState("");
   let [messageText, setMessageText] = useState("");
   let [isSendingMessage, setSendingMessage] = useState(false);
+  let uploading=useSelector((store)=>store.uploading);
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
@@ -71,7 +73,7 @@ function CreateMessage() {
           isGroupChat: false,
         })
       );
-
+      dispatch(uploadingToggle());//make uploading true
       clientSocket?.emit("sendMessage", {
         senderId: userAuth._id,
         recieverId: selectedUser._id,

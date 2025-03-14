@@ -63,6 +63,7 @@ function SocketProvider({ children }) {
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
   const prevGroupsRef = useRef([]);
   const isInitialConnect = useRef(true); // Add this line
+  let uploading = useSelector((store) => store.uploading);
 
   // Initialize socket connection
   useEffect(() => {
@@ -86,10 +87,10 @@ function SocketProvider({ children }) {
         isInitialConnect.current = false;
       });
 
-      socket.on("disconnect", (reason) => {
-        console.log(`Disconnected from socket server: ${reason}`);
-        toast.error("Connection lost! Trying to reconnect...");
-      });
+      // socket.on("disconnect", (reason) => {
+      //   console.log(`Disconnected from socket server: ${reason}`);
+      //   toast.error("Connection lost! Trying to reconnect...");
+      // });
 
       socket.on("connect_error", (error) => {
         console.error("Socket connection error:", error);
@@ -127,8 +128,9 @@ function SocketProvider({ children }) {
       socket.on("messageSent", (message) => {
         console.log("Message was sent succesfuly!:", message);
         dispatch(changeStatus(message));
+        dispatch(uploadingToggle());
       });
-      
+
       // Cleanup on unmount
       return () => {
         socket.off("getOnlineUsers");
@@ -141,6 +143,19 @@ function SocketProvider({ children }) {
       };
     }
   }, [isLoggedIn, backendUrl, userAuth, dispatch]);
+  useEffect(() => {
+    if (!clientSocket) {
+      return;
+    }
+    clientSocket.on("disconnect", (reason) => {
+      if (uploading) {
+        console.log("Ignoring disconnect due to active upload");
+        return;
+      }
+      console.log(`Disconnected from socket server: ${reason}`);
+      toast.error("Connection lost! Trying to reconnect...");
+    });
+  }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) {
       return;
@@ -162,14 +177,17 @@ function SocketProvider({ children }) {
         })
       );
 
-      const response = await fetch(`${backendUrl}/api/chats/${selectedUser._id}`, {
-        method: "PUT",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ status: data.status }),
-      });
+      const response = await fetch(
+        `${backendUrl}/api/chats/${selectedUser._id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: data.status }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(`Error: ${response.status} ${response.statusText}`);
@@ -178,10 +196,10 @@ function SocketProvider({ children }) {
       const result = await response.json();
       console.log(result);
     });
-    return (()=>{
+    return () => {
       clientSocket?.off("allMesssagesReaded");
-    })
-  },[selectedUser]);
+    };
+  }, [selectedUser]);
   useEffect(() => {
     if (!clientSocket) {
       return;

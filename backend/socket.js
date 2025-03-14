@@ -10,7 +10,7 @@ const io_server = new Server(http_server, {
     cors: { origin: `${process.env.frontendURL}` },
     maxHttpBufferSize: 1e8,
     pingInterval: 1000,  // Ping every 1 seconds
-    pingTimeout: 5000    // Disconnect if no response within 1.2 seconds
+    pingTimeout: 1200    // Disconnect if no response within 1.2 seconds
 });
 const ChatNotification = require("./models/chatNotification")
 const GroupNotification = require("./models/groupNotification");

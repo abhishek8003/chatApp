@@ -27,6 +27,7 @@ import groupPastMembersReducer from "./features/groupPastMembers";
 import addGroupMemberToggleReducer from "./features/addGroupMemberToggle";
 import newGroupMembersReducer from "./features/newGroupMembers"
 import retryReducer from "./features/retry";
+import uploadingReducer from "./features/uploading";
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -56,7 +57,8 @@ const store=configureStore({
         groupPastMembers:groupPastMembersReducer,
         addGroupMemberToggle:addGroupMemberToggleReducer,
         newGroupMembers:newGroupMembersReducer,
-        retry:retryReducer
+        retry:retryReducer,
+        uploading:uploadingReducer
     }
 });
 export default store;
