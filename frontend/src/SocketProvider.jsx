@@ -149,20 +149,21 @@ function SocketProvider({ children }) {
   }, [clientSocket]);
   useEffect(() => {
     if (!clientSocket) return;
-  
+
     if (uploading) {
       console.log("Starting keepAlive interval");
-  
+
       // Clear any existing interval before creating a new one
       if (keepAliveInterval.current) {
         clearInterval(keepAliveInterval.current);
       }
-  
-      keepAliveInterval.current = setInterval(() => {
-        console.log("Sending keep-alive ping...");
-        clientSocket.emit("keepAlive");
-      }, 1500);
-  
+
+     
+        setInterval(() => {
+          console.log("Sending keep-alive ping...");
+          clientSocket.emit("keepAlive");
+          
+        }, 5000);
       console.log("New interval ID:", keepAliveInterval.current);
     } else {
       console.log("Stopping keepAlive interval");
@@ -170,8 +171,7 @@ function SocketProvider({ children }) {
       keepAliveInterval.current = null;
     }
   }, [clientSocket, uploading]);
-  
-  
+
   useEffect(() => {
     if (!clientSocket) {
       return;
