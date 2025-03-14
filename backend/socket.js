@@ -91,7 +91,7 @@ io_server.on("connection", (clientSocket) => {
                 createdAt: messageBody.createdAt,
             });
             clientSocket.emit("messageSent", {
-                createdAt: messageBody.time,
+                createdAt: messageBody.createdAt,
                 senderId: messageBody.senderId,
                 receiverId: messageBody.recieverId,
                 text: messageBody.message_text,

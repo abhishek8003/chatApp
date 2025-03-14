@@ -128,7 +128,7 @@ function SocketProvider({ children }) {
         console.log("Message was sent succesfuly!:", message);
         dispatch(changeStatus(message));
       });
-
+      
       // Cleanup on unmount
       return () => {
         socket.off("getOnlineUsers");
