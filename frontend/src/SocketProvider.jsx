@@ -147,58 +147,22 @@ function SocketProvider({ children }) {
       dispatch(uploadingToggle(false));
     });
   }, [clientSocket]);
-  // useEffect(() => {
-  //   if (!clientSocket) return;
-  //   console.log("UPLOAD STATUS", uploading);
-  //   console.log("keepAliveInterval.current",keepAliveInterval.current);
-  //   let temp;
-  //   if (uploading) {
-  //     console.log("keep ALIVE MUST FIRED AS UPLOAD TRUE");
-  //    temp = setInterval(() => {
-  //       console.log("Sending keep-alive ping...");
-  //       clientSocket.emit("keepAlive");
-  //     },800);
-  //     console.log("INTERVAL VALUE MUST BE",temp);
-  //     keepAliveInterval.current=temp;
-  //     console.log("keepAliveInterval.current VALUE MUST BE",keepAliveInterval.current);
-  //   } else {
-  //     console.log("KEEP ALIVE MUT STOP NOW!");
-  //     console.log(keepAliveInterval.current);
-  //     clearInterval(keepAliveInterval.current);
-  //     keepAliveInterval.current=null;
-  //   }
-  // }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) return;
-    let temp;
-    // const intervalCleanup = () => {
-    //   if (keepAliveInterval.current) {
-    //     console.log("Clearing existing interval:", keepAliveInterval.current);
-    //     clearInterval(keepAliveInterval.current);
-    //     keepAliveInterval.current = null;
-    //   }
-    // };
-  
+    let temp;  
     if (uploading) {
       console.log("Starting keepAlive interval");
-      // intervalCleanup(); // Clear any existing interval first
-      // keepAliveInterval.current = setInterval(() => {
-      //   console.log("Sending keep-alive ping...");
-      //   clientSocket.emit("keepAlive");
-      // }, 800);
       temp = setInterval(() => {
         console.log("Sending keep-alive ping...");
         clientSocket.emit("keepAlive");
-      }, 800);
+      }, 1500);
       keepAliveInterval.current=temp;
 
-      // console.log("New interval ID:", keepAliveInterval.current);
+      console.log("New interval ID:", keepAliveInterval.current);
     } else {
       console.log("Stopping keepAlive interval");
       clearInterval(keepAliveInterval.current);
-      // intervalCleanup();
     }
-    // return intervalCleanup;
   }, [clientSocket, uploading]); 
   
   useEffect(() => {
