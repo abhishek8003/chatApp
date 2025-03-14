@@ -151,9 +151,11 @@ function SocketProvider({ children }) {
       keepAliveInterval = setInterval(() => {
         console.log("Sending keep-alive ping...");
         clientSocket.emit("keepAlive");
-      }, 1100);
+      }, 500);
     }
-    return () => clearInterval(keepAliveInterval);
+    else{
+      clearInterval(keepAliveInterval)
+    }
   }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) {
