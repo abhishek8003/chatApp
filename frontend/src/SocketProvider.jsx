@@ -170,33 +170,36 @@ function SocketProvider({ children }) {
   // }, [clientSocket, uploading]);
   useEffect(() => {
     if (!clientSocket) return;
-  
-    const intervalCleanup = () => {
-      if (keepAliveInterval.current) {
-        console.log("Clearing existing interval:", keepAliveInterval.current);
-        clearInterval(keepAliveInterval.current);
-        keepAliveInterval.current = null;
-      }
-    };
+    let temp;
+    // const intervalCleanup = () => {
+    //   if (keepAliveInterval.current) {
+    //     console.log("Clearing existing interval:", keepAliveInterval.current);
+    //     clearInterval(keepAliveInterval.current);
+    //     keepAliveInterval.current = null;
+    //   }
+    // };
   
     if (uploading) {
       console.log("Starting keepAlive interval");
-      intervalCleanup(); // Clear any existing interval first
-      
-      keepAliveInterval.current = setInterval(() => {
+      // intervalCleanup(); // Clear any existing interval first
+      // keepAliveInterval.current = setInterval(() => {
+      //   console.log("Sending keep-alive ping...");
+      //   clientSocket.emit("keepAlive");
+      // }, 800);
+      temp = setInterval(() => {
         console.log("Sending keep-alive ping...");
         clientSocket.emit("keepAlive");
       }, 800);
-  
-      console.log("New interval ID:", keepAliveInterval.current);
+      keepAliveInterval.current=temp;
+
+      // console.log("New interval ID:", keepAliveInterval.current);
     } else {
       console.log("Stopping keepAlive interval");
-      intervalCleanup();
+      clearInterval(keepAliveInterval.current);
+      // intervalCleanup();
     }
-  
-    // Cleanup when component unmounts or dependencies change
-    return intervalCleanup;
-  }, [clientSocket, uploading]); // Keep these dependencies
+    // return intervalCleanup;
+  }, [clientSocket, uploading]); 
   
   useEffect(() => {
     if (!clientSocket) {
