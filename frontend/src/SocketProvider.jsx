@@ -157,12 +157,9 @@ function SocketProvider({ children }) {
       if (keepAliveInterval.current) {
         clearInterval(keepAliveInterval.current);
       }
-
-     
-        setInterval(() => {
+        keepAliveInterval.current=setInterval(() => {
           console.log("Sending keep-alive ping...");
           clientSocket.emit("keepAlive");
-          
         }, 2000);
       console.log("New interval ID:", keepAliveInterval.current);
     } else {
