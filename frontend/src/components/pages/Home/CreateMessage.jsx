@@ -44,7 +44,7 @@ function CreateMessage() {
   useEffect(() => {
     keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
   }, [keepAliveInterval]);
-  let handleFilePreview = async() => {
+  let handleFilePreview = async () => {
     setPreview(true);
     if (inputFile) {
       let fileObj = inputFile.current.files[0];
@@ -59,176 +59,177 @@ function CreateMessage() {
 
   let form = useRef();
   let handleSendMessage = async (myForm) => {
-    setSendingMessage(true);
-    const time = new Date(Date.now()).toISOString(); // Set time once
-    let text = myForm.newMessage.value;
-    let imgTempUrl = previewUrl;
-
-    if (selectedUser) {
-      dispatch(
-        updateChats({
-          senderId: userAuth._id,
-          receiverId: selectedUser._id,
-          text: text,
-          image: {
-            local_url: "",
-            cloud_url: imgTempUrl,
-          },
-          createdAt: time,
-          status: "pending",
-          isGroupChat: false,
-        })
-      );
-      dispatch(uploadingToggle(true)); //make uploading true
-      setTimeout(() => {
-        clientSocket?.emit("sendMessage", {
-          senderId: userAuth._id,
-          recieverId: selectedUser._id,
-          message_text: text,
-          message_image: imgTempUrl,
-          createdAt: time,
-        });
-      }, 1);
-      console.log("am after setTImeout");
-      
-      // dispatch(
-      //   changeStatus({
-      //     senderId: userAuth._id,
-      //     receiverId: selectedUser._id,
-      //     text: text,
-      //     image: {
-      //       local_url: "",
-      //       cloud_url: imgTempUrl,
-      //     },
-      //     createdAt: time,
-      //     status: "sent",
-      //   })
-      // );
-      console.log(`logged socket after emiting:`, clientSocket);
-
-      let file = myForm.messageFile && myForm.messageFile.files[0];
-      console.log(text);
-      console.log(file);
-      if (!text && !file) {
-        return;
-      }
-      let formData = new FormData();
-      if (text) {
-        formData.append("messageText", text);
-      }
-      if (file) {
-        formData.append("messageImage", file);
-      }
-      formData.append("messageTime", time);
-      setPreview(false);
-      setMessageText("");
-      inputFile.current.value = "";
-      try {
-        let response = await fetch(
-          `${backendUrl}/api/chats/${selectedUser._id}`,
-          {
-            method: "POST",
-            credentials: "include",
-            body: formData,
-          }
+    setTimeout(async () => {
+      setSendingMessage(true);
+      const time = new Date(Date.now()).toISOString(); // Set time once
+      let text = myForm.newMessage.value;
+      let imgTempUrl = previewUrl;
+      if (selectedUser) {
+        dispatch(
+          updateChats({
+            senderId: userAuth._id,
+            receiverId: selectedUser._id,
+            text: text,
+            image: {
+              local_url: "",
+              cloud_url: imgTempUrl,
+            },
+            createdAt: time,
+            status: "pending",
+            isGroupChat: false,
+          })
         );
-        let json = await response.json();
-        if (response.status === 200) {
-          console.log("After saving to database:", json.newMessage);
-          // dispatch(setChats([...chats, json.newMessage]));
-          // setMessageText("");
-          // inputFile.current.value = "";
-          // setPreview(false);
-          // console.log("Clearing interval:", keepAliveIntervalRef.current);
-          // clearInterval(keepAliveIntervalRef.current);
-          // dispatch(setKeepAliveInterval(null));
-          let receiverStatus = onlineUsers.find((u) => {
-            if (u._id == json.newMessage.receiverId) {
-              return true;
-            }
-            return false;
+        dispatch(uploadingToggle(true)); //make uploading true
+        setTimeout(() => {
+          clientSocket?.emit("sendMessage", {
+            senderId: userAuth._id,
+            recieverId: selectedUser._id,
+            message_text: text,
+            message_image: imgTempUrl,
+            createdAt: time,
           });
-          if (!receiverStatus) {
-            dispatch(changeStatus(json.newMessage));
-          }
+        }, 1);
+        console.log("am after setTImeout");
 
-          setSendingMessage(false);
-          setPreviewUrl(null);
+        // dispatch(
+        //   changeStatus({
+        //     senderId: userAuth._id,
+        //     receiverId: selectedUser._id,
+        //     text: text,
+        //     image: {
+        //       local_url: "",
+        //       cloud_url: imgTempUrl,
+        //     },
+        //     createdAt: time,
+        //     status: "sent",
+        //   })
+        // );
+        console.log(`logged socket after emiting:`, clientSocket);
+
+        let file = myForm.messageFile && myForm.messageFile.files[0];
+        console.log(text);
+        console.log(file);
+        if (!text && !file) {
+          return;
         }
-      } catch (error) {
-        console.log(error);
-        toast.error(error);
-      } finally {
-        setSendingMessage(false);
-      }
-    }
-    if (selectedGroup) {
-      try {
-        if (selectedGroup.pastMembers.includes(userAuth._id)) {
-          // alert("BRO Its not member!")
-          console.log("BUG selected Group:", selectedGroup);
-          throw new Error("You are not a member of this group");
-        } else {
-          console.log("TEST selected Group:", selectedGroup);
+        let formData = new FormData();
+        if (text) {
+          formData.append("messageText", text);
         }
-      } catch (error) {
-        toast.error(error.message);
+        if (file) {
+          formData.append("messageImage", file);
+        }
+        formData.append("messageTime", time);
+        setPreview(false);
         setMessageText("");
         inputFile.current.value = "";
-        setSendingMessage(false);
-        setPreview(false);
-        setPreviewUrl(null);
-        return;
-      }
-      // alert("BRO !")
+        try {
+          let response = await fetch(
+            `${backendUrl}/api/chats/${selectedUser._id}`,
+            {
+              method: "POST",
+              credentials: "include",
+              body: formData,
+            }
+          );
+          let json = await response.json();
+          if (response.status === 200) {
+            console.log("After saving to database:", json.newMessage);
+            // dispatch(setChats([...chats, json.newMessage]));
+            // setMessageText("");
+            // inputFile.current.value = "";
+            // setPreview(false);
+            // console.log("Clearing interval:", keepAliveIntervalRef.current);
+            // clearInterval(keepAliveIntervalRef.current);
+            // dispatch(setKeepAliveInterval(null));
+            let receiverStatus = onlineUsers.find((u) => {
+              if (u._id == json.newMessage.receiverId) {
+                return true;
+              }
+              return false;
+            });
+            if (!receiverStatus) {
+              dispatch(changeStatus(json.newMessage));
+            }
 
-      let file = myForm.messageFile && myForm.messageFile.files[0];
-      console.log(text);
-      console.log(file);
-      if (!text && !file) {
-        return;
-      }
-      let formData = new FormData();
-      if (text) {
-        formData.append("messageText", text);
-      }
-      if (file) {
-        formData.append("messageImage", file);
-      }
-      try {
-        clientSocket?.emit("addGroupMessage", {
-          selectedGroup: selectedGroup._id,
-          messageBody: {
-            messageText: text,
-            messageImage: previewUrl,
-            createdAt: new Date(Date.now()),
-          },
-        });
-        let response = await fetch(
-          `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
-          {
-            method: "POST",
-            credentials: "include",
-            body: formData,
+            setSendingMessage(false);
+            setPreviewUrl(null);
           }
-        );
-        let json = await response.json();
-        if (response.status === 200) {
-          console.log(json.group);
-          dispatch(setGroupChat(json.group));
+        } catch (error) {
+          console.log(error);
+          toast.error(error);
+        } finally {
+          setSendingMessage(false);
+        }
+      }
+      if (selectedGroup) {
+        try {
+          if (selectedGroup.pastMembers.includes(userAuth._id)) {
+            // alert("BRO Its not member!")
+            console.log("BUG selected Group:", selectedGroup);
+            throw new Error("You are not a member of this group");
+          } else {
+            console.log("TEST selected Group:", selectedGroup);
+          }
+        } catch (error) {
+          toast.error(error.message);
           setMessageText("");
           inputFile.current.value = "";
           setSendingMessage(false);
           setPreview(false);
           setPreviewUrl(null);
+          return;
         }
-      } catch (error) {
-        console.log(error);
-        toast.error(error);
-      } finally {
-        setSendingMessage(false);
+        // alert("BRO !")
+
+        let file = myForm.messageFile && myForm.messageFile.files[0];
+        console.log(text);
+        console.log(file);
+        if (!text && !file) {
+          return;
+        }
+        let formData = new FormData();
+        if (text) {
+          formData.append("messageText", text);
+        }
+        if (file) {
+          formData.append("messageImage", file);
+        }
+        try {
+          clientSocket?.emit("addGroupMessage", {
+            selectedGroup: selectedGroup._id,
+            messageBody: {
+              messageText: text,
+              messageImage: previewUrl,
+              createdAt: new Date(Date.now()),
+            },
+          });
+          let response = await fetch(
+            `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
+            {
+              method: "POST",
+              credentials: "include",
+              body: formData,
+            }
+          );
+          let json = await response.json();
+          if (response.status === 200) {
+            console.log(json.group);
+            dispatch(setGroupChat(json.group));
+            setMessageText("");
+            inputFile.current.value = "";
+            setSendingMessage(false);
+            setPreview(false);
+            setPreviewUrl(null);
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error);
+        } finally {
+          setSendingMessage(false);
+        }
       }
-    }
+    }, 0);
   };
   useEffect(() => {
     if (chats && selectedUser) {
