@@ -74,7 +74,7 @@ function SocketProvider({ children }) {
         query: { user: JSON.stringify(userAuth) },
         reconnection: true, // Enables automatic reconnection
         reconnectionAttempts: Infinity, // Keep trying indefinitely
-        reconnectionDelay: 3000   // Wait 3s before retrying
+        reconnectionDelay: 1000   // Wait 3s before retrying
       });
 
       setClientSocket(socket);
@@ -158,7 +158,7 @@ function SocketProvider({ children }) {
       }
       keepAliveInterval.current = setInterval(() => {
         clientSocket.emit("keepAlive");
-      }, 5000); // Send every 5s
+      }, 2000); // Send every 5s
       console.log("New interval ID:", keepAliveInterval.current);
     } else {
       console.log("Stopping keepAlive interval");
