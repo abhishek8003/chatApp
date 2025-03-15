@@ -81,6 +81,10 @@ function SocketProvider({ children }) {
 
       socket.on("connect", () => {
         console.log("Connected to socket server");
+        socket.on("getOnlineUsers", (onlineUsers) => {
+          console.log("Online users:", onlineUsers);
+          dispatch(setOnlineUsers(onlineUsers));
+        });
         if (!isInitialConnect.current) {
           // Force full page reload on reconnect
           toast.success("Reconnected!");
@@ -111,11 +115,6 @@ function SocketProvider({ children }) {
 
       socket.on("error", (error) => {
         console.error("Socket error:", error);
-      });
-
-      socket.on("getOnlineUsers", (onlineUsers) => {
-        console.log("Online users:", onlineUsers);
-        dispatch(setOnlineUsers(onlineUsers));
       });
 
       socket.on("addFriend", (data) => {
