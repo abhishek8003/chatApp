@@ -178,7 +178,6 @@ function SocketProvider({ children }) {
 
     if (uploading) {
       console.log("Starting keepAlive interval");
-
       // Clear previous interval if exists
       if (keepAliveInterval) {
         clearInterval(keepAliveInterval);

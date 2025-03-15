@@ -9,8 +9,8 @@ const http_server = http.createServer(app);
 const io_server = new Server(http_server, {
     cors: { origin: `${process.env.frontendURL}` },
     maxHttpBufferSize: 1e8,
-    pingTimeout: 25000, // Wait 25s before disconnecting
-    pingInterval: 10000, // Send pings every 10s   
+    pingTimeout: 10000, // Wait 25s before disconnecting
+    pingInterval: 2000, // Send pings every 10s   
 });
 const ChatNotification = require("./models/chatNotification")
 const GroupNotification = require("./models/groupNotification");
@@ -37,8 +37,11 @@ io_server.on("connection", (clientSocket) => {
     }
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
-    clientSocket.on("keepAlive", () => {
+    clientSocket.on("keepAlive", (d,callback) => {
         console.log(`Received keepAlive from ${clientSocket.id}`);
+        if (callback) {
+            callback(); // This triggers the client's callback function.
+          }
     });
     clientSocket.on("deleteOnlineUser", (data) => {
         console.log(data);
