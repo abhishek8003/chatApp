@@ -161,6 +161,7 @@ function SocketProvider({ children }) {
         clearInterval(keepAliveIntervalRef.current);
       }
       let temp = setInterval(() => {
+        console.log("FIRING KEEP ALIVE!");
         clientSocket.emit("keepAlive");
       }, 2000); // Send every 5s
       dispatch(setKeepAliveInterval(temp));
