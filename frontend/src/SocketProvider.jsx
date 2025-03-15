@@ -175,22 +175,22 @@ function SocketProvider({ children }) {
 
   useEffect(() => {
     if (!clientSocket) return;
-  
+
     if (uploading) {
       console.log("Starting keepAlive interval");
-  
+
       // Clear previous interval if exists
       if (keepAliveInterval) {
         clearInterval(keepAliveInterval);
       }
-  
+
       // Create new keepAlive interval
       let temp = setInterval(() => {
         if (clientSocket?.connected) {
-          console.log("FIRING KEEP ALIVE!");
-          clientSocket.emit("keepAlive");
+          clientSocket.emit("keepAlive", null, () => {
+            console.log("FIRed KEEP ALIVE!");
+          });
         } else {
-          console.warn("Skipping keepAlive - Socket is not connected!");
           clearInterval(temp);
           dispatch(setKeepAliveInterval(null));
         }
@@ -203,7 +203,7 @@ function SocketProvider({ children }) {
       dispatch(setKeepAliveInterval(null));
     }
   }, [clientSocket, uploading]);
-  
+
   useEffect(() => {
     if (!clientSocket) {
       return;
