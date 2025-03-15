@@ -80,13 +80,17 @@ function CreateMessage() {
         })
       );
       dispatch(uploadingToggle(true)); //make uploading true
-      clientSocket?.emit("sendMessage", {
-        senderId: userAuth._id,
-        recieverId: selectedUser._id,
-        message_text: text,
-        message_image: imgTempUrl,
-        createdAt: time,
-      });
+      setTimeout(() => {
+        clientSocket?.emit("sendMessage", {
+          senderId: userAuth._id,
+          recieverId: selectedUser._id,
+          message_text: text,
+          message_image: imgTempUrl,
+          createdAt: time,
+        });
+      }, 0);
+      
+
       // dispatch(
       //   changeStatus({
       //     senderId: userAuth._id,
@@ -135,7 +139,7 @@ function CreateMessage() {
           // setMessageText("");
           // inputFile.current.value = "";
           // setPreview(false);
-          console.log("Clearing interval:",  keepAliveIntervalRef.current);
+          console.log("Clearing interval:", keepAliveIntervalRef.current);
           clearInterval(keepAliveIntervalRef.current);
           dispatch(setKeepAliveInterval(null));
           let receiverStatus = onlineUsers.find((u) => {
