@@ -56,7 +56,7 @@ function CreateMessage() {
         });
         fileReader.readAsDataURL(fileObj);
       }
-    });
+    },2);
   };
 
   let form = useRef();
