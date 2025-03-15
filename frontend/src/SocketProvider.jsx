@@ -157,7 +157,7 @@ function SocketProvider({ children }) {
         clearInterval(keepAliveInterval.current);
       }
       keepAliveInterval.current = setInterval(() => {
-        socket.emit("keepAlive");
+        clientSocket.emit("keepAlive");
       }, 5000); // Send every 5s
       console.log("New interval ID:", keepAliveInterval.current);
     } else {
