@@ -44,20 +44,29 @@ function CreateMessage() {
   useEffect(() => {
     keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
   }, [keepAliveInterval]);
-  let handleFilePreview = async () => {
-    setTimeout(() => {
+  // let handleFilePreview = async () => {
+  //   setTimeout(() => {
+  //     setPreview(true);
+  //     if (inputFile) {
+  //       let fileObj = inputFile.current.files[0];
+  //       let fileReader = new FileReader();
+  //       fileReader.addEventListener("loadend", (e) => {
+  //         console.log(e.target.result);
+  //         setPreviewUrl(e.target.result);
+  //       });
+  //       fileReader.readAsDataURL(fileObj);
+  //     }
+  //   });
+  // };
+  let handleFilePreview = () => {
+    const file = inputFile.current?.files[0];
+    if (file) {
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
       setPreview(true);
-      if (inputFile) {
-        let fileObj = inputFile.current.files[0];
-        let fileReader = new FileReader();
-        fileReader.addEventListener("loadend", (e) => {
-          console.log(e.target.result);
-          setPreviewUrl(e.target.result);
-        });
-        fileReader.readAsDataURL(fileObj);
-      }
-    });
+    }
   };
+  
 
   let form = useRef();
   let handleSendMessage = async (myForm) => {
