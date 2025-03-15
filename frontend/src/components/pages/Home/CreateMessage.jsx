@@ -88,8 +88,9 @@ function CreateMessage() {
           message_image: imgTempUrl,
           createdAt: time,
         });
-      }, 0);
-
+      }, 1);
+      console.log("am after setTImeout");
+      
       // dispatch(
       //   changeStatus({
       //     senderId: userAuth._id,
