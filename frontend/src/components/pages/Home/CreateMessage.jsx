@@ -89,7 +89,6 @@ function CreateMessage() {
           createdAt: time,
         });
       }, 0);
-      
 
       // dispatch(
       //   changeStatus({
@@ -139,9 +138,9 @@ function CreateMessage() {
           // setMessageText("");
           // inputFile.current.value = "";
           // setPreview(false);
-          console.log("Clearing interval:", keepAliveIntervalRef.current);
-          clearInterval(keepAliveIntervalRef.current);
-          dispatch(setKeepAliveInterval(null));
+          // console.log("Clearing interval:", keepAliveIntervalRef.current);
+          // clearInterval(keepAliveIntervalRef.current);
+          // dispatch(setKeepAliveInterval(null));
           let receiverStatus = onlineUsers.find((u) => {
             if (u._id == json.newMessage.receiverId) {
               return true;
