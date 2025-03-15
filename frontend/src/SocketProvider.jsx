@@ -187,7 +187,7 @@ function SocketProvider({ children }) {
       let temp = setInterval(() => {
         if (clientSocket?.connected) {
           clientSocket.emit("keepAlive", null, () => {
-            console.log("FIRed KEEP ALIVE!");
+            console.log("FIRed  ALIVE!");
           });
         } else {
           clearInterval(temp);
