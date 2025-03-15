@@ -68,8 +68,12 @@ function SocketProvider({ children }) {
   const prevGroupsRef = useRef([]);
   const isInitialConnect = useRef(true); // Add this line
   let uploading = useSelector((store) => store.uploading);
+  const keepAliveIntervalRef = useRef(null);
 
   // Initialize socket connection
+  useEffect(() => {
+    keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
+  }, [keepAliveInterval]);
   useEffect(() => {
     if (isLoggedIn) {
       const socket = io(backendUrl, {
@@ -150,24 +154,23 @@ function SocketProvider({ children }) {
   }, [clientSocket]);
   useEffect(() => {
     if (!clientSocket) return;
-
     if (uploading) {
       console.log("Starting keepAlive interval");
       // Clear any existing interval before creating a new one
-      if (keepAliveInterval) {
-        clearInterval(keepAliveInterval);
+      if (keepAliveIntervalRef.current) {
+        clearInterval(keepAliveIntervalRef.current);
       }
       let temp = setInterval(() => {
         clientSocket.emit("keepAlive");
       }, 2000); // Send every 5s
-      setKeepAliveInterval(temp);
-      console.log("New interval ID:", keepAliveInterval);
+      dispatch(setKeepAliveInterval(temp));
+      console.log("New interval ID:", temp);
     } else {
       console.log("Stopping keepAlive interval");
-      clearInterval(keepAliveInterval);
-      setKeepAliveInterval(null);
+      clearInterval(keepAliveIntervalRef.current);
+      dispatch(setKeepAliveInterval(null));
     }
-  }, [clientSocket, uploading, keepAliveInterval]);
+  }, [clientSocket, uploading]);
 
   useEffect(() => {
     if (!clientSocket) {

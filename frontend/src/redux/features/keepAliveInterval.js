@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-const initialState = false;
+const initialState = null;
 const keepAliveIntervalSlice = createSlice({
     name: "keepAliveInterval",
     initialState: initialState,

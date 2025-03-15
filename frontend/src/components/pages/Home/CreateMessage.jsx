@@ -31,7 +31,7 @@ function CreateMessage() {
     return store.onlineUsers;
   });
   let [preview, setPreview] = useState(false);
-  let keepAliveInterval=useSelector((store)=>store.keepAliveInterval)
+  let keepAliveInterval = useSelector((store) => store.keepAliveInterval);
   let [previewUrl, setPreviewUrl] = useState("");
   let [messageText, setMessageText] = useState("");
   let [isSendingMessage, setSendingMessage] = useState(false);
@@ -40,6 +40,10 @@ function CreateMessage() {
     return store.userAuth;
   });
   let dispatch = useDispatch();
+  let keepAliveIntervalRef = useRef(null); // ✅ Create a ref
+  useEffect(() => {
+    keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
+  }, [keepAliveInterval]);
   let handleFilePreview = () => {
     setPreview(true);
     if (inputFile) {
@@ -131,6 +135,9 @@ function CreateMessage() {
           // setMessageText("");
           // inputFile.current.value = "";
           // setPreview(false);
+          console.log("Clearing interval:",  keepAliveIntervalRef.current);
+          clearInterval(keepAliveIntervalRef.current);
+          dispatch(setKeepAliveInterval(null));
           let receiverStatus = onlineUsers.find((u) => {
             if (u._id == json.newMessage.receiverId) {
               return true;
@@ -140,8 +147,7 @@ function CreateMessage() {
           if (!receiverStatus) {
             dispatch(changeStatus(json.newMessage));
           }
-          clearInterval(keepAliveInterval);
-          setKeepAliveInterval(null);
+
           setSendingMessage(false);
           setPreviewUrl(null);
         }
