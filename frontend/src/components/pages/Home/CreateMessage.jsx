@@ -44,7 +44,7 @@ function CreateMessage() {
   useEffect(() => {
     keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
   }, [keepAliveInterval]);
-  let handleFilePreview = () => {
+  let handleFilePreview = async() => {
     setPreview(true);
     if (inputFile) {
       let fileObj = inputFile.current.files[0];
