@@ -74,7 +74,7 @@ function SocketProvider({ children }) {
         query: { user: JSON.stringify(userAuth) },
         reconnection: true, // Enables automatic reconnection
         reconnectionAttempts: Infinity, // Keep trying indefinitely
-        reconnectionDelay: 1000, // Wait 1 second before trying to reconnect
+        reconnectionDelay: 3000   // Wait 3s before retrying
       });
 
       setClientSocket(socket);

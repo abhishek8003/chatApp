@@ -9,8 +9,8 @@ const http_server = http.createServer(app);
 const io_server = new Server(http_server, {
     cors: { origin: `${process.env.frontendURL}` },
     maxHttpBufferSize: 1e8,
-    pingTimeout: 10000, // 10s (detect offline users fast)
-    pingInterval: 5000,  // Send pings every 5s    
+    pingTimeout: 25000, // Wait 25s before disconnecting
+    pingInterval: 10000, // Send pings every 10s   
 });
 const ChatNotification = require("./models/chatNotification")
 const GroupNotification = require("./models/groupNotification");
