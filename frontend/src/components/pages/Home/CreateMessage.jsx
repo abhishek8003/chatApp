@@ -45,16 +45,18 @@ function CreateMessage() {
     keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
   }, [keepAliveInterval]);
   let handleFilePreview = async () => {
-    setPreview(true);
-    if (inputFile) {
-      let fileObj = inputFile.current.files[0];
-      let fileReader = new FileReader();
-      fileReader.addEventListener("loadend", (e) => {
-        console.log(e.target.result);
-        setPreviewUrl(e.target.result);
-      });
-      fileReader.readAsDataURL(fileObj);
-    }
+    setTimeout(() => {
+      setPreview(true);
+      if (inputFile) {
+        let fileObj = inputFile.current.files[0];
+        let fileReader = new FileReader();
+        fileReader.addEventListener("loadend", (e) => {
+          console.log(e.target.result);
+          setPreviewUrl(e.target.result);
+        });
+        fileReader.readAsDataURL(fileObj);
+      }
+    });
   };
 
   let form = useRef();
