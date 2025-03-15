@@ -28,6 +28,7 @@ import addGroupMemberToggleReducer from "./features/addGroupMemberToggle";
 import newGroupMembersReducer from "./features/newGroupMembers"
 import retryReducer from "./features/retry";
 import uploadingReducer from "./features/uploading";
+import keepAliveIntervalReducer from "./features/keepAliveInterval"
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -58,7 +59,8 @@ const store=configureStore({
         addGroupMemberToggle:addGroupMemberToggleReducer,
         newGroupMembers:newGroupMembersReducer,
         retry:retryReducer,
-        uploading:uploadingReducer
+        uploading:uploadingReducer,
+        keepAliveInterval:keepAliveIntervalReducer
     }
 });
 export default store;

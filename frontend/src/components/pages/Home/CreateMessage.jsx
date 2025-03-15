@@ -30,10 +30,11 @@ function CreateMessage() {
     return store.onlineUsers;
   });
   let [preview, setPreview] = useState(false);
+  let keepAliveInterval=useSelector((store)=>store.keepAliveInterval)
   let [previewUrl, setPreviewUrl] = useState("");
   let [messageText, setMessageText] = useState("");
   let [isSendingMessage, setSendingMessage] = useState(false);
-  let uploading=useSelector((store)=>store.uploading);
+  let uploading = useSelector((store) => store.uploading);
   let userAuth = useSelector((store) => {
     return store.userAuth;
   });
@@ -73,7 +74,7 @@ function CreateMessage() {
           isGroupChat: false,
         })
       );
-      dispatch(uploadingToggle(true));//make uploading true
+      dispatch(uploadingToggle(true)); //make uploading true
       clientSocket?.emit("sendMessage", {
         senderId: userAuth._id,
         recieverId: selectedUser._id,
@@ -138,6 +139,8 @@ function CreateMessage() {
           if (!receiverStatus) {
             dispatch(changeStatus(json.newMessage));
           }
+          clearInterval(keepAliveInterval);
+          setKeepAliveInterval(null);
           setSendingMessage(false);
           setPreviewUrl(null);
         }

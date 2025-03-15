@@ -46,11 +46,12 @@ import {
 import toast from "react-hot-toast";
 import { increaseRetry } from "./redux/features/retry";
 import { uploadingToggle } from "./redux/features/uploading";
+import { setKeepAliveInterval } from "./redux/features/keepAliveInterval";
 
 const socketContext = createContext();
 
 function SocketProvider({ children }) {
-  let keepAliveInterval = useRef();
+  // let keepAliveInterval = useRef();
   const dispatch = useDispatch();
   const groups = useSelector((store) => store.groups);
   const selectedGroup = useSelector((store) => store.selectedGroup);
@@ -60,6 +61,7 @@ function SocketProvider({ children }) {
   const selectedUser = useSelector((store) => store.selectedUser);
   const isLoggedIn = !!userAuth;
   const users = useSelector((store) => store.users);
+  let keepAliveInterval = useSelector((store) => store.keepAliveInterval);
 
   const [clientSocket, setClientSocket] = useState(null);
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
@@ -74,7 +76,7 @@ function SocketProvider({ children }) {
         query: { user: JSON.stringify(userAuth) },
         reconnection: true, // Enables automatic reconnection
         reconnectionAttempts: Infinity, // Keep trying indefinitely
-        reconnectionDelay: 1000   // Wait 3s before retrying
+        reconnectionDelay: 1000, // Wait 3s before retrying
       });
 
       setClientSocket(socket);
@@ -151,21 +153,21 @@ function SocketProvider({ children }) {
 
     if (uploading) {
       console.log("Starting keepAlive interval");
-
       // Clear any existing interval before creating a new one
-      if (keepAliveInterval.current) {
-        clearInterval(keepAliveInterval.current);
+      if (keepAliveInterval) {
+        clearInterval(keepAliveInterval);
       }
-      keepAliveInterval.current = setInterval(() => {
+      let temp = setInterval(() => {
         clientSocket.emit("keepAlive");
       }, 2000); // Send every 5s
-      console.log("New interval ID:", keepAliveInterval.current);
+      setKeepAliveInterval(temp);
+      console.log("New interval ID:", keepAliveInterval);
     } else {
       console.log("Stopping keepAlive interval");
-      clearInterval(keepAliveInterval.current);
-      keepAliveInterval.current = null;
+      clearInterval(keepAliveInterval);
+      setKeepAliveInterval(null);
     }
-  }, [clientSocket, uploading]);
+  }, [clientSocket, uploading, keepAliveInterval]);
 
   useEffect(() => {
     if (!clientSocket) {
