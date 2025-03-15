@@ -26,8 +26,15 @@ io_server.on("connection", (clientSocket) => {
         user.socketId = clientSocket.id;
     }
     console.log("TEST online users:", online_users);
-
-    online_users.push(user);
+    let alreadyExists = online_users.find((e) => {
+        if (e._id == user._id) {
+            return true;
+        }
+        return false;
+    })
+    if (!alreadyExists) {
+        online_users.push(user);
+    }
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
     clientSocket.on("keepAlive", () => {
@@ -318,10 +325,8 @@ io_server.on("connection", (clientSocket) => {
 
     clientSocket.on("disconnect", () => {
         console.log("A user disconnected with Socket id:", clientSocket.id);
-        if (user && user._id) {
-            online_users = online_users.filter((u) => u._id !== user._id);
-            io_server.emit("getOnlineUsers", online_users);
-        }
+        online_users = online_users.filter((u) => u._id !== user._id);
+        io_server.emit("getOnlineUsers", online_users);
     });
 });
 
