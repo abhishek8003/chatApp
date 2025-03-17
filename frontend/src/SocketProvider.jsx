@@ -71,16 +71,16 @@ function SocketProvider({ children }) {
   const keepAliveIntervalRef = useRef(null);
 
   // Initialize socket connection
-  useEffect(() => {
-    keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
-  }, [keepAliveInterval]);
+  // useEffect(() => {
+  //   keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
+  // }, [keepAliveInterval]);
   useEffect(() => {
     if (isLoggedIn) {
       const socket = io(backendUrl, {
         query: { user: JSON.stringify(userAuth) },
         reconnection: true, // Enables automatic reconnection
         reconnectionAttempts: Infinity, // Keep trying indefinitely
-        reconnectionDelay: 1000, // Wait 3s before retrying
+        reconnectionDelay: 3000, // Wait 3s before retrying
       });
 
       setClientSocket(socket);
@@ -155,56 +155,7 @@ function SocketProvider({ children }) {
       dispatch(uploadingToggle(false));
     });
   }, [clientSocket]);
-  // useEffect(() => {
-  //   if (!clientSocket) return;
-  //   if (uploading) {
-  //     console.log("Starting keepAlive interval");
-  //     // Clear any existing interval before creating a new one
-  //     if (keepAliveIntervalRef.current) {
-  //       clearInterval(keepAliveIntervalRef.current);
-  //     }
-  //     let temp = setInterval(() => {
-  //       console.log("FIRING KEEP ALIVE!");
-  //       clientSocket.emit("keepAlive");
-  //     }, 2000); // Send every 5s
-  //     dispatch(setKeepAliveInterval(temp));
-  //     console.log("New interval ID:", temp);
-  //   } else {
-  //     console.log("Stopping keepAlive interval");
-  //     clearInterval(keepAliveIntervalRef.current);
-  //     dispatch(setKeepAliveInterval(null));
-  //   }
-  // }, [clientSocket, uploading]);
 
-  // useEffect(() => {
-  //   if (!clientSocket) return;
-
-  //   if (uploading) {
-  //     console.log("Starting keepAlive interval");
-  //     // Clear previous interval if exists
-  //     if (keepAliveInterval) {
-  //       clearInterval(keepAliveInterval);
-  //     }
-
-  //     // Create new keepAlive interval
-  //     let temp = setInterval(() => {
-  //       if (clientSocket?.connected) {
-  //         clientSocket.emit("keepAlive", null, () => {
-  //           console.log("FIRed  ALIVE!");
-  //         });
-  //       } else {
-  //         clearInterval(temp);
-  //         dispatch(setKeepAliveInterval(null));
-  //       }
-  //     }, 2000); // Send every 2s
-  //     dispatch(setKeepAliveInterval(temp));
-  //     console.log("New interval ID:", temp);
-  //   } else {
-  //     console.log("Stopping keepAlive interval");
-  //     clearInterval(keepAliveInterval);
-  //     dispatch(setKeepAliveInterval(null));
-  //   }
-  // }, [clientSocket, uploading]);
 
   useEffect(() => {
     if (!clientSocket) {
