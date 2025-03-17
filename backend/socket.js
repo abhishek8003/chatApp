@@ -33,8 +33,8 @@ io_server.on("connection", (clientSocket) => {
         return false;
     })
     if (!alreadyExists) {
-        online_users.push(user);
     }
+    online_users.push(user);
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
     clientSocket.on("keepAlive", (d,callback) => {
