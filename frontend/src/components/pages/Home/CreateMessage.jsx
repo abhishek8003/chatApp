@@ -82,15 +82,17 @@ function CreateMessage() {
           })
         );
         dispatch(uploadingToggle(true)); //make uploading true
-        setTimeout(() => {
+        new Promise((resolve, reject) => {
           clientSocket?.emit("sendMessage", {
             senderId: userAuth._id,
             recieverId: selectedUser._id,
             message_text: text,
             message_image: imgTempUrl,
             createdAt: time,
+          },()=>{
+            resolve();
           });
-        }, 1);
+        });
         console.log("am after setTImeout");
 
         // dispatch(

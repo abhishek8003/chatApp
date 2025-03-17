@@ -76,7 +76,7 @@ io_server.on("connection", (clientSocket) => {
 
         clientSocket.emit("getAllUsersExceptMe", allUsers);
     });
-    clientSocket.on("sendMessage", async (messageBody) => {
+    clientSocket.on("sendMessage", async (messageBody,callback) => {
         console.log("messageBOdy", messageBody);
         console.log("onlineUSersss", online_users.length);
         console.log("MESSAGE TIME:", messageBody.createdAt);
@@ -120,6 +120,7 @@ io_server.on("connection", (clientSocket) => {
                 isGroupChat: false
             });
         }
+        callback();
     });
 
     clientSocket.on("messagesSeenByUser", async (Targetuser) => {
