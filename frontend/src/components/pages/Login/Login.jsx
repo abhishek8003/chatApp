@@ -77,7 +77,7 @@ let backendUrl=useContext(backendContext)
     <>
       <Navbar></Navbar>
 
-      <div>
+     
         <div
           className="row"
           style={{
@@ -235,7 +235,7 @@ let backendUrl=useContext(backendContext)
             </form>
           </div>
         </div>
-      </div>
+      
       <Footer></Footer>
     </>
   );

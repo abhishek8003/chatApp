@@ -82,7 +82,7 @@ function Signup() {
     <>
       <Navbar></Navbar>
 
-      <div>
+      
         <div
           className="row"
           style={{
@@ -257,7 +257,7 @@ function Signup() {
             </form>
           </div>
         </div>
-      </div>
+      
       <Footer></Footer>
     </>
   );
