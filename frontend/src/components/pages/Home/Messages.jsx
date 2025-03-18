@@ -140,11 +140,12 @@ function Messages() {
   return (
     <Box
       sx={{
-        height: "80vh",
+        height: "89vh",
         display: "flex",
         flexDirection: "column",
         minWidth: "80px",
         position: "relative",
+        border:"2px solid green"
       }}
     >
       {selectedUser ? (

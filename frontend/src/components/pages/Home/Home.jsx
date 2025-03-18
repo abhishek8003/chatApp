@@ -80,15 +80,17 @@ function Home() {
     <>
       <Navbar></Navbar>
       <div
-        className="p-1 border"
+        className="p-1"
         style={{
+          border:"2px solid green",
           display: "flex",
           flexWrap: "nowrap",
           minWidth: "fit-content",
+          
         }}
       >
         <Sidebar></Sidebar>
-        <div style={{ flexGrow: "1", border: "2px solid yellow" }}>
+        <div style={{ flexGrow: "1" }}>
           {!selectedUser && !selectedGroup ? (
             <MessagePlaceholder />
           ) : (
