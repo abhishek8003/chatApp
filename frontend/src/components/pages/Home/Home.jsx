@@ -9,6 +9,7 @@ import { socketContext } from "../../../SocketProvider";
 import { setOnlineUsers } from "../../../redux/features/onlineUsers";
 import { backendContext } from "../../../BackendProvider";
 import { intializeNotification } from "../../../redux/features/notifications";
+import { Box } from "@mui/material";
 
 function Home() {
   let selectedUser = useSelector((store) => {
@@ -73,32 +74,42 @@ function Home() {
     fetchNotifications();
   }, [userAuth]);
   useEffect(() => {
+    document.body.style.overflowX = "hidden"; // Disable scroll
+
+    return () => {
+      document.body.style.overflow = "auto"; // Re-enable scroll on unmount
+    };
+  }, []);
+
+  useEffect(() => {
     console.log("groups changed!");
     // alert("groups changed!",groups)
   }, [groups]);
   return (
     <>
-      <Navbar></Navbar>
-      <div
-        className="p-1"
-        style={{
-          border:"2px solid green",
-          display: "flex",
-          flexWrap: "nowrap",
-          minWidth: "fit-content",
-          
-        }}
-      >
-        <Sidebar></Sidebar>
-        <div style={{ flexGrow: "1" }}>
-          {!selectedUser && !selectedGroup ? (
-            <MessagePlaceholder />
-          ) : (
-            <Messages />
-          )}
+      <Box sx={{ overflow: "hidden" }}>
+        <Navbar></Navbar>
+        <div
+          className="p-1"
+          style={{
+            border: "2px solid green",
+            display: "flex",
+            flexWrap: "nowrap",
+            minWidth: "fit-content",
+            overflow: "hidden",
+          }}
+        >
+          <Sidebar></Sidebar>
+          <div style={{ flexGrow: "1" }}>
+            {!selectedUser && !selectedGroup ? (
+              <MessagePlaceholder />
+            ) : (
+              <Messages />
+            )}
+          </div>
         </div>
-      </div>
-      <Footer></Footer>
+        <Footer></Footer>
+      </Box>
     </>
   );
 }

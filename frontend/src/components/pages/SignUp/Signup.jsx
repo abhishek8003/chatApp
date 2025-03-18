@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import MessageIcon from "@mui/icons-material/Message";
 import { useForm } from "react-hook-form";
 import LockIcon from "@mui/icons-material/Lock";
@@ -77,7 +77,13 @@ function Signup() {
     }
     console.log(isSubmitting);
   };
+ useEffect(() => {
+    document.body.style.overflowX = "hidden"; // Disable scroll
 
+    return () => {
+      document.body.style.overflow = "auto"; // Re-enable scroll on unmount
+    };
+  }, []);
   return (
     <>
       <Navbar></Navbar>
