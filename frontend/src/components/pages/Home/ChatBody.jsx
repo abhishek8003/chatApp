@@ -27,8 +27,15 @@ function ChatBody() {
   };
 
   useEffect(() => {
-    scrollTo.current?.scrollIntoView({ behavior: "smooth" });
+    if (chatContainer.current) {
+      chatContainer.current.scrollTo({
+        top: chatContainer.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
   }, [chats]);
+  
+  
 
   const formatTime = (date) =>
     new Date(date).toLocaleTimeString("en-IN", {
@@ -211,8 +218,6 @@ function ChatBody() {
           </Typography>
         </Box>
       )}
-
-      <div ref={scrollTo} style={{ visibility: "hidden" }}></div>
     </Box>
   );
 }

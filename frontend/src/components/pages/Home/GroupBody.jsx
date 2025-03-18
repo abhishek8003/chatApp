@@ -24,14 +24,19 @@ function GroupBody() {
   let selectedGroup = useSelector((store) => store.selectedGroup);
 
   // Check if the user is in pastMembers
-
   useEffect(() => {
-    scrollTo.current?.scrollIntoView({ behavior: "smooth" });
-  }, [groupChat?.groupMessages]);
+    if (chatContainer.current) {
+      chatContainer.current.scrollTo({
+        top: chatContainer.current.scrollHeight,
+        behavior: "smooth",
+      });
+    }
+  }, [groupChat]);
   const handleImagePreview = (imageUrl) => {
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
   };
+
   const formatTime = (date) =>
     new Date(date).toLocaleTimeString("en-IN", {
       hour: "numeric",
