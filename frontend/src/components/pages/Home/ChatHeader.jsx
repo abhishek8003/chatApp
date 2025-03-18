@@ -2,21 +2,21 @@ import React, { useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
 import CloseIcon from "@mui/icons-material/Close";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import AccountInfo from "./AccountInfo";
-import {  setaccountInfoToggle } from "../../../redux/features/accountInfoToggle";
+import { setaccountInfoToggle } from "../../../redux/features/accountInfoToggle";
 function ChatHeader() {
-    let selectedUser = useSelector((store) => {
-        return store.selectedUser;
-      });
-      let dispatch=useDispatch();
-      let anchorElement=useRef();
+  let selectedUser = useSelector((store) => {
+    return store.selectedUser;
+  });
+  let dispatch = useDispatch();
+  let anchorElement = useRef();
   return (
     <div
       className="chat-head-main"
       style={{
         border: "2px solid brown",
-        position:"relative",
+        position: "relative",
         // padding: "10px",
         display: "flex",
         justifyContent: "space-between",
@@ -24,8 +24,8 @@ function ChatHeader() {
     >
       <div
         style={{
-        //   width: "301px",
-        //   border: "2px solid red",
+          //   width: "301px",
+          //   border: "2px solid red",
           padding: "0.5rem",
         }}
       >
@@ -36,7 +36,7 @@ function ChatHeader() {
             // border: "2px solid red",
           }}
           ref={anchorElement}
-          onClick={()=>{
+          onClick={() => {
             console.log("tiiiajfajfaimfpamsf");
             dispatch(setaccountInfoToggle());
           }}
@@ -53,24 +53,31 @@ function ChatHeader() {
           >
             <img src={selectedUser.profilePic.cloud_url} alt="Profile" />
           </Typography>
-          <Typography
-            variant="body1"
+          <Box
             sx={{
-              flexGrow: "1",
               height: "70px",
-              display: "flex",
-            
-              alignItems: "center",
+              display:"flex",
+              justifyContent:"flex-start",
+              alignItems:"center",
+              flexDirection:"column"
             }}
-           
           >
-            {selectedUser.fullName}
-          </Typography>
+            <Typography
+              variant="body1"
+              sx={{
+                flexGrow: "1",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              {selectedUser.fullName[0].toUpperCase().concat(selectedUser.fullName.slice(1))}
+            </Typography>
+            <p style={{margin:"2px"}}>Typing...</p>
+          </Box>
         </div>
       </div>
       <div
         style={{
-         
           padding: "0.5rem",
         }}
         onClick={() => {
