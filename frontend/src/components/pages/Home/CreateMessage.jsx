@@ -368,8 +368,8 @@ function CreateMessage() {
                   >
                     <CircularProgress
                       sx={{
-                        height: "29.3px",
-                        width: "29.3px",
+                        height: "20.3px",
+                        width: "20.3px",
                         "& svg": {
                           height: "100%",
                           width: "100%",
