@@ -40,10 +40,10 @@ function CreateMessage() {
     return store.userAuth;
   });
   let dispatch = useDispatch();
-  let keepAliveIntervalRef = useRef(null); // ✅ Create a ref
-  useEffect(() => {
-    keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
-  }, [keepAliveInterval]);
+  // let keepAliveIntervalRef = useRef(null); // ✅ Create a ref
+  // useEffect(() => {
+  //   keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
+  // }, [keepAliveInterval]);
   let handleFilePreview = async () => {
     setTimeout(() => {
       setPreview(true);
@@ -56,7 +56,7 @@ function CreateMessage() {
         });
         fileReader.readAsDataURL(fileObj);
       }
-    }, 2);
+    }, 0);
   };
 
   let form = useRef();
@@ -83,31 +83,18 @@ function CreateMessage() {
         );
         dispatch(uploadingToggle(true)); //make uploading true
         new Promise((resolve, reject) => {
-          clientSocket?.emit("sendMessage", {
-            senderId: userAuth._id,
-            recieverId: selectedUser._id,
-            message_text: text,
-            message_image: imgTempUrl,
-            createdAt: time,
-          },()=>{
-            resolve();
-          });
+          clientSocket?.emit(
+            "sendMessage",
+            {
+              senderId: userAuth._id,
+              recieverId: selectedUser._id,
+              message_text: text,
+              message_image: imgTempUrl,
+              createdAt: time,
+            }
+          );
         });
         console.log("am after setTImeout");
-
-        // dispatch(
-        //   changeStatus({
-        //     senderId: userAuth._id,
-        //     receiverId: selectedUser._id,
-        //     text: text,
-        //     image: {
-        //       local_url: "",
-        //       cloud_url: imgTempUrl,
-        //     },
-        //     createdAt: time,
-        //     status: "sent",
-        //   })
-        // );
         console.log(`logged socket after emiting:`, clientSocket);
 
         let file = myForm.messageFile && myForm.messageFile.files[0];
@@ -139,13 +126,6 @@ function CreateMessage() {
           let json = await response.json();
           if (response.status === 200) {
             console.log("After saving to database:", json.newMessage);
-            // dispatch(setChats([...chats, json.newMessage]));
-            // setMessageText("");
-            // inputFile.current.value = "";
-            // setPreview(false);
-            // console.log("Clearing interval:", keepAliveIntervalRef.current);
-            // clearInterval(keepAliveIntervalRef.current);
-            // dispatch(setKeepAliveInterval(null));
             let receiverStatus = onlineUsers.find((u) => {
               if (u._id == json.newMessage.receiverId) {
                 return true;

@@ -61,19 +61,14 @@ function SocketProvider({ children }) {
   const selectedUser = useSelector((store) => store.selectedUser);
   const isLoggedIn = !!userAuth;
   const users = useSelector((store) => store.users);
-  let keepAliveInterval = useSelector((store) => store.keepAliveInterval);
+  // let keepAliveInterval = useSelector((store) => store.keepAliveInterval);
 
   const [clientSocket, setClientSocket] = useState(null);
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
   const prevGroupsRef = useRef([]);
   const isInitialConnect = useRef(true); // Add this line
   let uploading = useSelector((store) => store.uploading);
-  const keepAliveIntervalRef = useRef(null);
 
-  // Initialize socket connection
-  // useEffect(() => {
-  //   keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
-  // }, [keepAliveInterval]);
   useEffect(() => {
     if (isLoggedIn) {
       const socket = io(backendUrl, {
@@ -127,10 +122,12 @@ function SocketProvider({ children }) {
         console.log("New friend without reload:", data);
         dispatch(addNewFriend(data));
       });
+    
       setInterval(() => {
         console.log("FIRING KEEP ALIVE!");
         socket.emit("keepAlive");
       }, 2000); // Send every 2s
+
       socket.on("createNewGroup", (data) => {
         console.log("New group created:", data.newGroup);
         dispatch(addGroup(data.newGroup));
@@ -155,7 +152,6 @@ function SocketProvider({ children }) {
       dispatch(uploadingToggle(false));
     });
   }, [clientSocket]);
-
 
   useEffect(() => {
     if (!clientSocket) {
