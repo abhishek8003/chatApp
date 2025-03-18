@@ -72,7 +72,7 @@ function Navbar() {
   };
   return (
     <>
-      <AppBar sx={{ position: "sticky", bgcolor: "black" }}>
+      <AppBar sx={{ position: "sticky", bgcolor: "black" , width:"100%"}}>
         <Toolbar>
           <Box
             sx={{

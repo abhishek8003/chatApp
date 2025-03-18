@@ -87,6 +87,7 @@ function Signup() {
           className="row"
           style={{
             "min-height": "88vh",
+            width:"100%",
             alignItems: "center",
             "@media (max-width:600px)": {
               alignItems: "start",
