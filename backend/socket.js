@@ -295,13 +295,13 @@ io_server.on("connection", (clientSocket) => {
                 }
 
             } else {
-                let user = await Users.find({ email: targetMemberEmail });
+                let user = await User.find({ email: targetMemberEmail });
                 console.log(`Socket not found for user ${user._id}`);
                 throw new Error("socket not found!");
             }
 
         } else {
-            let user = await Users.find({ email: targetMemberEmail });
+            let user = await User.find({ email: targetMemberEmail });
             console.log(`User ${user._id} is not online.`);
         }
     });
