@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import SendIcon from "@mui/icons-material/Send";
+import { CircularProgress } from "@mui/material"; // Import CircularProgress
 import {
   changeStatus,
   setChats,
@@ -61,8 +62,8 @@ function CreateMessage() {
 
   let form = useRef();
   let handleSendMessage = async (myForm) => {
+    setSendingMessage(true);
     setTimeout(async () => {
-      setSendingMessage(true);
       const time = new Date(Date.now()).toISOString(); // Set time once
       let text = myForm.newMessage.value;
       let imgTempUrl = previewUrl;
@@ -83,16 +84,13 @@ function CreateMessage() {
         );
         dispatch(uploadingToggle(true)); //make uploading true
         new Promise((resolve, reject) => {
-          clientSocket?.emit(
-            "sendMessage",
-            {
-              senderId: userAuth._id,
-              recieverId: selectedUser._id,
-              message_text: text,
-              message_image: imgTempUrl,
-              createdAt: time,
-            }
-          );
+          clientSocket?.emit("sendMessage", {
+            senderId: userAuth._id,
+            recieverId: selectedUser._id,
+            message_text: text,
+            message_image: imgTempUrl,
+            createdAt: time,
+          });
         });
         console.log("am after setTImeout");
         console.log(`logged socket after emiting:`, clientSocket);
@@ -349,7 +347,7 @@ function CreateMessage() {
               style={{ display: "none" }}
             ></input>
             <label>
-              <Button
+              {/* <Button
                 onClick={(e) => {
                   e.preventDefault();
                   form.current.requestSubmit();
@@ -360,7 +358,42 @@ function CreateMessage() {
                 }
               >
                 <SendIcon></SendIcon>
-              </Button>
+              </Button> */}
+              {isSendingMessage ? (
+                <>
+                  <Button
+                    onClick={(e) => {
+                      e.preventDefault();
+                    }}
+                  >
+                    <CircularProgress
+                      sx={{
+                        height: "29.3px",
+                        width: "29.3px",
+                        "& svg": {
+                          height: "100%",
+                          width: "100%",
+                          margin: "0px",
+                          padding: "0px",
+                        },
+                      }}
+                    ></CircularProgress>
+                  </Button>
+                </>
+              ) : (
+                <Button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    form.current.requestSubmit();
+                  }}
+                  disabled={
+                    (messageText.length > 0 || preview ? false : true) ||
+                    isSendingMessage
+                  }
+                >
+                  <SendIcon></SendIcon>
+                </Button>
+              )}
             </label>
           </Box>
         </div>
