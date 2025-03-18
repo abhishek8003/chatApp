@@ -200,18 +200,20 @@ function GroupBody() {
                         )}
 
                         {/* Timestamp for Image */}
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            textAlign: "right",
-                            color: "#808080",
-                            fontSize: "0.75rem",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {formatTime(chat.createdAt)}
-                        </Typography>
+                        {isSender && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              textAlign: "right",
+                              color: "#808080",
+                              fontSize: "0.75rem",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {formatTime(chat.createdAt)} - {chat.status}
+                          </Typography>
+                        )}
                       </Box>
                     ) : (
                       /* Text Message */
@@ -230,31 +232,26 @@ function GroupBody() {
                         <Typography variant="body1">{chat.text}</Typography>
 
                         {/* Timestamp for Text */}
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            textAlign: "right",
-                            color: "#808080",
-                            fontSize: "0.75rem",
-                            marginTop: "4px",
-                          }}
-                        >
-                          {formatTime(chat.createdAt)}
-                        </Typography>
+                        { isSender&&
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              textAlign: "right",
+                              color: "#808080",
+                              fontSize: "0.75rem",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {formatTime(chat.createdAt)} - {chat.status}
+                          </Typography>
+                        }
                       </Box>
                     )}
                   </Box>
                 </Box>
               </React.Fragment>
             );
-            {
-              selectedGroup.pastMembers.includes(userAuth._id) ? (
-                <>
-                  <p>You are not a member now!</p>
-                </>
-              ) : null;
-            }
           })}
           {selectedGroup.pastMembers.includes(userAuth._id) ? (
             <>

@@ -38,7 +38,7 @@ group_route.get("/group/:group_id", isAuthenticated, async (req, res, next) => {
         //     res.status(200).send({ group: completeGroup });
         // },5000)
         res.status(200).send({ group: completeGroup });
-        
+
 
     } catch (error) {
         console.log(error);
@@ -56,13 +56,13 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
         let image;
         // Check if group exists
         let groupExists = await Group.findById(groupId);
-        if (!groupExists ) {
+        if (!groupExists) {
             return res.status(404).json({ message: "Group not found" });
         }
         console.log(groupExists.pastMembers);
         console.log(senderId);
-        
-        if(groupExists.pastMembers.includes(senderId)){
+
+        if (groupExists.pastMembers.includes(senderId)) {
             console.log("yup");
             return res.status(401).json({ message: "You are not a member of this grup anymore!" });
         }
@@ -89,7 +89,8 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             senderId: senderId,
             receiverId: groupId,
             text: message_text,
-            image: image
+            image: image,
+            status: "delivered"
         });
 
         let notificationImage = image ? image.cloud_url : "";
@@ -113,9 +114,8 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
         }
         catch (err) {
             console.log(err);
-
         }
-        res.json({ group: updatedGroup, message: "Group message saved!" });
+        res.json({ newMessage: updatedGroup.groupMessages[updatedGroup.groupMessages.length-1], message: "Group message saved!" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
@@ -181,7 +181,7 @@ group_route.post("/:admin_id", upload_group_logo.single("groupImage"), isAuthent
 //                 "pastMembers":newMembers._id
 //             }
 //         })
-        
+
 //         //todo
 
 //     } catch (error) {
@@ -205,7 +205,7 @@ group_route.put("/:group_id/addMembers", isAuthenticated, async (req, res) => {
         // Remove members from pastMembers
         await Group.findByIdAndUpdate(
             group_id,
-            { $pull: { pastMembers:  { $in: newMembersId }} }, // Correct `$pull`
+            { $pull: { pastMembers: { $in: newMembersId } } }, // Correct `$pull`
             { new: true }
         );
 
@@ -245,18 +245,18 @@ group_route.delete("/:group_id/deleteMember/:member_id", isAuthenticated, async 
 
             // Find the group by ID and pull the member from the groupMembers array
             let updatedGroup = await Group.findByIdAndUpdate(
-                
+
                 groupId,
                 {
-                    
+
                     $addToSet: {
                         pastMembers: memberId // push the memberId from the groupMembers array
                     },
-                   
+
                 },
                 { new: true } // Returns the updated group after the update
             );
-            
+
             if (!updatedGroup) {
                 return res.status(404).json({ message: 'Group not found' });
             }
@@ -287,18 +287,18 @@ group_route.put("/:group_id/addMember/:member_id", isAuthenticated, async (req, 
 
             // Find the group by ID and pull the member from the groupMembers array
             let updatedGroup = await Group.findByIdAndUpdate(
-                
+
                 groupId,
                 {
-                    
+
                     $push: {
                         pastMembers: memberId // push the memberId from the groupMembers array
                     },
-                   
+
                 },
                 { new: true } // Returns the updated group after the update
             );
-            
+
             if (!updatedGroup) {
                 return res.status(404).json({ message: 'Group not found' });
             }

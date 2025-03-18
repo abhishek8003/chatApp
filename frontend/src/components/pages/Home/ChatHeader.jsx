@@ -10,6 +10,9 @@ function ChatHeader() {
     return store.selectedUser;
   });
   let dispatch = useDispatch();
+  let typing=useSelector((store)=>{
+    return store.typing;
+  })
   let anchorElement = useRef();
   return (
     <div
@@ -72,7 +75,7 @@ function ChatHeader() {
             >
               {selectedUser.fullName[0].toUpperCase().concat(selectedUser.fullName.slice(1))}
             </Typography>
-            {/* <p style={{margin:"2px"}}>Typing...</p> */}
+            {typing?<p style={{margin:"2px"}}>Typing...</p>:null}
           </Box>
         </div>
       </div>

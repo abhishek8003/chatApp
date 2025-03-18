@@ -234,8 +234,9 @@ io_server.on("connection", (clientSocket) => {
         console.log(data.messageBody);
         console.log(data.selectedGroup);
         let roomID = data.selectedGroup;
+        let time=data.messageBody.createdAt;
         if (completeUser) {
-            io_server.to(roomID).emit("recieveGroupMessageLive", {
+            clientSocket.broadcast.to(roomID).emit("recieveGroupMessageLive", {
                 isGroupChat: true,
                 senderId: completeUser,
                 receiverId: roomID,
@@ -245,7 +246,20 @@ io_server.on("connection", (clientSocket) => {
                     cloud_url: data.messageBody.messageImage,
                     public_id: '',
                 },
-                createdAt: new Date(Date.now())
+                createdAt: time
+            });
+            clientSocket.emit("groupMessageSent", {
+                isGroupChat: true,
+                senderId: completeUser,
+                receiverId: roomID,
+                text: data.messageBody.messageText,
+                image: {
+                    local_url: '',
+                    cloud_url: data.messageBody.messageImage,
+                    public_id: '',
+                },
+                createdAt: time,
+                status:"delivered"
             });
             io_server.to(roomID).emit("addGroupNotification", {
                 isGroupChat: true,

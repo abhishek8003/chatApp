@@ -12,9 +12,11 @@ import {
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
-import { setGroupChat } from "../../../redux/features/groupChats";
+import { changeGroupMessageStatus, setGroupChat, updateGroupChat } from "../../../redux/features/groupChats";
 import { uploadingToggle } from "../../../redux/features/uploading";
 import { setKeepAliveInterval } from "../../../redux/features/keepAliveInterval";
+import { addNewMessageInSelectedGroup } from "../../../redux/features/selectedGroup";
+import { addNewMessageInGroups } from "../../../redux/features/groups";
 function CreateMessage() {
   let selectedGroup = useSelector((store) => {
     return store.selectedGroup;
@@ -180,13 +182,30 @@ function CreateMessage() {
         setPreview(false);
         setMessageText("");
         inputFile.current.value = "";
+        dispatch(
+          updateGroupChat({
+            senderId: userAuth,
+            receiverId: selectedGroup._id,
+            text: text,
+            image: {
+              local_url: "",
+              cloud_url: imgTempUrl,
+            },
+            createdAt: time,
+            status: "pending",
+            isGroupChat: true,
+          })
+        );
+
         try {
           clientSocket?.emit("addGroupMessage", {
             selectedGroup: selectedGroup._id,
             messageBody: {
               messageText: text,
               messageImage: previewUrl,
-              createdAt: new Date(Date.now()),
+              createdAt: time,
+              status: "pending",
+              isGroupChat: false,
             },
           });
           let response = await fetch(
@@ -198,9 +217,11 @@ function CreateMessage() {
             }
           );
           let json = await response.json();
+          
           if (response.status === 200) {
-            console.log(json.group);
-            dispatch(setGroupChat(json.group));
+            console.log("AFTER SAVING TO DATABASE NEW MESSAGE:",json.newMessage);
+            // dispatch(setGroupChat(json.group));
+            dispatch(changeGroupMessageStatus(json.newMessage));
             setMessageText("");
             inputFile.current.value = "";
             setSendingMessage(false);

@@ -28,14 +28,9 @@ function ChatBody() {
 
   useEffect(() => {
     if (chatContainer.current) {
-      chatContainer.current.scrollTo({
-        top: chatContainer.current.scrollHeight,
-         // behavior: "smooth",
-      });
+      chatContainer.current.scrollTop = chatContainer.current.scrollHeight;
     }
   }, [chats]);
-  
-  
 
   const formatTime = (date) =>
     new Date(date).toLocaleTimeString("en-IN", {
@@ -179,6 +174,20 @@ function ChatBody() {
                             </Typography>
                           </CardContent>
                         )}
+                        {isSender && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              textAlign: "right",
+                              color: "#808080",
+                              fontSize: "0.75rem",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {formatTime(chat.createdAt)} - {chat.status}
+                          </Typography>
+                        )}
                       </Box>
                     ) : (
                       <Box
@@ -190,19 +199,21 @@ function ChatBody() {
                         }}
                       >
                         <Typography variant="body1">{chat.text}</Typography>
+                        {isSender && (
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              textAlign: "right",
+                              color: "#808080",
+                              fontSize: "0.75rem",
+                              marginTop: "4px",
+                            }}
+                          >
+                            {formatTime(chat.createdAt)} - {chat.status}
+                          </Typography>
+                        )}
                       </Box>
-                    )}
-                    {isSender && (
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: "#808080",
-                          fontSize: "0.75rem",
-                          marginTop: "4px",
-                        }}
-                      >
-                        {formatTime(chat.createdAt)} - {chat.status}
-                      </Typography>
                     )}
                   </Box>
                 </Box>
@@ -212,12 +223,27 @@ function ChatBody() {
           return null;
         })
       ) : (
-        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
-          <Typography variant="h6" sx={{ fontWeight: "bolder", fontSize: "2rem", color: "text.secondary" }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: "bolder",
+              fontSize: "2rem",
+              color: "text.secondary",
+            }}
+          >
             No messages!
           </Typography>
         </Box>
       )}
+      <div ref={scrollTo} style={{ visibility: "none" }}></div>
     </Box>
   );
 }

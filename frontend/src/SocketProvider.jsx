@@ -22,16 +22,19 @@ import { addNotification } from "./redux/features/notifications";
 import {
   addGroup,
   addMemberInGroups,
+  addNewMessageInGroups,
   removeMemberFromGroups,
 } from "./redux/features/groups";
 import {
   addMemberInGroupChat,
+  changeGroupMessageStatus,
   removeMemberFromGroupChat,
   setGroupChat,
   updateGroupChat,
 } from "./redux/features/groupChats";
 import {
   addMemberInSelectedGroup,
+  addNewMessageInSelectedGroup,
   removeMemberFromSelectedGroup,
   setSelectedGroup,
 } from "./redux/features/selectedGroup";
@@ -61,8 +64,6 @@ function SocketProvider({ children }) {
   const selectedUser = useSelector((store) => store.selectedUser);
   const isLoggedIn = !!userAuth;
   const users = useSelector((store) => store.users);
-  // let keepAliveInterval = useSelector((store) => store.keepAliveInterval);
-
   const [clientSocket, setClientSocket] = useState(null);
   const notificationSound = useRef(new Audio("/notificationSound.mp3"));
   const prevGroupsRef = useRef([]);
@@ -338,9 +339,22 @@ function SocketProvider({ children }) {
     clientSocket.on("recieveGroupMessageLive", (data) => {
       if (selectedGroup?._id === data.receiverId.toString()) {
         console.log("Received group message:", data);
-        dispatch(updateGroupChat(data));
+        dispatch(changeGroupMessageStatus(data));
+        dispatch(addNewMessageInSelectedGroup({...data,senderId:data.senderId._id}))
+        dispatch(addNewMessageInGroups({...data,senderId:data.senderId._id}))
+        //todo selectedGroup message push and groups message push
       }
     });
+    clientSocket.on("groupMessageSent", (data) => {
+      console.log("EVNR SENT");
+      
+      if (selectedGroup?._id === data.receiverId.toString()) {
+        console.log(" group message was sent:", data);
+        dispatch(changeGroupMessageStatus(data));
+        //todo selectedGroup message push and groups message push
+      }
+    });
+
     clientSocket.on("addGroupNotification", (message) => {
       if (
         selectedGroup &&

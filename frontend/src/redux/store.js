@@ -29,6 +29,7 @@ import newGroupMembersReducer from "./features/newGroupMembers"
 import retryReducer from "./features/retry";
 import uploadingReducer from "./features/uploading";
 import keepAliveIntervalReducer from "./features/keepAliveInterval"
+import typingReducer from "./features/typing"
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -60,7 +61,8 @@ const store=configureStore({
         newGroupMembers:newGroupMembersReducer,
         retry:retryReducer,
         uploading:uploadingReducer,
-        keepAliveInterval:keepAliveIntervalReducer
+        keepAliveInterval:keepAliveIntervalReducer,
+        typing:typingReducer
     }
 });
 export default store;
