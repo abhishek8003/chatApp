@@ -177,6 +177,9 @@ function CreateMessage() {
         if (file) {
           formData.append("messageImage", file);
         }
+        setPreview(false);
+        setMessageText("");
+        inputFile.current.value = "";
         try {
           clientSocket?.emit("addGroupMessage", {
             selectedGroup: selectedGroup._id,
