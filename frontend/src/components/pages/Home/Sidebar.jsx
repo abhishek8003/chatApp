@@ -191,7 +191,7 @@ function Sidebar() {
       sx={{
         gap: "10px",
         border: "2px solid blue",
-        height: "89vh",
+        height: "80vh",
         overflow: "auto",
         scrollbarWidth: "thin",
         "@media (min-width:0px) and (max-width:600px)": {

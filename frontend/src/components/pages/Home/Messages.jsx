@@ -140,7 +140,7 @@ function Messages() {
   return (
     <Box
       sx={{
-        height: "89vh",
+        height: "80vh",
         display: "flex",
         flexDirection: "column",
         minWidth: "80px",
