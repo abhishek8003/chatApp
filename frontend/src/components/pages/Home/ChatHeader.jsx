@@ -72,7 +72,7 @@ function ChatHeader() {
             >
               {selectedUser.fullName[0].toUpperCase().concat(selectedUser.fullName.slice(1))}
             </Typography>
-            <p style={{margin:"2px"}}>Typing...</p>
+            {/* <p style={{margin:"2px"}}>Typing...</p> */}
           </Box>
         </div>
       </div>
