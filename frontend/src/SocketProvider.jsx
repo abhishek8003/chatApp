@@ -339,7 +339,7 @@ function SocketProvider({ children }) {
     clientSocket.on("recieveGroupMessageLive", (data) => {
       if (selectedGroup?._id === data.receiverId.toString()) {
         console.log("Received group message:", data);
-        dispatch(changeGroupMessageStatus(data));
+        dispatch(updateGroupChat(data));
         dispatch(addNewMessageInSelectedGroup({...data,senderId:data.senderId._id}))
         dispatch(addNewMessageInGroups({...data,senderId:data.senderId._id}))
         //todo selectedGroup message push and groups message push

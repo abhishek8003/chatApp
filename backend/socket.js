@@ -246,7 +246,7 @@ io_server.on("connection", (clientSocket) => {
                     cloud_url: data.messageBody.messageImage,
                     public_id: '',
                 },
-                createdAt: time
+                createdAt: time,
             });
             clientSocket.emit("groupMessageSent", {
                 isGroupChat: true,
