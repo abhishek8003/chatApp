@@ -86,7 +86,7 @@ function Signup() {
         <div
           className="row"
           style={{
-            "min-height": "90vh",
+            "min-height": "88vh",
             alignItems: "center",
             "@media (max-width:600px)": {
               alignItems: "start",
