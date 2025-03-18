@@ -28,7 +28,7 @@ function GroupBody() {
     if (chatContainer.current) {
       chatContainer.current.scrollTo({
         top: chatContainer.current.scrollHeight,
-        behavior: "smooth",
+        // behavior: "smooth",
       });
     }
   }, [groupChat]);
