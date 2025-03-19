@@ -227,7 +227,10 @@ function CreateMessage() {
             // if (!receiverStatus) {
             //   dispatch(changeStatus(json.newMessage));
             // }
-            if (selectedUser._id == json.newMessage.receiverId) {
+            console.log("SELECTED USER ID:",selectedUser._id);
+            console.log("json.newMessage.senderId:",json.newMessage.senderId);
+            
+            if (selectedUser._id == json.newMessage.senderId) {
               dispatch(updateChats(json.newMessage));
               setSendingMessage(false);
             }
