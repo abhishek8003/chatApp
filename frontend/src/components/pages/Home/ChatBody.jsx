@@ -169,7 +169,7 @@ function ChatBody() {
                           <CardContent sx={{ padding: "4px 8px" }}>
                             <Typography
                               variant="body2"
-                             
+                              sx={{ wordBreak: "break-word" }}
                             >
                               <ReactMarkdown>{chat.text}</ReactMarkdown>
                             </Typography>
@@ -202,7 +202,7 @@ function ChatBody() {
                         {/* <Typography variant="body1">{chat.text}</Typography> */}
                         <Typography
                           variant="body1"
-                          
+                          sx={{ wordBreak: "break-word" }}
                         >
                           <ReactMarkdown>{chat.text}</ReactMarkdown>
                         </Typography>

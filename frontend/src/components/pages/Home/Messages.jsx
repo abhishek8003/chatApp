@@ -143,7 +143,8 @@ function Messages() {
         height: "80vh",
         display: "flex",
         flexDirection: "column",
-        minWidth: "80px",
+        minWidth: "10px",
+        width:"100%",
         position: "relative",
         border:"2px solid green"
       }}
