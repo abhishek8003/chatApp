@@ -360,12 +360,13 @@ function Sidebar() {
                   }}
                 >
                   <img src={user.profilePic.cloud_url} alt="Profile" />
-                  {onlineUsers &&
-                  onlineUsers.find((e) => {
-                    if (e._id == user._id) {
-                      return e;
-                    }
-                  }) ? (
+                  {(onlineUsers &&
+                    onlineUsers.find((e) => {
+                      if (e._id == user._id) {
+                        return e;
+                      }
+                    })) ||
+                  user?.isAi ? (
                     <Typography
                       sx={{
                         display: "none",
