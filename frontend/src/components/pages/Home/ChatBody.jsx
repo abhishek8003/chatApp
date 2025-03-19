@@ -7,6 +7,7 @@ import {
   CardContent,
 } from "@mui/material";
 import React, { useContext, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
 import { useDispatch, useSelector } from "react-redux";
 import { setmessageImagePreviewUrl } from "../../../redux/features/messageImagePreviewUrl";
 import { messageImagePreviewToggle } from "../../../redux/features/messageImagePreview";
@@ -168,9 +169,9 @@ function ChatBody() {
                           <CardContent sx={{ padding: "4px 8px" }}>
                             <Typography
                               variant="body2"
-                              sx={{ wordBreak: "break-word" }}
+                             
                             >
-                              {chat.text}
+                              <ReactMarkdown>{chat.text}</ReactMarkdown>
                             </Typography>
                           </CardContent>
                         )}
@@ -198,7 +199,14 @@ function ChatBody() {
                           maxWidth: "250px",
                         }}
                       >
-                        <Typography variant="body1">{chat.text}</Typography>
+                        {/* <Typography variant="body1">{chat.text}</Typography> */}
+                        <Typography
+                          variant="body1"
+                          
+                        >
+                          <ReactMarkdown>{chat.text}</ReactMarkdown>
+                        </Typography>
+
                         {isSender && (
                           <Typography
                             variant="caption"
