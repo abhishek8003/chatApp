@@ -12,7 +12,11 @@ import {
 import toast from "react-hot-toast";
 import { socketContext } from "../../../SocketProvider";
 import { backendContext } from "../../../BackendProvider";
-import { changeGroupMessageStatus, setGroupChat, updateGroupChat } from "../../../redux/features/groupChats";
+import {
+  changeGroupMessageStatus,
+  setGroupChat,
+  updateGroupChat,
+} from "../../../redux/features/groupChats";
 import { uploadingToggle } from "../../../redux/features/uploading";
 import { setKeepAliveInterval } from "../../../redux/features/keepAliveInterval";
 import { addNewMessageInSelectedGroup } from "../../../redux/features/selectedGroup";
@@ -69,7 +73,7 @@ function CreateMessage() {
       const time = new Date(Date.now()).toISOString(); // Set time once
       let text = myForm.newMessage.value;
       let imgTempUrl = previewUrl;
-      if (selectedUser) {
+      if (selectedUser && !selectedUser.isAi) {
         dispatch(
           updateChats({
             senderId: userAuth._id,
@@ -146,6 +150,94 @@ function CreateMessage() {
           setSendingMessage(false);
         }
       }
+      if (selectedUser && selectedUser.isAi) {
+        dispatch(
+          updateChats({
+            senderId: userAuth._id,
+            receiverId: selectedUser._id,
+            text: text,
+            image: {
+              local_url: "",
+              cloud_url: imgTempUrl,
+            },
+            createdAt: time,
+            status: "pending",
+            isGroupChat: false,
+          })
+        );
+        // new Promise((resolve, reject) => {
+        //   clientSocket?.emit("sendMessage", {
+        //     senderId: userAuth._id,
+        //     recieverId: selectedUser._id,
+        //     message_text: text,
+        //     message_image: imgTempUrl,
+        //     createdAt: time,
+        //   });
+        // });
+
+        // let file = myForm.messageFile && myForm.messageFile.files[0];
+        console.log(text);
+        // console.log(file);
+        if (!text) {
+          return;
+        }
+        let formData = new FormData();
+        if (text) {
+          formData.append("messageText", text);
+        }
+        // if (file) {
+        //   formData.append("messageImage", file);
+        // }
+        formData.append("messageTime", time);
+        setPreview(false);
+        setMessageText("");
+        // inputFile.current.value = "";
+        try {
+          let response = await fetch(
+            `${backendUrl}/api/chats/${selectedUser._id}`,
+            {
+              method: "POST",
+              credentials: "include",
+              body: formData,
+            }
+          );
+          let json = await response.json();
+          if (response.status === 200) {
+            console.log("After saving to database:", json.newMessage);
+            dispatch(
+              changeStatus({
+                senderId: userAuth._id,
+                receiverId: selectedUser._id,
+                text: text,
+                image: {
+                  local_url: "",
+                  cloud_url: imgTempUrl,
+                },
+                createdAt: time,
+                status: "processed",
+                isGroupChat: false,
+              })
+            );
+            // let receiverStatus = onlineUsers.find((u) => {
+            //   if (u._id == json.newMessage.receiverId) {
+            //     return true;
+            //   }
+            //   return false;
+            // });
+            // if (!receiverStatus) {
+            //   dispatch(changeStatus(json.newMessage));
+            // }
+            dispatch(updateChats(json.newMessage));
+            setSendingMessage(false);
+          }
+        } catch (error) {
+          console.log(error);
+          toast.error(error);
+        } finally {
+          setSendingMessage(false);
+          setPreviewUrl(null);
+        }
+      }
       if (selectedGroup) {
         try {
           if (selectedGroup.pastMembers.includes(userAuth._id)) {
@@ -217,9 +309,12 @@ function CreateMessage() {
             }
           );
           let json = await response.json();
-          
+
           if (response.status === 200) {
-            console.log("AFTER SAVING TO DATABASE NEW MESSAGE:",json.newMessage);
+            console.log(
+              "AFTER SAVING TO DATABASE NEW MESSAGE:",
+              json.newMessage
+            );
             // dispatch(setGroupChat(json.group));
             dispatch(changeGroupMessageStatus(json.newMessage));
             setMessageText("");
@@ -356,20 +451,25 @@ function CreateMessage() {
               },
             }}
           >
-            <label for="messageFile">
-              <CollectionsIcon></CollectionsIcon>
-            </label>
-            <input
-              type="file"
-              ref={inputFile}
-              id="messageFile"
-              name="messageFile"
-              onChange={() => {
-                handleFilePreview();
-                document.querySelector('input[name="newMessage"]').focus();
-              }}
-              style={{ display: "none" }}
-            ></input>
+            {!selectedUser.isAi ? (
+              <>
+                <label for="messageFile">
+                  <CollectionsIcon></CollectionsIcon>
+                </label>
+                <input
+                  type="file"
+                  ref={inputFile}
+                  id="messageFile"
+                  name="messageFile"
+                  onChange={() => {
+                    handleFilePreview();
+                    document.querySelector('input[name="newMessage"]').focus();
+                  }}
+                  style={{ display: "none" }}
+                ></input>
+              </>
+            ) : null}
+
             <label>
               {/* <Button
                 onClick={(e) => {

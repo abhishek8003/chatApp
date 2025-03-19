@@ -10,6 +10,37 @@ const My_SECRET = "mysecret1";
 const cloudinary = require("../storage/cloudConfig/cloud");
 const { validate_user, isAuthenticated } = require("../middlewares");
 const { io_server } = require("../socket");
+const path = require("path");
+//create a AI user
+(async () => {
+    try {
+        let anyAi = await User.find({ isAi: true });
+        console.log(anyAi);
+        if (anyAi.length) {
+            console.log("Ai user exists!");
+        }
+        else {
+            let ai_user = new User({
+                isAi: true,
+                email: "chatgpt@ai.com",
+                fullName: "Your Assistant",
+                friends: [],
+                password: 123456,
+                profilePic: {
+                    local_url:`${process.env.backendURL}/images/ai_image.png`,
+                    cloud_url:`${process.env.backendURL}/images/ai_image.png`,
+                    public_id: ""
+                }
+            });
+            await ai_user.save();
+            console.log("AI intialized!");
+
+        }
+    } catch (error) {
+        console.log(error);
+    }
+})();
+//create normal user
 auth_router.post("/login", validate_user, async (req, res, next) => {
     try {
         const { email, password } = req.body;
@@ -35,7 +66,7 @@ auth_router.post("/login", validate_user, async (req, res, next) => {
             maxAge: 1000 * 60 * 60,
             httpOnly: true,
             secure: process.env.NODE_ENV == "production",
-            sameSite: process.env.NODE_ENV == "production"?"None":"strict",
+            sameSite: process.env.NODE_ENV == "production" ? "None" : "strict",
 
         });
 
@@ -52,7 +83,6 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
         let exists = await User.findOne({ email: email });
         let profilePic;
         console.log(req.file);
-
         if (req.file) {
             console.log("REQUEST FLE CAME");
 
@@ -75,8 +105,24 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
             };
         }
         if (!exists) {
-            let newUser = new User({ ...req.body, profilePic: profilePic });
+
+            let ai_user = await User.findOne({ isAi: true });
+            console.log("YOUR AI friend", ai_user);
+            //make user AIs friend
+            let newUser = new User({
+                ...req.body,
+                profilePic: profilePic,
+                friends: [ai_user._id] // Store AI user's ID
+            });
             let registeredUser = await newUser.save();
+            //
+            await User.updateOne(
+                { isAi: true },
+                { $push: { friends: registeredUser._id } } 
+            );
+
+            //make Ais as user friend
+
             console.log("newUserRegistered:", registeredUser);
             io_server.emit("newUserRegistered", registeredUser);
             let newAccessToken = jwt.sign({ _id: registeredUser._id, fullName: registeredUser.fullName }, My_SECRET, {
@@ -85,7 +131,7 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
             res.cookie("access_token", newAccessToken, {
                 maxAge: (1000 * 60 * 60),
                 secure: process.env.NODE_ENV == "production",
-                sameSite: process.env.NODE_ENV == "production"?"None":"strict",
+                sameSite: process.env.NODE_ENV == "production" ? "None" : "strict",
             })
             res.status(200).json({ message: "user registered", user: registeredUser });
 
@@ -164,7 +210,7 @@ auth_router.put("/update-profile", isAuthenticated, upload_profile_pics.single("
             profilePic: profilePic
         }, { new: true })
         console.log(`newUser: ${newUser}`);
-        io_server.emit("profileUpdated",newUser);
+        io_server.emit("profileUpdated", newUser);
         res.status(200).json({ message: "Profile image updated!", user: newUser })
     }
     catch (err) {

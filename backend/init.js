@@ -13,6 +13,9 @@ mongoose.connect("mongodb://127.0.0.1:27017/chatApp").then(() => {
 const Users = require("./models/users");
 const Message = require("./models/messages");
 const bcrypt = require('bcryptjs');
+const groups=require("./models/group")
+const chatNotification = require("./models/chatNotification");
+const groupNotification = require("./models/groupNotification");
 async function insertUsers(db) {
     const users = [];
     const passwordHash = await bcrypt.hash("123456", 10); // Hash the password once
@@ -44,6 +47,9 @@ async function insertUsers(db) {
     try{
         await Users.deleteMany({});
         await Message.deleteMany({});
+        await chatNotification.deleteMany({});
+        await groupNotification.deleteMany({});
+        await groups.deleteMany({});
         console.log("Database wiped");
 
 

@@ -69,7 +69,7 @@ function Sidebar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(targetUserNotifications[0]),//we sennded only one notification as we just need senderID and reciever ID in backend
+      body: JSON.stringify(targetUserNotifications[0]), //we sennded only one notification as we just need senderID and reciever ID in backend
     })
       .then((result) => {
         console.log(
@@ -99,7 +99,7 @@ function Sidebar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(targetGroupNotifications[0]),//we sennded only one notification as we just need senderID and reciever ID in backend
+      body: JSON.stringify(targetGroupNotifications[0]), //we sennded only one notification as we just need senderID and reciever ID in backend
     })
       .then((result) => {
         console.log(
@@ -424,12 +424,13 @@ function Sidebar() {
                   }}
                 >
                   {user.fullName}
-                  {onlineUsers &&
-                  onlineUsers.find((e) => {
-                    if (e._id == user._id) {
-                      return e;
-                    }
-                  }) ? (
+                  {(onlineUsers &&
+                    onlineUsers.find((e) => {
+                      if (e._id == user._id) {
+                        return e;
+                      }
+                    })) ||
+                  user?.isAi ? (
                     <Typography
                       variant="subtitle2"
                       sx={{

@@ -37,6 +37,11 @@ const userSchema = new mongoose.Schema({
         }
 
     },
+    isAi:{
+        type:Boolean,
+        required:true,
+        default:false
+    }
 
 }, { timestamps: true });
 userSchema.pre("save", async function (next) {

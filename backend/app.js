@@ -4,6 +4,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const user_router = require("./routes/user.route")
 const cors = require("cors");
+let Users=require("./models/users");
 
 const mongoose = require("mongoose");
 const message_router = require("./routes/message.route");
