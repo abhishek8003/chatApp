@@ -20,7 +20,7 @@ function ChatHeader() {
       style={{
         border: "2px solid brown",
         position: "relative",
-        width:"100%",
+        width:"83%",
         // padding: "10px",
         display: "flex",
         justifyContent: "space-between",

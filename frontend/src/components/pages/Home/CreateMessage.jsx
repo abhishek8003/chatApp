@@ -371,7 +371,7 @@ function CreateMessage() {
   }, [onlineUsers, selectedUser]);
   return (
     <>
-      <Box sx={{ width: "fit-content" }}>
+      <Box sx={{ width: "83%" }}>
         {preview && inputFile.current && inputFile.current.files[0] ? (
           <>
             <div style={{ position: "absolute", bottom: "80px", left: "10px" }}>
@@ -406,8 +406,9 @@ function CreateMessage() {
         <div
           style={{
             minHeight: "70px",
-            width: "100%",
-            border: "",
+            position:"relative",
+            border:"2px solid orange",
+            width: "83%",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",

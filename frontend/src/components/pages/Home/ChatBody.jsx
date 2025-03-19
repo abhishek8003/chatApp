@@ -69,7 +69,7 @@ function ChatBody() {
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
-        width: "100%",
+        width: "83%",
         border: "2px solid #1976d2",
         borderRadius: "8px",
         padding: "16px",
@@ -91,7 +91,12 @@ function ChatBody() {
               <React.Fragment key={chat._id}>
                 {showDate && (
                   <Box
-                    sx={{ display: "flex", justifyContent: "center", my: 2 }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      my: 2,
+                      width: "100%",
+                    }}
                   >
                     <Typography
                       sx={{
@@ -114,9 +119,7 @@ function ChatBody() {
                     gap: "8px",
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
-                    // maxWidth: "250px",
-                    // maxWidth:"600px",
-                    width:"100%",
+                    width: "100%",
                     marginBottom: "12px",
                   }}
                 >
@@ -132,14 +135,15 @@ function ChatBody() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: isSender ? "flex-end" : "flex-start",
-                      // maxWidth: "250px",
-                      // width:"100%"
-                      maxWidth:"600px",
+                      maxWidth: "85%",
                     }}
                   >
                     <Typography
                       variant="caption"
-                      sx={{ color: "text.secondary", marginBottom: "4px" }}
+                      sx={{
+                        color: "text.secondary",
+                        marginBottom: "4px",
+                      }}
                     >
                       {isSender ? "You" : selectedUser.fullName}
                     </Typography>
@@ -151,12 +155,15 @@ function ChatBody() {
                           padding: "6px",
                           borderRadius: "12px",
                           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                          // maxWidth: "250px",
-                          // width:"100%",
-                          maxWidth:"600px",
+                          width: "100%",
                         }}
                       >
-                        <Card sx={{ borderRadius: "12px", boxShadow: "none" }}>
+                        <Card
+                          sx={{
+                            borderRadius: "12px",
+                            boxShadow: "none",
+                          }}
+                        >
                           <CardMedia
                             component="img"
                             image={chat.image.cloud_url}
@@ -166,6 +173,7 @@ function ChatBody() {
                               height: "auto",
                               borderRadius: "12px",
                               cursor: "pointer",
+                              maxWidth: "400px",
                             }}
                             onClick={() =>
                               handleImagePreview(chat.image.cloud_url)
@@ -176,9 +184,24 @@ function ChatBody() {
                           <CardContent sx={{ padding: "4px 8px" }}>
                             <Typography
                               variant="body2"
-                              sx={{ wordBreak: "break-word" }}
+                              className="chat-container"
+                              sx={{
+                                // maxWidth: "250px",//fuck
+                                overflow: "auto",
+                              }}
                             >
-                              <ReactMarkdown>{chat.text}</ReactMarkdown>
+                              <Box
+                                sx={{
+                                  overflowX: "auto",
+                                  wordBreak: "break-word",
+                                  overflowWrap: "break-word",
+                                  whiteSpace: "pre-wrap",
+                                  maxWidth: "100%",
+                                }}
+                              >
+                                <ReactMarkdown>{chat.text}</ReactMarkdown>
+                              </Box>
+                              {/* {chat.text} */}
                             </Typography>
                           </CardContent>
                         )}
@@ -203,19 +226,34 @@ function ChatBody() {
                           backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
                           padding: "8px 16px",
                           borderRadius: "12px",
-                          // maxWidth: "250px",
-                          // maxWidth: "250px",
-                          // width:"100%",
-                          maxWidth:"600px",
-                          // border:"2px solid red"
+                          width: "100%",
+                          boxSizing: "border-box",
                         }}
                       >
-                        {/* <Typography variant="body1">{chat.text}</Typography> */}
                         <Typography
-                          variant="body1"
-                          sx={{ wordBreak: "break-word" }}
+                          variant="body2"
+                          className="chat-container"
+                          sx={{
+                            wordBreak: "break-all",
+                            // maxWidth: "250px",//fuck
+                            overflowWrap: "break-all",
+                            overflow: "auto",
+                            position:"relative"
+                          }}
                         >
-                          <ReactMarkdown>{chat.text}</ReactMarkdown>
+                          <Box
+                            sx={{
+                              overflowX: "auto",
+                              position:"relative",
+                              wordBreak: "break-word",
+                              overflowWrap: "break-word",
+                              whiteSpace: "pre-wrap",
+                              maxWidth: "100%",
+                            }}
+                          >
+                            <ReactMarkdown>{chat.text}</ReactMarkdown>
+                          </Box>
+                          {/* {chat.text} */}
                         </Typography>
 
                         {isSender && (
