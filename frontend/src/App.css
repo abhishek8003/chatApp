@@ -56,21 +56,31 @@
 } */
 @media (min-width:0px) and (max-width:400px) {
   .chat-container {
-    max-width: 250px
+    max-width: 200px;
+    border:2px solid red;
   }
 }
-@media (min-width:401px) and (max-width:600px) {
+@media (min-width:401px) and (max-width:500px) {
   .chat-container {
-    max-width: 300px
+    max-width: 245px;
+    border:2px solid orange;
+  }
+}
+@media (min-width:501px) and (max-width:600px) {
+  .chat-container {
+    max-width: 300px;
+    border:2px solid rebeccapurple;
   }
 }
 @media (min-width:601px) and (max-width:800px) {
   .chat-container {
-    max-width: 400px
+    max-width: 400px;
+    border:2px solid yellow;
   }
 }
 @media (min-width:801px) {
   .chat-container {
-    max-width: 600px
+    max-width: 600px;
+    border:2px solid blue;
   }
 }

@@ -69,10 +69,10 @@ function ChatBody() {
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
-        width: "83%",
+        width: "100%",
         border: "2px solid #1976d2",
         borderRadius: "8px",
-        padding: "16px",
+        padding: "8px",
         backgroundColor: "#f5f5f5",
       }}
     >
@@ -103,7 +103,7 @@ function ChatBody() {
                         backgroundColor: "#e1e1e1",
                         color: "#555",
                         fontSize: "0.85rem",
-                        padding: "4px 12px",
+                        padding: "4px 5px",
                         borderRadius: "16px",
                         fontWeight: "bold",
                       }}
@@ -116,7 +116,7 @@ function ChatBody() {
                 <Box
                   sx={{
                     display: "flex",
-                    gap: "8px",
+                    gap: "3px",
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
                     width: "100%",
@@ -135,7 +135,7 @@ function ChatBody() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: isSender ? "flex-end" : "flex-start",
-                      maxWidth: "85%",
+                      maxWidth: "100%",
                     }}
                   >
                     <Typography
@@ -224,7 +224,7 @@ function ChatBody() {
                       <Box
                         sx={{
                           backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
-                          padding: "8px 16px",
+                          padding: "8px 8px",
                           borderRadius: "12px",
                           width: "100%",
                           boxSizing: "border-box",
