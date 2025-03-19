@@ -218,15 +218,6 @@ function CreateMessage() {
                 isGroupChat: false,
               })
             );
-            // let receiverStatus = onlineUsers.find((u) => {
-            //   if (u._id == json.newMessage.receiverId) {
-            //     return true;
-            //   }
-            //   return false;
-            // });
-            // if (!receiverStatus) {
-            //   dispatch(changeStatus(json.newMessage));
-            // }
             console.log("SELECTED USER ID:",selectedUser._id);
             console.log("json.newMessage.senderId:",json.newMessage.senderId);
             
