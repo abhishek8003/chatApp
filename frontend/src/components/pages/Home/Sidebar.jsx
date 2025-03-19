@@ -198,9 +198,13 @@ function Sidebar() {
           minWidth: "85px",
           maxWidth: "86px",
         },
-        "@media (min-width:601px) and (max-width: 850px)": {
-          minWidth: "250px",
-          maxWidth: "251px",
+        "@media (min-width:741px) and (max-width: 850px)": {
+          minWidth: "247px",
+          maxWidth: "248px",
+        },
+        "@media (min-width:601px) and (max-width: 740px)": {
+          minWidth: "200px",
+          maxWidth: "201px",
         },
         "@media (min-width:851px)": {
           minWidth: "350px",

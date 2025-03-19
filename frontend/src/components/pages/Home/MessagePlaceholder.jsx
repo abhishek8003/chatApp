@@ -10,6 +10,9 @@ function MessagePlaceholder() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        // "@media (min-width:1px) and (max-width:500px)":{
+        //   display:"none"
+        // }
       }}
     >
       <Box sx={{ border: "2px solid red", padding:"2rem" }}>

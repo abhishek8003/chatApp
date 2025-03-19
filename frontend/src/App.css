@@ -4,8 +4,10 @@
   padding:0px;
 }
 #root{
-  min-height: 100vh !important;
-  min-width: 100vw !important;
+  /* min-height: 100vh !important;
+  min-width: 100vw !important; */
+  height: 100% !important;
+  width: 100% !important;
 }
 .main-cont{
   min-height: calc(100vh);
@@ -47,3 +49,8 @@
   /* border: 2px solid black; */
   /* border-radius: 50%; */
 }
+/* @media (max-width: 600px) {
+  .message-container {
+    display: none;
+  }
+} */

@@ -95,12 +95,17 @@ function Home() {
             border: "2px solid green",
             display: "flex",
             flexWrap: "nowrap",
-            minWidth: "fit-content",
+            width:"100%",
             overflow: "hidden",
           }}
         >
           <Sidebar></Sidebar>
-          <div style={{ flexGrow: "1" }}>
+          <div className="message-container"
+            style={{
+              flexGrow: "1",
+              border:"2px solid yellow",
+            }}
+          >
             {!selectedUser && !selectedGroup ? (
               <MessagePlaceholder />
             ) : (

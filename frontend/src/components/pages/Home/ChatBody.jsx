@@ -114,6 +114,9 @@ function ChatBody() {
                     gap: "8px",
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
+                    // maxWidth: "250px",
+                    // maxWidth:"600px",
+                    width:"100%",
                     marginBottom: "12px",
                   }}
                 >
@@ -129,7 +132,9 @@ function ChatBody() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: isSender ? "flex-end" : "flex-start",
-                      maxWidth: "70%",
+                      // maxWidth: "250px",
+                      // width:"100%"
+                      maxWidth:"600px",
                     }}
                   >
                     <Typography
@@ -146,7 +151,9 @@ function ChatBody() {
                           padding: "6px",
                           borderRadius: "12px",
                           boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                          maxWidth: "250px",
+                          // maxWidth: "250px",
+                          // width:"100%",
+                          maxWidth:"600px",
                         }}
                       >
                         <Card sx={{ borderRadius: "12px", boxShadow: "none" }}>
@@ -196,7 +203,11 @@ function ChatBody() {
                           backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
                           padding: "8px 16px",
                           borderRadius: "12px",
-                          maxWidth: "250px",
+                          // maxWidth: "250px",
+                          // maxWidth: "250px",
+                          // width:"100%",
+                          maxWidth:"600px",
+                          // border:"2px solid red"
                         }}
                       >
                         {/* <Typography variant="body1">{chat.text}</Typography> */}
