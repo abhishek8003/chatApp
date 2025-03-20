@@ -211,7 +211,7 @@ function CreateMessage() {
 
         dispatch(
           updateGroupChat({
-            senderId: userAuth, // Fixed from userAuth
+            senderId: userAuth, // completed userAuth becuse senderId is a populated OBJECT
             receiverId: selectedGroup._id,
             text,
             image: { local_url: "", cloud_url: imgTempUrl },

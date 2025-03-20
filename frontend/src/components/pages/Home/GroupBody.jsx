@@ -23,7 +23,6 @@ function GroupBody() {
   const backendUrl = useContext(backendContext);
   let selectedGroup = useSelector((store) => store.selectedGroup);
 
-  // Check if the user is in pastMembers
   useEffect(() => {
     if (chatContainer.current) {
       chatContainer.current.scrollTo({
@@ -32,6 +31,7 @@ function GroupBody() {
       });
     }
   }, [groupChat]);
+
   const handleImagePreview = (imageUrl) => {
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
@@ -73,15 +73,19 @@ function GroupBody() {
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
+        "&::-webkit-scrollbar": { width: "0.375rem" }, // 6px
+        "&::-webkit-scrollbar-thumb": {
+          background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+          borderRadius: "0.5rem", // 8px
+        },
         width: "100%",
-        border: "2px solid #1976d2",
-        borderRadius: "8px",
-        padding: "16px",
-        backgroundColor: "#f5f5f5",
+        border: "0.125rem solid #1976d2", // 2px
+        borderRadius: "0.75rem", // 12px
+        padding: "1rem", // 16px
+        background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)",
+        boxShadow: "0 0.25rem 1.25rem rgba(0, 0, 0, 0.1)", // 4px 20px
       }}
     >
-      {/* Show alert if the user was kicked */}
-
       {groupChat?.groupMessages?.length > 0 ? (
         <>
           {groupChat.groupMessages.map((chat, index) => {
@@ -104,16 +108,23 @@ function GroupBody() {
                 {/* Date Separator */}
                 {showDate && (
                   <Box
-                    sx={{ display: "flex", justifyContent: "center", my: 2 }}
+                    sx={{
+                      display: "flex",
+                      justifyContent: "center",
+                      my: 3,
+                      width: "100%",
+                    }}
                   >
                     <Typography
                       sx={{
-                        backgroundColor: "#e1e1e1",
-                        color: "#555",
-                        fontSize: "0.85rem",
-                        padding: "4px 12px",
-                        borderRadius: "16px",
-                        fontWeight: "bold",
+                        background: "linear-gradient(45deg, #e1e1e1, #ffffff)",
+                        color: "#444",
+                        fontSize: "0.9rem",
+                        padding: "0.375rem 1rem", // 6px 16px
+                        borderRadius: "1.25rem", // 20px
+                        fontWeight: "600",
+                        boxShadow: "0 0.125rem 0.375rem rgba(0, 0, 0, 0.1)", // 2px 6px
+                        textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)", // 1px 2px
                       }}
                     >
                       {currentMessageDate}
@@ -124,10 +135,13 @@ function GroupBody() {
                 <Box
                   sx={{
                     display: "flex",
-                    gap: "8px",
+                    gap: "0.375rem", // 6px
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
-                    marginBottom: "12px",
+                    width: "100%",
+                    marginBottom: "1.25rem", // 20px
+                    transition: "all 0.3s ease",
+                    "&:hover": { transform: "translateY(-0.125rem)" }, // -2px
                   }}
                 >
                   <Avatar
@@ -135,7 +149,16 @@ function GroupBody() {
                       profilePic ||
                       `${backendUrl}/images/default_group_icon.png`
                     }
-                    sx={{ width: 40, height: 40 }}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      border: "0.125rem solid #fff", // 2px
+                      boxShadow: "0 0 0.5rem rgba(25, 118, 210, 0.5)", // 8px
+                      transition: "box-shadow 0.3s ease",
+                      "&:hover": {
+                        boxShadow: "0 0 0.75rem rgba(25, 118, 210, 0.7)", // 12px
+                      },
+                    }}
                   />
                   <Box
                     sx={{
@@ -148,26 +171,38 @@ function GroupBody() {
                     {/* Sender Name */}
                     <Typography
                       variant="caption"
-                      sx={{ color: "text.secondary", marginBottom: "4px" }}
+                      sx={{
+                        color: "text.secondary",
+                        marginBottom: "0.375rem", // 6px
+                        fontWeight: "500",
+                        textShadow: "0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.05)", // 1px 1px
+                        "&:hover": { color: "#1976d2" },
+                      }}
                     >
-                      {isSender ? "You" : senderName}&nbsp;
-                      {isKicked ? "(Kicked)" : null}
+                      {isSender ? "You" : senderName} {isKicked ? "(Kicked)" : null}
                     </Typography>
 
                     {/* Image Message */}
                     {chat.image && chat.image.cloud_url ? (
                       <Box
                         sx={{
-                          backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
-                          padding: "6px",
-                          borderRadius: "12px",
-                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-                          maxWidth: "250px",
+                          background: isSender
+                            ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
+                            : "linear-gradient(45deg, #ffffff, #f5f5f5)",
+                          padding: "0.625rem", // 10px
+                          borderRadius: "1.125rem", // 18px
+                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
+                          width: "100%",
+                          maxWidth: "400px",
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                          },
                         }}
                       >
                         <Card
                           sx={{
-                            borderRadius: "12px",
+                            borderRadius: "1.125rem", // 18px
                             boxShadow: "none",
                           }}
                         >
@@ -178,8 +213,11 @@ function GroupBody() {
                             sx={{
                               width: "100%",
                               height: "auto",
-                              borderRadius: "12px",
+                              borderRadius: "0.875rem", // 14px
                               cursor: "pointer",
+                              maxWidth: "400px",
+                              transition: "transform 0.3s ease",
+                              "&:hover": { transform: "scale(1.03)" },
                             }}
                             onClick={() =>
                               handleImagePreview(chat.image.cloud_url)
@@ -189,10 +227,16 @@ function GroupBody() {
 
                         {/* Text below image */}
                         {chat.text && (
-                          <CardContent sx={{ padding: "4px 8px" }}>
+                          <CardContent sx={{ padding: "0.375rem 0.625rem" }}>
                             <Typography
                               variant="body2"
-                              sx={{ wordBreak: "break-word" }}
+                              sx={{
+                                overflow: "auto",
+                                wordBreak: "break-word",
+                                whiteSpace: "pre-wrap",
+                                fontWeight: "400",
+                                color: "#333",
+                              }}
                             >
                               {chat.text}
                             </Typography>
@@ -200,52 +244,73 @@ function GroupBody() {
                         )}
 
                         {/* Timestamp for Image */}
-                        {isSender && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              textAlign: "right",
-                              color: "#808080",
-                              fontSize: "0.75rem",
-                              marginTop: "4px",
-                            }}
-                          >
-                            {formatTime(chat.createdAt)} - {chat.status}
-                          </Typography>
-                        )}
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: "block",
+                            textAlign: isSender ? "right" : "left",
+                            color: "#888",
+                            fontSize: "0.75rem",
+                            marginTop: "0.375rem", // 6px
+                            background: "linear-gradient(90deg, #888, #bbb)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                          }}
+                        >
+                          {formatTime(chat.createdAt)}
+                          {isSender && ` - ${chat.status}`}
+                        </Typography>
                       </Box>
                     ) : (
                       /* Text Message */
                       <Box
                         sx={{
-                          backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
-                          color: isSender ? "#000000" : "#000000",
-                          padding: "8px 16px",
-                          borderRadius: "12px",
-                          boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
-                          wordBreak: "break-word",
-                          position: "relative",
-                          maxWidth: "250px",
+                          background: isSender
+                            ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
+                            : "linear-gradient(45deg, #ffffff, #f5f5f5)",
+                          padding: "0.75rem 1rem", // 12px 16px
+                          borderRadius: "1.125rem", // 18px
+                          width: "100%",
+                          boxSizing: "border-box",
+                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
+                          transition: "all 0.3s ease",
+                          "&:hover": {
+                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                          },
                         }}
                       >
-                        <Typography variant="body1">{chat.text}</Typography>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            wordBreak: "break-all",
+                            overflowWrap: "break-all",
+                            overflow: "auto",
+                            position: "relative",
+                            whiteSpace: "pre-wrap",
+                            fontWeight: "400",
+                            color: "#333",
+                          }}
+                        >
+                          {chat.text}
+                        </Typography>
 
                         {/* Timestamp for Text */}
-                        { isSender&&
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              textAlign: "right",
-                              color: "#808080",
-                              fontSize: "0.75rem",
-                              marginTop: "4px",
-                            }}
-                          >
-                            {formatTime(chat.createdAt)} - {chat.status}
-                          </Typography>
-                        }
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: "block",
+                            textAlign: isSender ? "right" : "left",
+                            color: "#888",
+                            fontSize: "0.75rem",
+                            marginTop: "0.375rem", // 6px
+                            background: "linear-gradient(90deg, #888, #bbb)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                          }}
+                        >
+                          {formatTime(chat.createdAt)}
+                          {isSender && ` - ${chat.status}`}
+                        </Typography>
                       </Box>
                     )}
                   </Box>
@@ -253,16 +318,15 @@ function GroupBody() {
               </React.Fragment>
             );
           })}
-          {selectedGroup.pastMembers.includes(userAuth._id) ? (
-            <>
-              <Alert severity="warning">You were kicked by Admin!</Alert>
-            </>
-          ) : null}
+          {selectedGroup.pastMembers.includes(userAuth._id) && (
+            <Alert severity="warning">You were kicked by Admin!</Alert>
+          )}
         </>
       ) : (
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
@@ -272,11 +336,25 @@ function GroupBody() {
             variant="h6"
             sx={{
               fontWeight: "bolder",
-              fontSize: "2rem",
-              color: "text.secondary",
+              fontSize: "2.5rem",
+              background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.1)", // 2px 4px
             }}
           >
             No messages!
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              color: "#666",
+              fontStyle: "italic",
+              textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)", // 1px 2px
+            }}
+          >
+            Start a beautiful conversation!
           </Typography>
         </Box>
       )}
