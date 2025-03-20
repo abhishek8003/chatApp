@@ -110,7 +110,7 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                         { senderId: receiverId, receiverId: senderId }
                     ],
                     isGroupChat: false
-                }).sort({ createdAt: 1 }).limit(10);
+                }).sort({ createdAt: 1 });
                 let promptWithHistory = "You are an AI chatting with a user. Here’s the conversation so far:\n";
                 previousMessages.forEach(msg => {
                     promptWithHistory += `${msg.senderId.equals(senderId) ? "User" : "AI"}: ${msg.text}\n`;
