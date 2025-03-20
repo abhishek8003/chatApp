@@ -144,7 +144,7 @@ function SocketProvider({ children }) {
         socket.disconnect();
       };
     }
-  }, [isLoggedIn, backendUrl, userAuth, dispatch]);
+  }, [isLoggedIn, backendUrl, userAuth?._id, dispatch]);
   useEffect(() => {
     if (!clientSocket) return;
     clientSocket.on("messageSent", (message) => {
@@ -264,7 +264,7 @@ function SocketProvider({ children }) {
         clientSocket.emit("joinGroupWithID", { group: data.group });
       }
     });
-  }, [userAuth, users, selectedGroup, groups, groupChat]);
+  }, [userAuth?._id, users, selectedGroup, groups, groupChat]);
   // Handle live messages and notifications
   useEffect(() => {
     if (!clientSocket) return;
@@ -330,7 +330,7 @@ function SocketProvider({ children }) {
       clientSocket.off("profileUpdated");
       clientSocket.off("addNotification");
     };
-  }, [clientSocket, selectedUser, dispatch, userAuth]);
+  }, [clientSocket, selectedUser, dispatch, userAuth?._id]);
 
   // Handle group messages
   useEffect(() => {
@@ -399,7 +399,7 @@ function SocketProvider({ children }) {
       clientSocket.emit("joinGroups", { groups: addedGroups });
       prevGroupsRef.current = groups; // Update reference
     }
-  }, [clientSocket, userAuth, groups]);
+  }, [clientSocket, userAuth?._id, groups]);
 
   return (
     <socketContext.Provider value={clientSocket}>

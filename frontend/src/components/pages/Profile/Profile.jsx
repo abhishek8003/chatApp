@@ -45,6 +45,7 @@ function Profile() {
           dispatch(updateSelectedUserr(json.user));
         }
         dispatch(updateFriends(json.user));
+        dispatch(setUser(json.user));// dont DO it it will sadly reload the page as changes the user auth
         toast.success(json.message);
       } else {
         toast.error(json.message);
