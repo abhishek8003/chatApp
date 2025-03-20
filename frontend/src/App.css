@@ -75,24 +75,24 @@
 @media (min-width:421px) and (max-width:533px) {
   .chat-container {
     max-width: 245px;
-    border:2px solid orange;
+    /* border:2px solid orange; */
   }
 }
 @media (min-width:534px) and (max-width:680px) {
   .chat-container {
     max-width: 300px;
-    border:2px solid rebeccapurple;
+    /* border:2px solid rebeccapurple; */
   }
 }
 @media (min-width:681px) and (max-width:1034px) {
   .chat-container {
     max-width: 400px;
-    border:2px solid yellow;
+    /* border:2px solid yellow; */
   }
 }
 @media (min-width:1035px) {
   .chat-container {
     max-width: 600px;
-    border:2px solid blue;
+    /* border:2px solid blue; */
   }
 }
