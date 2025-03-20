@@ -3,7 +3,7 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import SendIcon from "@mui/icons-material/Send";
-import { CircularProgress } from "@mui/material"; // Import CircularProgress
+import { CircularProgress } from "@mui/material";
 import {
   changeStatus,
   setChats,
@@ -21,44 +21,33 @@ import { uploadingToggle } from "../../../redux/features/uploading";
 import { setKeepAliveInterval } from "../../../redux/features/keepAliveInterval";
 import { addNewMessageInSelectedGroup } from "../../../redux/features/selectedGroup";
 import { addNewMessageInGroups } from "../../../redux/features/groups";
+
 function CreateMessage() {
-  let selectedGroup = useSelector((store) => {
-    return store.selectedGroup;
-  });
-  let backendUrl = useContext(backendContext);
-  let selectedUser = useSelector((store) => {
-    return store.selectedUser;
-  });
-  let inputFile = useRef();
-  let clientSocket = useContext(socketContext);
-  let chats = useSelector((store) => {
-    return store.chats;
-  });
-  let onlineUsers = useSelector((store) => {
-    return store.onlineUsers;
-  });
-  let [preview, setPreview] = useState(false);
-  let keepAliveInterval = useSelector((store) => store.keepAliveInterval);
-  let [previewUrl, setPreviewUrl] = useState("");
-  let [messageText, setMessageText] = useState("");
-  let [isSendingMessage, setSendingMessage] = useState(false);
-  let uploading = useSelector((store) => store.uploading);
-  let userAuth = useSelector((store) => {
-    return store.userAuth;
-  });
-  let dispatch = useDispatch();
-  // let keepAliveIntervalRef = useRef(null); // ✅ Create a ref
-  // useEffect(() => {
-  //   keepAliveIntervalRef.current = keepAliveInterval; // ✅ Always update ref when Redux value changes
-  // }, [keepAliveInterval]);
-  let handleFilePreview = async () => {
+  const selectedGroup = useSelector((store) => store.selectedGroup);
+  const backendUrl = useContext(backendContext);
+  const selectedUser = useSelector((store) => store.selectedUser);
+  const inputFile = useRef();
+  const clientSocket = useContext(socketContext);
+  const chats = useSelector((store) => store.chats);
+  const onlineUsers = useSelector((store) => store.onlineUsers);
+  const [preview, setPreview] = useState(false);
+  const keepAliveInterval = useSelector((store) => store.keepAliveInterval);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const [messageText, setMessageText] = useState("");
+  const [isSendingMessage, setSendingMessage] = useState(false);
+  const uploading = useSelector((store) => store.uploading);
+  const userAuth = useSelector((store) => store.userAuth);
+  const dispatch = useDispatch();
+  const form = useRef();
+
+  const handleFilePreview = async () => {
     setTimeout(() => {
       setPreview(true);
-      if (inputFile) {
-        let fileObj = inputFile.current.files[0];
-        let fileReader = new FileReader();
+      if (inputFile.current && inputFile.current.files[0]) {
+        const fileObj = inputFile.current.files[0];
+        const fileReader = new FileReader();
         fileReader.addEventListener("loadend", (e) => {
-          console.log(e.target.result);
+          console.log("File preview URL:", e.target.result);
           setPreviewUrl(e.target.result);
         });
         fileReader.readAsDataURL(fileObj);
@@ -66,334 +55,257 @@ function CreateMessage() {
     }, 0);
   };
 
-  let form = useRef();
-  let handleSendMessage = async (myForm) => {
+  const handleSendMessage = async (myForm) => {
     setSendingMessage(true);
-    setTimeout(async () => {
-      const time = new Date(Date.now()).toISOString(); // Set time once
-      let text = myForm.newMessage.value;
-      let imgTempUrl = previewUrl;
+    const time = new Date(Date.now()).toISOString();
+    const text = myForm.newMessage.value;
+    const imgTempUrl = previewUrl;
+
+    try {
       if (selectedUser && !selectedUser.isAi) {
+        // Regular user chat
         dispatch(
           updateChats({
             senderId: userAuth._id,
             receiverId: selectedUser._id,
-            text: text,
-            image: {
-              local_url: "",
-              cloud_url: imgTempUrl,
-            },
+            text,
+            image: { local_url: "", cloud_url: imgTempUrl },
             createdAt: time,
             status: "pending",
             isGroupChat: false,
           })
         );
-        dispatch(uploadingToggle(true)); //make uploading true
-        new Promise((resolve, reject) => {
-          clientSocket?.emit("sendMessage", {
-            senderId: userAuth._id,
-            recieverId: selectedUser._id,
-            message_text: text,
-            message_image: imgTempUrl,
-            createdAt: time,
-          });
+        dispatch(uploadingToggle(true));
+
+        clientSocket?.emit("sendMessage", {
+          senderId: userAuth._id,
+          recieverId: selectedUser._id,
+          message_text: text,
+          message_image: imgTempUrl,
+          createdAt: time,
         });
-        console.log("am after setTImeout");
-        console.log(`logged socket after emiting:`, clientSocket);
 
-        let file = myForm.messageFile && myForm.messageFile.files[0];
-        console.log(text);
-        console.log(file);
+        const file = myForm.messageFile?.files[0];
         if (!text && !file) {
+          toast.error("Message or file required!");
+          setSendingMessage(false);
           return;
         }
-        let formData = new FormData();
-        if (text) {
-          formData.append("messageText", text);
-        }
-        if (file) {
-          formData.append("messageImage", file);
-        }
+
+        const formData = new FormData();
+        if (text) formData.append("messageText", text);
+        if (file) formData.append("messageImage", file);
         formData.append("messageTime", time);
+
         setPreview(false);
         setMessageText("");
-        inputFile.current.value = "";
-        try {
-          let response = await fetch(
-            `${backendUrl}/api/chats/${selectedUser._id}`,
-            {
-              method: "POST",
-              credentials: "include",
-              body: formData,
-            }
-          );
-          let json = await response.json();
-          if (response.status === 200) {
-            console.log("After saving to database:", json.newMessage);
-            let receiverStatus = onlineUsers.find((u) => {
-              if (u._id == json.newMessage.receiverId) {
-                return true;
-              }
-              return false;
-            });
-            if (!receiverStatus) {
-              dispatch(changeStatus(json.newMessage));
-            }
+        if (inputFile.current) inputFile.current.value = ""; // Safe reset
 
-            setSendingMessage(false);
-            setPreviewUrl(null);
+        const response = await fetch(`${backendUrl}/api/chats/${selectedUser._id}`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+        const json = await response.json();
+
+        if (response.status === 200) {
+          console.log("After saving to database:", json.newMessage);
+          const receiverStatus = onlineUsers.some((u) => u._id === json.newMessage.receiverId);
+          if (!receiverStatus) {
+            dispatch(changeStatus(json.newMessage));
           }
-        } catch (error) {
-          console.log(error);
-          toast.error(error);
-        } finally {
-          setSendingMessage(false);
+          setPreviewUrl(null);
+        } else {
+          throw new Error("Failed to save message");
         }
-      }
-      if (selectedUser && selectedUser.isAi) {
+      } else if (selectedUser && selectedUser.isAi) {
+        // AI chat
+        if (!text) {
+          toast.error("Message text required for AI chat!");
+          setSendingMessage(false);
+          return;
+        }
+
         dispatch(
           updateChats({
             senderId: userAuth._id,
             receiverId: selectedUser._id,
-            text: text,
-            image: {
-              local_url: "",
-              cloud_url: imgTempUrl,
-            },
+            text,
+            image: { local_url: "", cloud_url: imgTempUrl },
             createdAt: time,
             status: "pending",
             isGroupChat: false,
           })
         );
-        // new Promise((resolve, reject) => {
-        //   clientSocket?.emit("sendMessage", {
-        //     senderId: userAuth._id,
-        //     recieverId: selectedUser._id,
-        //     message_text: text,
-        //     message_image: imgTempUrl,
-        //     createdAt: time,
-        //   });
-        // });
 
-        // let file = myForm.messageFile && myForm.messageFile.files[0];
-        console.log(text);
-        // console.log(file);
-        if (!text) {
-          return;
-        }
-        let formData = new FormData();
-        if (text) {
-          formData.append("messageText", text);
-        }
-        // if (file) {
-        //   formData.append("messageImage", file);
-        // }
+        const formData = new FormData();
+        formData.append("messageText", text);
         formData.append("messageTime", time);
+
         setPreview(false);
         setMessageText("");
-        // inputFile.current.value = "";
-        try {
-          let response = await fetch(
-            `${backendUrl}/api/chats/${selectedUser._id}`,
-            {
-              method: "POST",
-              credentials: "include",
-              body: formData,
-            }
+
+        const response = await fetch(`${backendUrl}/api/chats/${selectedUser._id}`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+        const json = await response.json();
+
+        if (response.status === 200) {
+          console.log("AI message saved:", json.newMessage);
+          dispatch(
+            changeStatus({
+              senderId: userAuth._id,
+              receiverId: selectedUser._id,
+              text,
+              image: { local_url: "", cloud_url: imgTempUrl },
+              createdAt: time,
+              status: "processed",
+              isGroupChat: false,
+            })
           );
-          let json = await response.json();
-          if (response.status === 200) {
-            console.log("After saving to database:", json.newMessage);
-            dispatch(
-              changeStatus({
-                senderId: userAuth._id,
-                receiverId: selectedUser._id,
-                text: text,
-                image: {
-                  local_url: "",
-                  cloud_url: imgTempUrl,
-                },
-                createdAt: time,
-                status: "processed",
-                isGroupChat: false,
-              })
-            );
-            console.log("SELECTED USER ID:",selectedUser._id);
-            console.log("json.newMessage.senderId:",json.newMessage.senderId);
-            
-            if (selectedUser._id == json.newMessage.senderId) {
-              dispatch(updateChats(json.newMessage));
-              setSendingMessage(false);
-            }
+          if (selectedUser._id === json.newMessage.senderId) {
+            dispatch(updateChats(json.newMessage));
           }
-        } catch (error) {
-          console.log(error);
-          toast.error(error);
-        } finally {
-          setSendingMessage(false);
           setPreviewUrl(null);
+        } else {
+          throw new Error("Failed to save AI message");
         }
-      }
-      if (selectedGroup) {
-        try {
-          if (selectedGroup.pastMembers.includes(userAuth._id)) {
-            // alert("BRO Its not member!")
-            console.log("BUG selected Group:", selectedGroup);
-            throw new Error("You are not a member of this group");
-          } else {
-            console.log("TEST selected Group:", selectedGroup);
-          }
-        } catch (error) {
-          toast.error(error.message);
-          setMessageText("");
-          inputFile.current.value = "";
+      } else if (selectedGroup) {
+        // Group chat
+        if (!selectedGroup._id || !Array.isArray(selectedGroup.pastMembers)) {
+          console.error("Invalid selectedGroup:", selectedGroup);
+          toast.error("Invalid group selected!");
           setSendingMessage(false);
+          return;
+        }
+
+        if (selectedGroup.pastMembers.includes(userAuth._id)) {
+          toast.error("You are not a member of this group!");
+          setMessageText("");
           setPreview(false);
           setPreviewUrl(null);
+          setSendingMessage(false);
           return;
         }
-        // alert("BRO !")
 
-        let file = myForm.messageFile && myForm.messageFile.files[0];
-        console.log(text);
-        console.log(file);
+        const file = myForm.messageFile?.files[0];
         if (!text && !file) {
+          toast.error("Message or file required!");
+          setSendingMessage(false);
           return;
         }
-        let formData = new FormData();
-        if (text) {
-          formData.append("messageText", text);
-        }
-        if (file) {
-          formData.append("messageImage", file);
-        }
-        setPreview(false);
-        setMessageText("");
-        inputFile.current.value = "";
+
+        const formData = new FormData();
+        if (text) formData.append("messageText", text);
+        if (file) formData.append("messageImage", file);
+
         dispatch(
           updateGroupChat({
-            senderId: userAuth,
+            senderId: userAuth, // Fixed from userAuth
             receiverId: selectedGroup._id,
-            text: text,
-            image: {
-              local_url: "",
-              cloud_url: imgTempUrl,
-            },
+            text,
+            image: { local_url: "", cloud_url: imgTempUrl },
             createdAt: time,
             status: "pending",
             isGroupChat: true,
           })
         );
 
-        try {
-          clientSocket?.emit("addGroupMessage", {
-            selectedGroup: selectedGroup._id,
-            messageBody: {
-              messageText: text,
-              messageImage: previewUrl,
-              createdAt: time,
-              status: "pending",
-              isGroupChat: false,
-            },
-          });
-          let response = await fetch(
-            `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
-            {
-              method: "POST",
-              credentials: "include",
-              body: formData,
-            }
-          );
-          let json = await response.json();
+        clientSocket?.emit("addGroupMessage", {
+          selectedGroup: selectedGroup._id,
+          messageBody: {
+            messageText: text,
+            messageImage: previewUrl,
+            createdAt: time,
+            status: "pending",
+            isGroupChat: true, // Fixed to true
+          },
+        });
 
-          if (response.status === 200) {
-            console.log(
-              "AFTER SAVING TO DATABASE NEW MESSAGE:",
-              json.newMessage
-            );
-            // dispatch(setGroupChat(json.group));
-            dispatch(changeGroupMessageStatus(json.newMessage));
-            setMessageText("");
-            inputFile.current.value = "";
-            setSendingMessage(false);
-            setPreview(false);
-            setPreviewUrl(null);
+        setPreview(false);
+        setMessageText("");
+        if (inputFile.current) inputFile.current.value = ""; // Safe reset
+
+        const response = await fetch(
+          `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
           }
-        } catch (error) {
-          console.log(error);
-          toast.error(error);
-        } finally {
-          setSendingMessage(false);
+        );
+        const json = await response.json();
+
+        if (response.status === 200) {
+          console.log("Group message saved:", json.newMessage);
+          dispatch(changeGroupMessageStatus(json.newMessage));
+          setPreviewUrl(null);
+        } else {
+          throw new Error("Failed to save group message");
         }
       }
-    }, 0);
+    } catch (error) {
+      console.error("Error in handleSendMessage:", error);
+      toast.error(error.message || "Something went wrong!");
+    } finally {
+      setSendingMessage(false);
+    }
   };
+
   useEffect(() => {
     if (chats && selectedUser) {
-      let targetChats = chats.filter((c) => {
-        if (
-          c.senderId == userAuth._id &&
-          c.receiverId == selectedUser._id &&
-          c.status == "sent"
-        ) {
-          return true;
-        }
-        return false;
-      });
-      let targetChats2 = chats.filter((c) => {
-        if (
-          c.senderId == userAuth._id &&
-          c.receiverId == selectedUser._id &&
-          c.status == "delivered"
-        ) {
-          return true;
-        }
-        return false;
-      });
-      console.log("THEY GOT BROKE", targetChats);
-      let receiverStatus = onlineUsers.find((e) => {
-        if (e._id == selectedUser._id) {
-          return true;
-        }
-        return false;
-      });
+      const targetChats = chats.filter(
+        (c) =>
+          c.senderId === userAuth._id &&
+          c.receiverId === selectedUser._id &&
+          c.status === "sent"
+      );
+      const targetChats2 = chats.filter(
+        (c) =>
+          c.senderId === userAuth._id &&
+          c.receiverId === selectedUser._id &&
+          c.status === "delivered"
+      );
+
+      const receiverStatus = onlineUsers.some((e) => e._id === selectedUser._id);
       if (!receiverStatus) {
-        targetChats.forEach((chat) => {
-          dispatch(changeStatus({ ...chat, status: "delivered" })); //jbb offline hoga
-        });
+        targetChats.forEach((chat) =>
+          dispatch(changeStatus({ ...chat, status: "delivered" }))
+        );
       }
       if (receiverStatus) {
-        targetChats2.forEach((chat) => {
-          dispatch(changeStatus({ ...chat, status: "sent" })); //jb online hoga
-        });
+        targetChats2.forEach((chat) =>
+          dispatch(changeStatus({ ...chat, status: "sent" }))
+        );
       }
     }
-  }, [onlineUsers, selectedUser]);
+  }, [onlineUsers, selectedUser, chats, dispatch, userAuth._id]);
+
   return (
     <>
       <Box sx={{ width: "100%" }}>
-        {preview && inputFile.current && inputFile.current.files[0] ? (
-          <>
-            <div style={{ position: "absolute", bottom: "80px", left: "10px" }}>
-              <img src={previewUrl} height={"100px"} width={"100px"}></img>
-              <i
-                onClick={() => {
-                  (inputFile.current.value = ""), setPreview(null);
-                  setPreviewUrl(null);
-                }}
-                class="fa-solid fa-square-xmark"
-                style={{
-                  position: "absolute",
-                  right: "-11px",
-                  top: "-11px",
-                  fontSize: "1.25rem",
-                  color: "red",
-                }}
-              ></i>
-            </div>
-          </>
-        ) : (
-          ""
+        {preview && inputFile.current?.files[0] && (
+          <div style={{ position: "absolute", bottom: "80px", left: "10px" }}>
+            <img src={previewUrl} height="100px" width="100px" alt="Preview" />
+            <i
+              onClick={() => {
+                if (inputFile.current) inputFile.current.value = "";
+                setPreview(false);
+                setPreviewUrl(null);
+              }}
+              className="fa-solid fa-square-xmark"
+              style={{
+                position: "absolute",
+                right: "-11px",
+                top: "-11px",
+                fontSize: "1.25rem",
+                color: "red",
+                cursor: "pointer",
+              }}
+            />
+          </div>
         )}
       </Box>
       <form
@@ -406,8 +318,8 @@ function CreateMessage() {
         <div
           style={{
             minHeight: "70px",
-            position:"relative",
-            border:"2px solid orange",
+            position: "relative",
+            border: "2px solid orange",
             width: "100%",
             display: "flex",
             justifyContent: "center",
@@ -419,23 +331,19 @@ function CreateMessage() {
             autoComplete="off"
             value={messageText}
             name="newMessage"
-            onChange={(e) => {
-              setMessageText(e.target.value);
-            }}
+            onChange={(e) => setMessageText(e.target.value)}
             onKeyDown={(e) => {
               if (!(messageText.length > 0 || preview)) {
                 if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault(); // Prevent form submission
+                  e.preventDefault();
                 }
               }
             }}
             sx={{ flexGrow: "1", border: "" }}
-          ></TextField>
+          />
           <Box
             style={{
               width: "fit-content",
-              //   border:"2px solid red",
-
               display: "flex",
               justifyContent: "space-around",
               alignItems: "center",
@@ -448,10 +356,10 @@ function CreateMessage() {
               },
             }}
           >
-            {!selectedUser.isAi ? (
+            {selectedUser && !selectedUser.isAi && (
               <>
-                <label for="messageFile">
-                  <CollectionsIcon></CollectionsIcon>
+                <label htmlFor="messageFile">
+                  <CollectionsIcon />
                 </label>
                 <input
                   type="file"
@@ -463,59 +371,29 @@ function CreateMessage() {
                     document.querySelector('input[name="newMessage"]').focus();
                   }}
                   style={{ display: "none" }}
-                ></input>
+                />
               </>
-            ) : null}
-
-            <label>
-              {/* <Button
+            )}
+            {isSendingMessage ? (
+              <Button onClick={(e) => e.preventDefault()}>
+                <CircularProgress
+                  sx={{
+                    height: "20.3px !important",
+                    width: "20.3px !important",
+                  }}
+                />
+              </Button>
+            ) : (
+              <Button
                 onClick={(e) => {
                   e.preventDefault();
                   form.current.requestSubmit();
                 }}
-                disabled={
-                  (messageText.length > 0 || preview ? false : true) ||
-                  isSendingMessage
-                }
+                disabled={!(messageText.length > 0 || preview) || isSendingMessage}
               >
-                <SendIcon></SendIcon>
-              </Button> */}
-              {isSendingMessage ? (
-                <>
-                  <Button
-                    onClick={(e) => {
-                      e.preventDefault();
-                    }}
-                  >
-                    <CircularProgress
-                      sx={{
-                        height: "20.3px",
-                        width: "20.3px",
-                        "& svg": {
-                          height: "100%",
-                          width: "100%",
-                          margin: "0px",
-                          padding: "0px",
-                        },
-                      }}
-                    ></CircularProgress>
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  onClick={(e) => {
-                    e.preventDefault();
-                    form.current.requestSubmit();
-                  }}
-                  disabled={
-                    (messageText.length > 0 || preview ? false : true) ||
-                    isSendingMessage
-                  }
-                >
-                  <SendIcon></SendIcon>
-                </Button>
-              )}
-            </label>
+                <SendIcon />
+              </Button>
+            )}
           </Box>
         </div>
       </form>
