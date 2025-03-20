@@ -59,7 +59,7 @@ function Login() {
         dispatch(setUser(json.user));
         dispatch(setSelectedUser(null));
         toast.success(`Welcome back, ${json.user.fullName}!`);
-        navigate("/dashboard"); // Redirect to dashboard or desired page
+        navigate("/"); // Redirect to dashboard or desired page
       } else {
         toast.error(json.message || "Login failed");
       }

@@ -74,7 +74,7 @@ function Signup() {
         toast.success("Account created successfully!");
         dispatch(setSelectedUser(null));
         dispatch(setUser(json.user));
-        navigate("/dashboard"); // Redirect to dashboard or desired page
+        navigate("/"); // Redirect to dashboard or desired page
       } else {
         toast.error(json.message || "Registration failed");
       }

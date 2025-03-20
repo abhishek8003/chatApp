@@ -12,12 +12,13 @@ const { validate_user, isAuthenticated } = require("../middlewares");
 const { io_server } = require("../socket");
 const path = require("path");
 //create a AI user
-let initAI=async () => {
+let initAI=async (req,res,next) => {
     try {
         let anyAi = await User.find({ isAi: true });
         console.log(anyAi);
         if (anyAi.length) {
             console.log("Ai user exists!");
+            next();
         }
         else {
             let ai_user = new User({
@@ -34,10 +35,12 @@ let initAI=async () => {
             });
             await ai_user.save();
             console.log("AI intialized!");
+            next();
 
         }
     } catch (error) {
         console.log(error);
+        res.status(404).json({ message: "User cant be registered!" });
     }
 }
 //create normal user
