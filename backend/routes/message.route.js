@@ -103,8 +103,24 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                 // let image;
                 // let recieverUser = await User.findById(receiverId);
                 // let isrecieverUserAi = recieverUser.isAi;
+                //testing
+                let previousMessages = await Message.find({
+                    $or: [
+                        { senderId: senderId, receiverId: receiverId },
+                        { senderId: receiverId, receiverId: senderId }
+                    ],
+                    isGroupChat: false
+                }).sort({ createdAt: 1 }).limit(10);
+                let promptWithHistory = "You are an AI chatting with a user. Here’s the conversation so far:\n";
+                previousMessages.forEach(msg => {
+                    promptWithHistory += `${msg.senderId.equals(senderId) ? "User" : "AI"}: ${msg.text}\n`;
+                });
+                promptWithHistory += `User: ${message_text}\nAI:`;
+                console.log(promptWithHistory);
+                
+                //testing
                 let prompt = req.body.messageText;
-                const result = await gemini_ai.generateContent(prompt);
+                const result = await gemini_ai.generateContent(promptWithHistory);
                 console.log("SO he is talking with AI!");
                 console.log(result.response.text());
                 //user message save to database
@@ -125,7 +141,7 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                     createdAt: message_time,
                     status: "processed"
                 });
-                let s=await newMessage1.save();
+                let s = await newMessage1.save();
                 const savedMessage = await newMessage2.save();
                 console.log("messeage saved in database:", savedMessage);
                 res.status(200).json({ newMessage: savedMessage });

@@ -19,7 +19,7 @@ function GroupInfoNav() {
         flexDirection: 'column',
         alignItems: 'center',
         backgroundColor: '#f5f5f5',
-        // borderRight: '2px solid #ddd',
+        borderRight: '2px solid #ddd',
       }}
     >
       <Tooltip title="Overview" onClick={()=>{
