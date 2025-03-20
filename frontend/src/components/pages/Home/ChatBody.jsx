@@ -252,7 +252,8 @@ function ChatBody() {
                           }}
                         >
                           {formatTime(chat.createdAt)}
-                          {isSender && ` - ${chat.status}`} {/* Status only for sender */}
+                          {isSender && ` - ${chat.status}`}{" "}
+                          {/* Status only for sender */}
                         </Typography>
                       </Box>
                     ) : (
@@ -312,7 +313,8 @@ function ChatBody() {
                           }}
                         >
                           {formatTime(chat.createdAt)}
-                          {isSender && ` - ${chat.status}`} {/* Status only for sender */}
+                          {isSender && ` - ${chat.status}`}{" "}
+                          {/* Status only for sender */}
                         </Typography>
                       </Box>
                     )}
