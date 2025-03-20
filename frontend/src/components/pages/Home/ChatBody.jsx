@@ -69,17 +69,17 @@ function ChatBody() {
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
-        "&::-webkit-scrollbar": { width: "6px" },
+        "&::-webkit-scrollbar": { width: "0.375rem" }, // 6px
         "&::-webkit-scrollbar-thumb": {
           background: "linear-gradient(45deg, #1976d2, #42a5f5)",
-          borderRadius: "8px",
+          borderRadius: "0.5rem", // 8px
         },
         width: "100%",
-        border: "2px solid #1976d2", // Kept your border
-        borderRadius: "12px", // Softer corners
-        padding: "16px", // More padding
-        background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)", // Gradient background
-        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)", // Elegant shadow
+        border: "2px solid #1976d2",
+        borderRadius: "0.75rem", // 12px
+        padding: "1rem", // 16px
+        background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)",
+        boxShadow: "0 0.25rem 1.25rem rgba(0, 0, 0, 0.1)", // 4px 20px
       }}
     >
       {chats.length > 0 ? (
@@ -109,11 +109,11 @@ function ChatBody() {
                         background: "linear-gradient(45deg, #e1e1e1, #ffffff)",
                         color: "#444",
                         fontSize: "0.9rem",
-                        padding: "6px 16px",
-                        borderRadius: "20px",
+                        padding: "0.375rem 1rem", // 6px 16px
+                        borderRadius: "1.25rem", // 20px
                         fontWeight: "600",
-                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
-                        textShadow: "0 1px 2px rgba(0, 0, 0, 0.05)", // Subtle text shadow
+                        boxShadow: "0 0.125rem 0.375rem rgba(0, 0, 0, 0.1)", // 2px 6px
+                        textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)", // 1px 2px
                       }}
                     >
                       {currentMessageDate}
@@ -124,13 +124,13 @@ function ChatBody() {
                 <Box
                   sx={{
                     display: "flex",
-                    gap: "6px",
+                    gap: "0.375rem", // 6px
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
                     width: "100%",
-                    marginBottom: "20px", // More spacing
+                    marginBottom: "1.25rem", // 20px
                     transition: "all 0.3s ease",
-                    "&:hover": { transform: "translateY(-2px)" }, // Lift on hover
+                    "&:hover": { transform: "translateY(-0.125rem)" }, // -2px
                   }}
                 >
                   <Avatar
@@ -141,10 +141,12 @@ function ChatBody() {
                     sx={{
                       width: 40,
                       height: 40,
-                      border: "2px solid #fff",
-                      boxShadow: "0 0 8px rgba(25, 118, 210, 0.5)", // Glowing effect
+                      border: "0.125rem solid #fff", // 2px
+                      boxShadow: "0 0 0.5rem rgba(25, 118, 210, 0.5)", // 8px
                       transition: "box-shadow 0.3s ease",
-                      "&:hover": { boxShadow: "0 0 12px rgba(25, 118, 210, 0.7)" },
+                      "&:hover": {
+                        boxShadow: "0 0 0.75rem rgba(25, 118, 210, 0.7)", // 12px
+                      },
                     }}
                   />
                   <Box
@@ -152,16 +154,16 @@ function ChatBody() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: isSender ? "flex-end" : "flex-start",
-                      maxWidth: "70%", // Elegant width limit
+                      maxWidth: "90%", //fuck
                     }}
                   >
                     <Typography
                       variant="caption"
                       sx={{
                         color: "text.secondary",
-                        marginBottom: "6px",
+                        marginBottom: "0.375rem", // 6px
                         fontWeight: "500",
-                        textShadow: "0 1px 1px rgba(0, 0, 0, 0.05)",
+                        textShadow: "0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.05)", // 1px 1px
                         "&:hover": { color: "#1976d2" },
                       }}
                     >
@@ -174,18 +176,20 @@ function ChatBody() {
                           background: isSender
                             ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
                             : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "10px",
-                          borderRadius: "18px", // Softer corners
-                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                          padding: "0.625rem", // 10px
+                          borderRadius: "1.125rem", // 18px
+                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
                           width: "100%",
-                          maxWidth: "400px", // Kept your maxWidth
+                          maxWidth: "400px",
                           transition: "all 0.3s ease",
-                          "&:hover": { boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)" },
+                          "&:hover": {
+                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                          },
                         }}
                       >
                         <Card
                           sx={{
-                            borderRadius: "18px",
+                            borderRadius: "1.125rem", // 18px
                             boxShadow: "none",
                           }}
                         >
@@ -196,7 +200,7 @@ function ChatBody() {
                             sx={{
                               width: "100%",
                               height: "auto",
-                              borderRadius: "14px",
+                              borderRadius: "0.875rem", // 14px
                               cursor: "pointer",
                               maxWidth: "400px",
                               transition: "transform 0.3s ease",
@@ -208,7 +212,7 @@ function ChatBody() {
                           />
                         </Card>
                         {chat.text && (
-                          <CardContent sx={{ padding: "6px 10px" }}>
+                          <CardContent sx={{ padding: "0.375rem 0.625rem" }}> // 6px 10px
                             <Typography
                               variant="body2"
                               className="chat-container" // Kept your class
@@ -242,7 +246,7 @@ function ChatBody() {
                               textAlign: "right",
                               color: "#888",
                               fontSize: "0.75rem",
-                              marginTop: "6px",
+                              marginTop: "0.375rem", // 6px
                               background: "linear-gradient(90deg, #888, #bbb)",
                               WebkitBackgroundClip: "text",
                               WebkitTextFillColor: "transparent",
@@ -258,13 +262,15 @@ function ChatBody() {
                           background: isSender
                             ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
                             : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "12px 16px",
-                          borderRadius: "18px",
+                          padding: "0.75rem 1px", // 12px 16px
+                          borderRadius: "1.125rem", // 18px
                           width: "100%",
                           boxSizing: "border-box",
-                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
                           transition: "all 0.3s ease",
-                          "&:hover": { boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)" },
+                          "&:hover": {
+                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                          },
                         }}
                       >
                         <Typography
@@ -302,7 +308,7 @@ function ChatBody() {
                               textAlign: "right",
                               color: "#888",
                               fontSize: "0.75rem",
-                              marginTop: "6px",
+                              marginTop: "0.375rem", // 6px
                               background: "linear-gradient(90deg, #888, #bbb)",
                               WebkitBackgroundClip: "text",
                               WebkitTextFillColor: "transparent",
@@ -338,7 +344,7 @@ function ChatBody() {
               background: "linear-gradient(45deg, #1976d2, #42a5f5)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
+              textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.1)", // 2px 4px
             }}
           >
             No messages!
@@ -349,7 +355,7 @@ function ChatBody() {
               mt: 1,
               color: "#666",
               fontStyle: "italic",
-              textShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+              textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)", // 1px 2px
             }}
           >
             Start a beautiful conversation!

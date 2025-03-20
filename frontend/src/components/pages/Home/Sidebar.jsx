@@ -194,18 +194,19 @@ function Sidebar() {
         height: "80vh",
         overflow: "auto",
         scrollbarWidth: "thin",
-        "@media (min-width:0px) and (max-width:600px)": {
+        "@media (min-width:0px) and (max-width:633px)": {
           minWidth: "85px",
           maxWidth: "86px",
+        },
+        "@media (min-width:634px) and (max-width: 740px)": {
+          minWidth: "200px",
+          maxWidth: "201px",
         },
         "@media (min-width:741px) and (max-width: 850px)": {
           minWidth: "247px",
           maxWidth: "248px",
         },
-        "@media (min-width:601px) and (max-width: 740px)": {
-          minWidth: "200px",
-          maxWidth: "201px",
-        },
+
         "@media (min-width:851px)": {
           minWidth: "350px",
           maxWidth: "351px",
@@ -241,7 +242,7 @@ function Sidebar() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            "@media (max-width:600px)": {
+            "@media (max-width:633px)": {
               display: "none",
             },
           }}
@@ -260,7 +261,7 @@ function Sidebar() {
             fontSize: "1rem",
             color: "#777",
             display: "block",
-            "@media (min-width:1px) and (max-width:600px)": {
+            "@media (min-width:1px) and (max-width:633px)": {
               display: "none",
             },
           }}
@@ -311,7 +312,7 @@ function Sidebar() {
                     display: "flex",
                     flexDirection: "column",
                     wordBreak: "break-all",
-                    "@media (max-width:600px)": {
+                    "@media (max-width:633px)": {
                       display: "none",
                     },
                   }}
@@ -374,7 +375,7 @@ function Sidebar() {
                     <Typography
                       sx={{
                         display: "none",
-                        "@media (min-width:1px) and (max-width:600px)": {
+                        "@media (min-width:1px) and (max-width:633px)": {
                           display: "inline",
                         },
                       }}
@@ -396,7 +397,7 @@ function Sidebar() {
                     <Typography
                       sx={{
                         display: "none",
-                        "@media (min-width:1px) and (max-width:600px)": {
+                        "@media (min-width:1px) and (max-width:633px)": {
                           display: "inline",
                         },
                       }}
@@ -423,7 +424,7 @@ function Sidebar() {
                     display: "flex",
                     flexDirection: "column",
                     wordBreak: "break-all",
-                    "@media (max-width:600px)": {
+                    "@media (max-width:633px)": {
                       display: "none",
                     },
                   }}
@@ -501,12 +502,28 @@ function Sidebar() {
               dispatch(changeDm());
             }}
           >
-            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+            <Typography
+              sx={{
+                "@media (max-width:633px)": {
+                  display: "none",
+                },
+                "@media (min-width:634px)": {
+                  display: "inline-block",
+                },
+              }}
+            >
               Create new DM
             </Typography>
             <ControlPointIcon
               className="add_dm_icon"
-              sx={{ display: { xs: "inline-block", sm: "none" } }}
+              sx={{
+                "@media (max-width:633px)": {
+                  display: "block",
+                },
+                "@media (min-width:634px)": {
+                  display: "none",
+                },
+              }}
             />
           </div>
           <CreateGroup></CreateGroup>
@@ -523,12 +540,29 @@ function Sidebar() {
               dispatch(changeGroupBox());
             }}
           >
-            <Typography sx={{ display: { xs: "none", sm: "block" } }}>
+            <Typography
+              sx={{
+               
+                "@media (max-width:633px)": {
+                  display: "none",
+                },
+                "@media (min-width:634px)": {
+                  display: "block",
+                },
+              }}
+            >
               Create new Group!
             </Typography>
             <GroupAddIcon
               className="add_dm_icon"
-              sx={{ display: { xs: "inline-block", sm: "none" } }}
+              sx={{
+              "@media (max-width:633px)": {
+                display: "inline-block",
+              },
+              "@media (min-width:634px)": {
+                display: "none",
+              },
+            }}
             />
           </div>
         </>
