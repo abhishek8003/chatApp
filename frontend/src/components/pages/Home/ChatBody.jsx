@@ -262,7 +262,7 @@ function ChatBody() {
                           background: isSender
                             ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
                             : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "0.75rem 1px", // 12px 16px
+                          padding: "0.75rem 5px", // 12px 16px
                           borderRadius: "1.125rem", // 18px
                           width: "100%",
                           boxSizing: "border-box",
