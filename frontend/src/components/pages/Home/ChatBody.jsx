@@ -69,17 +69,17 @@ function ChatBody() {
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
-        "&::-webkit-scrollbar": { width: "0.375rem" }, // 6px
+        "&::-webkit-scrollbar": { width: "0.375rem" },
         "&::-webkit-scrollbar-thumb": {
           background: "linear-gradient(45deg, #1976d2, #42a5f5)",
-          borderRadius: "0.5rem", // 8px
+          borderRadius: "0.5rem",
         },
         width: "100%",
         border: "2px solid #1976d2",
-        borderRadius: "0.75rem", // 12px
-        padding: "1rem", // 16px
+        borderRadius: "0.75rem",
+        padding: "1rem",
         background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)",
-        boxShadow: "0 0.25rem 1.25rem rgba(0, 0, 0, 0.1)", // 4px 20px
+        boxShadow: "0 0.25rem 1.25rem rgba(0, 0, 0, 0.1)",
       }}
     >
       {chats.length > 0 ? (
@@ -109,11 +109,11 @@ function ChatBody() {
                         background: "linear-gradient(45deg, #e1e1e1, #ffffff)",
                         color: "#444",
                         fontSize: "0.9rem",
-                        padding: "0.375rem 1rem", // 6px 16px
-                        borderRadius: "1.25rem", // 20px
+                        padding: "0.375rem 1rem",
+                        borderRadius: "1.25rem",
                         fontWeight: "600",
-                        boxShadow: "0 0.125rem 0.375rem rgba(0, 0, 0, 0.1)", // 2px 6px
-                        textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)", // 1px 2px
+                        boxShadow: "0 0.125rem 0.375rem rgba(0, 0, 0, 0.1)",
+                        textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)",
                       }}
                     >
                       {currentMessageDate}
@@ -124,13 +124,13 @@ function ChatBody() {
                 <Box
                   sx={{
                     display: "flex",
-                    gap: "0.375rem", // 6px
+                    gap: "0.375rem",
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
                     width: "100%",
-                    marginBottom: "1.25rem", // 20px
+                    marginBottom: "1.25rem",
                     transition: "all 0.3s ease",
-                    "&:hover": { transform: "translateY(-0.125rem)" }, // -2px
+                    "&:hover": { transform: "translateY(-0.125rem)" },
                   }}
                 >
                   <Avatar
@@ -141,11 +141,11 @@ function ChatBody() {
                     sx={{
                       width: 40,
                       height: 40,
-                      border: "0.125rem solid #fff", // 2px
-                      boxShadow: "0 0 0.5rem rgba(25, 118, 210, 0.5)", // 8px
+                      border: "0.125rem solid #fff",
+                      boxShadow: "0 0 0.5rem rgba(25, 118, 210, 0.5)",
                       transition: "box-shadow 0.3s ease",
                       "&:hover": {
-                        boxShadow: "0 0 0.75rem rgba(25, 118, 210, 0.7)", // 12px
+                        boxShadow: "0 0 0.75rem rgba(25, 118, 210, 0.7)",
                       },
                     }}
                   />
@@ -154,16 +154,16 @@ function ChatBody() {
                       display: "flex",
                       flexDirection: "column",
                       alignItems: isSender ? "flex-end" : "flex-start",
-                      maxWidth: "90%", //fuck
+                      maxWidth: "90%",
                     }}
                   >
                     <Typography
                       variant="caption"
                       sx={{
                         color: "text.secondary",
-                        marginBottom: "0.375rem", // 6px
+                        marginBottom: "0.375rem",
                         fontWeight: "500",
-                        textShadow: "0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.05)", // 1px 1px
+                        textShadow: "0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.05)",
                         "&:hover": { color: "#1976d2" },
                       }}
                     >
@@ -176,20 +176,20 @@ function ChatBody() {
                           background: isSender
                             ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
                             : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "0.625rem", // 10px
-                          borderRadius: "1.125rem", // 18px
-                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
+                          padding: "0.625rem",
+                          borderRadius: "1.125rem",
+                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)",
                           width: "100%",
                           maxWidth: "400px",
                           transition: "all 0.3s ease",
                           "&:hover": {
-                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)",
                           },
                         }}
                       >
                         <Card
                           sx={{
-                            borderRadius: "1.125rem", // 18px
+                            borderRadius: "1.125rem",
                             boxShadow: "none",
                           }}
                         >
@@ -200,7 +200,7 @@ function ChatBody() {
                             sx={{
                               width: "100%",
                               height: "auto",
-                              borderRadius: "0.875rem", // 14px
+                              borderRadius: "0.875rem",
                               cursor: "pointer",
                               maxWidth: "400px",
                               transition: "transform 0.3s ease",
@@ -212,10 +212,10 @@ function ChatBody() {
                           />
                         </Card>
                         {chat.text && (
-                          <CardContent sx={{ padding: "0.375rem 0.625rem" }}> // 6px 10px
+                          <CardContent sx={{ padding: "0.375rem 0.625rem" }}>
                             <Typography
                               variant="body2"
-                              className="chat-container" // Kept your class
+                              className="chat-container"
                               sx={{
                                 overflow: "auto",
                                 wordBreak: "break-word",
@@ -238,23 +238,22 @@ function ChatBody() {
                             </Typography>
                           </CardContent>
                         )}
-                        {isSender && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              textAlign: "right",
-                              color: "#888",
-                              fontSize: "0.75rem",
-                              marginTop: "0.375rem", // 6px
-                              background: "linear-gradient(90deg, #888, #bbb)",
-                              WebkitBackgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                            }}
-                          >
-                            {formatTime(chat.createdAt)} - {chat.status}
-                          </Typography>
-                        )}
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: "block",
+                            textAlign: isSender ? "right" : "left",
+                            color: "#888",
+                            fontSize: "0.75rem",
+                            marginTop: "0.375rem",
+                            background: "linear-gradient(90deg, #888, #bbb)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                          }}
+                        >
+                          {formatTime(chat.createdAt)}
+                          {isSender && ` - ${chat.status}`} {/* Status only for sender */}
+                        </Typography>
                       </Box>
                     ) : (
                       <Box
@@ -262,20 +261,20 @@ function ChatBody() {
                           background: isSender
                             ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
                             : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "0.75rem 5px", // 12px 16px
-                          borderRadius: "1.125rem", // 18px
+                          padding: "0.75rem 0.3125rem", // Adjusted from 5px to 0.3125rem
+                          borderRadius: "1.125rem",
                           width: "100%",
                           boxSizing: "border-box",
-                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
+                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)",
                           transition: "all 0.3s ease",
                           "&:hover": {
-                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)",
                           },
                         }}
                       >
                         <Typography
                           variant="body2"
-                          className="chat-container" // Kept your class
+                          className="chat-container"
                           sx={{
                             wordBreak: "break-all",
                             overflowWrap: "break-all",
@@ -299,24 +298,22 @@ function ChatBody() {
                             <ReactMarkdown>{chat.text}</ReactMarkdown>
                           </Box>
                         </Typography>
-
-                        {isSender && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              display: "block",
-                              textAlign: "right",
-                              color: "#888",
-                              fontSize: "0.75rem",
-                              marginTop: "0.375rem", // 6px
-                              background: "linear-gradient(90deg, #888, #bbb)",
-                              WebkitBackgroundClip: "text",
-                              WebkitTextFillColor: "transparent",
-                            }}
-                          >
-                            {formatTime(chat.createdAt)} - {chat.status}
-                          </Typography>
-                        )}
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            display: "block",
+                            textAlign: isSender ? "right" : "left",
+                            color: "#888",
+                            fontSize: "0.75rem",
+                            marginTop: "0.375rem",
+                            background: "linear-gradient(90deg, #888, #bbb)",
+                            WebkitBackgroundClip: "text",
+                            WebkitTextFillColor: "transparent",
+                          }}
+                        >
+                          {formatTime(chat.createdAt)}
+                          {isSender && ` - ${chat.status}`} {/* Status only for sender */}
+                        </Typography>
                       </Box>
                     )}
                   </Box>
@@ -344,7 +341,7 @@ function ChatBody() {
               background: "linear-gradient(45deg, #1976d2, #42a5f5)",
               WebkitBackgroundClip: "text",
               WebkitTextFillColor: "transparent",
-              textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.1)", // 2px 4px
+              textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.1)",
             }}
           >
             No messages!
@@ -355,7 +352,7 @@ function ChatBody() {
               mt: 1,
               color: "#666",
               fontStyle: "italic",
-              textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)", // 1px 2px
+              textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.05)",
             }}
           >
             Start a beautiful conversation!
