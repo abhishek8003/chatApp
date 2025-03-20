@@ -23,11 +23,13 @@ function ChatbodySkeleton() {
         <React.Fragment key={index}>
           {/* Sent Message (Left-aligned) */}
           <Box
+          classname="chat-container "
             sx={{
               display: "flex",
               gap: "0.5rem", // 8px
               flexDirection: "row",
               marginBottom: "1rem", // 16px
+              // border:"2px solid red"
             }}
           >
             <Skeleton

@@ -1,6 +1,6 @@
 import { Box, Modal, Typography, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setNotificationToggle } from "../../../redux/features/notificationToggle";
 import { setSelectedUser } from "../../../redux/features/selectedUser";
@@ -17,23 +17,47 @@ function NotificationPanel() {
     notification: store.notification,
     users: store.users,
   }));
-  let groups = useSelector((store) => {
-    return store.groups;
-  });
-  let backendUrl=useContext(backendContext);
-  let userAuth = useSelector((store) => {
-    return store.userAuth;
-  });
-  let selectedGroup = useSelector((store) => {
-    return store.selectedGroup;
-  });
+  const groups = useSelector((store) => store.groups);
+  const backendUrl = useContext(backendContext);
+  const userAuth = useSelector((store) => store.userAuth);
+  const selectedGroup = useSelector((store) => store.selectedGroup);
   const dispatch = useDispatch();
+
+  const handleNotificationClick = async (message) => {
+    try {
+      const response = await fetch(`${backendUrl}/api/notifications/`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(message),
+      });
+      if (response.ok) {
+        dispatch(deleteNotification(message));
+        if (message.isGroupChat) {
+          const targetGroup = groups.find((g) => g._id === message.receiverId);
+          dispatch(setSelectedUser(null));
+          dispatch(setSelectedGroup(targetGroup));
+        } else {
+          const senderUser = users.find((u) => u._id === message.senderId);
+          dispatch(setSelectedGroup(null));
+          dispatch(setSelectedUser(senderUser));
+        }
+        dispatch(setNotificationToggle());
+      } else {
+        console.error("Failed to delete notification");
+      }
+    } catch (error) {
+      console.error("Error deleting notification:", error);
+    }
+  };
+
   return (
     <Modal
       open={notificationToggle}
       onClose={() => dispatch(setNotificationToggle())}
       sx={{
-        color: "white",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -41,30 +65,63 @@ function NotificationPanel() {
     >
       <Box
         sx={{
-          height: "auto",
           width: { xs: "90%", sm: "60%", md: "40%" },
           maxHeight: "70vh",
           overflowY: "auto",
-          backgroundColor: "#222",
-          p: 3,
-          borderRadius: "12px",
-          color: "white",
+          backgroundColor: "#fafafa", // Light gray background
+          padding: "1.5rem", // 24px
+          borderRadius: "0.75rem", // 12px
+          boxShadow: "0 0.25rem 0.5rem rgba(0, 0, 0, 0.2)", // Stronger shadow for modal
           position: "relative",
+          scrollbarWidth: "thin",
+          "&::-webkit-scrollbar": { width: "0.375rem" }, // 6px
+          "&::-webkit-scrollbar-thumb": {
+            background: "#bdbdbd", // Gray scrollbar thumb
+            borderRadius: "0.5rem", // 8px
+          },
         }}
       >
         <IconButton
-          sx={{ position: "absolute", top: 8, right: 8, color: "white" }}
+          sx={{
+            position: "absolute",
+            top: "0.5rem", // 8px
+            right: "0.5rem", // 8px
+            color: "#757575", // Medium gray
+            "&:hover": {
+              color: "#333", // Dark gray on hover
+            },
+          }}
           onClick={() => dispatch(setNotificationToggle())}
         >
-          <CloseIcon />
+          <CloseIcon sx={{ fontSize: "1.5rem" }} /> {/* 24px */}
         </IconButton>
-        <Typography variant="h5" align="center" fontWeight={600} mb={2}>
+
+        <Typography
+          variant="h5"
+          align="center"
+          sx={{
+            fontWeight: 600,
+            color: "#333", // Dark gray
+            fontSize: "1.5rem", // 24px
+            mb: "1rem", // 16px
+          }}
+        >
           Notifications
         </Typography>
-        <Typography variant="body1" align="center" mb={2}>
+
+        <Typography
+          variant="body1"
+          align="center"
+          sx={{
+            color: "#757575", // Medium gray
+            fontSize: "1rem", // 16px
+            mb: "1.5rem", // 24px
+          }}
+        >
           You have {notification.length} new{" "}
           {notification.length === 1 ? "notification" : "notifications"}
         </Typography>
+
         <Box>
           {notification.length > 0 ? (
             notification.map((message, index) => {
@@ -74,150 +131,172 @@ function NotificationPanel() {
                   <Box
                     key={index}
                     sx={{
-                      p: 2,
-                      mb: 1,
-                      backgroundColor: "#333",
-                      borderRadius: "8px",
+                      p: "1rem", // 16px
+                      mb: "0.75rem", // 12px
+                      backgroundColor: "#ffffff", // White card
+                      borderRadius: "0.5rem", // 8px
                       display: "flex",
                       alignItems: "center",
-                      gap: 2,
-                      flexDirection: { xs: "column", sm: "row" },
+                      gap: "1rem", // 16px
+                      boxShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.05)", // Subtle shadow
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5", // Light gray hover
+                      },
                     }}
+                    onClick={() => handleNotificationClick(message)}
                   >
-                    <Box
-                      flex={1}
-                      textAlign={{ xs: "center", sm: "left" }}
-                      onClick={() => {
-                        let senderUser = users.find((u) => {
-                          if (u._id == message.senderId) {
-                            return true;
-                          }
-                        });
-                        console.log(senderUser);
-                        let response =  fetch(
-                          `${backendUrl}/api/notifications/`,
-                          {
-                            method: "DELETE",
-                            credentials: "include",
-                            headers: {
-                              "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify(message),
-                          }
-                        );
-                        dispatch(deleteNotification(message));
-                        dispatch(setSelectedGroup(null));
-                        dispatch(setSelectedUser(senderUser));
-                        dispatch(setNotificationToggle());
-                      }}
-                    >
-                      <Typography variant="body1" fontWeight={500}>
+                    {message.image?.cloud_url && (
+                      <img
+                        src={message.image.cloud_url}
+                        height="3.75rem" // 60px
+                        width="3.75rem" // 60px
+                        alt="Notification"
+                        style={{
+                          borderRadius: "0.5rem", // 8px
+                          objectFit: "cover",
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <Box flex={1}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 500,
+                          color: "#333", // Dark gray
+                          fontSize: "1rem", // 16px
+                        }}
+                      >
                         {sender ? sender.fullName : "Unknown"}
                       </Typography>
                       {message.text && (
-                        <Typography variant="body2" color="green" mt={0.5}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#388e3c", // Green for text
+                            fontSize: "0.875rem", // 14px
+                            mt: "0.25rem", // 4px
+                          }}
+                        >
                           {message.text}
                         </Typography>
                       )}
-
                       {message.createdAt && (
-                        <Typography variant="caption" color="gray" mt={0.5}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "#757575", // Medium gray
+                            fontSize: "0.75rem", // 12px
+                            mt: "0.25rem", // 4px
+                          }}
+                        >
                           {new Date(message.createdAt).toLocaleString()}
                         </Typography>
                       )}
                     </Box>
-                    {message.image && (
-                      <img
-                        src={message.image}
-                        height="60"
-                        width="60"
-                        alt="Notification"
-                        style={{ borderRadius: "8px", objectFit: "cover" }}
-                      />
-                    )}
                   </Box>
                 );
               }
-              if (message.isGroupChat && groups ) {
-                console.log(groups);
-                console.log(message.receiverId);
-                let targetGroup = groups.find((g) => {
-                  if (g._id == message.receiverId) {
-                    return true;
-                  }
-                });
-
-                console.log("targetGroup", targetGroup);
-
+              if (message.isGroupChat && groups) {
+                const targetGroup = groups.find(
+                  (g) => g._id === message.receiverId
+                );
                 return (
-                  <>
-                    <Box
-                      key={index}
-                      sx={{
-                        p: 2,
-                        mb: 1,
-                        backgroundColor: "#333",
-                        borderRadius: "8px",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: 2,
-                        flexDirection: { xs: "column", sm: "row" },
-                      }}
-                    >
-                      <Box
-                        flex={1}
-                        textAlign={{ xs: "center", sm: "left" }}
-                        onClick={() => {
-                          console.log(targetGroup);
-                          dispatch(deleteNotification(message));
-                          let response =  fetch(
-                            `${backendUrl}/api/notifications/`,
-                            {
-                              method: "DELETE",
-                              credentials: "include",
-                              headers: {
-                                "Content-Type": "application/json",
-                              },
-                              body: JSON.stringify(message),
-                            }
-                          );
-                          dispatch(setSelectedUser(null));
-                          dispatch(setSelectedGroup(targetGroup));
-                          dispatch(setNotificationToggle());
+                  <Box
+                    key={index}
+                    sx={{
+                      p: "1rem", // 16px
+                      mb: "0.75rem", // 12px
+                      backgroundColor: "#ffffff", // White card
+                      borderRadius: "0.5rem", // 8px
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "1rem", // 16px
+                      boxShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.05)", // Subtle shadow
+                      cursor: "pointer",
+                      "&:hover": {
+                        backgroundColor: "#f5f5f5", // Light gray hover
+                      },
+                    }}
+                    onClick={() => handleNotificationClick(message)}
+                  >
+                    {targetGroup?.groupIcon?.cloud_url && (
+                      <img
+                        src={targetGroup.groupIcon.cloud_url}
+                        height="3.75rem" // 60px
+                        width="3.75rem" // 60px
+                        alt="Group Icon"
+                        style={{
+                          borderRadius: "0.5rem", // 8px
+                          objectFit: "cover",
+                          flexShrink: 0,
+                        }}
+                      />
+                    )}
+                    <Box flex={1}>
+                      <Typography
+                        variant="body1"
+                        sx={{
+                          fontWeight: 500,
+                          color: "#333", // Dark gray
+                          fontSize: "1rem", // 16px
                         }}
                       >
-                        <Typography variant="body1" fontWeight={500}>
-                          {targetGroup
-                            ? targetGroup.groupName
-                            : "Unknown Group"}
+                        {targetGroup ? targetGroup.groupName : "Unknown Group"}
+                      </Typography>
+                      {message.text && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#388e3c", // Green for text
+                            fontSize: "0.875rem", // 14px
+                            mt: "0.25rem", // 4px
+                          }}
+                        >
+                          {message.text}
                         </Typography>
-                        {message.text && (
-                          <Typography variant="body2" color="green" mt={0.5}>
-                            {message.text}
-                          </Typography>
-                        )}
-                        {message.image.cloud_url && <p>image</p>}
-                        {message.createdAt && (
-                          <Typography variant="caption" color="gray" mt={0.5}>
-                            {new Date(message.createdAt).toLocaleString()}
-                          </Typography>
-                        )}
-                      </Box>
-
-                      <img
-                        src={targetGroup?targetGroup.groupIcon.cloud_url:""}
-                        height="60"
-                        width="60"
-                        alt="Notification"
-                        style={{ borderRadius: "8px", objectFit: "cover" }}
-                      />
+                      )}
+                      {message.image?.cloud_url && (
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            color: "#1976d2", // Blue for image indicator
+                            fontSize: "0.875rem", // 14px
+                            mt: "0.25rem", // 4px
+                          }}
+                        >
+                          Image
+                        </Typography>
+                      )}
+                      {message.createdAt && (
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: "#757575", // Medium gray
+                            fontSize: "0.75rem", // 12px
+                            mt: "0.25rem", // 4px
+                          }}
+                        >
+                          {new Date(message.createdAt).toLocaleString()}
+                        </Typography>
+                      )}
                     </Box>
-                  </>
+                  </Box>
                 );
               }
+              return null; // Fallback for invalid cases
             })
           ) : (
-            <Typography variant="body2" align="center" color="gray">
+            <Typography
+              variant="body2"
+              align="center"
+              sx={{
+                color: "#757575", // Medium gray
+                fontSize: "0.875rem", // 14px
+                py: "1rem", // 16px
+              }}
+            >
               No new notifications
             </Typography>
           )}
