@@ -185,7 +185,7 @@ function Signup() {
                       required: "Email is required",
                       pattern: {
                         value:
-                          /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[A-Za-z]{2,}$/,
+                          /^[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z0-9]+$/,
                         message: "Enter a valid email address",
                       },
                     })}
@@ -220,10 +220,6 @@ function Signup() {
                       minLength: {
                         value: 6,
                         message: "Must be at least 6 characters",
-                      },
-                      pattern: {
-                        value: /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{6,}$/,
-                        message: "Must include letters and numbers",
                       },
                     })}
                     error={!!errors.password}
