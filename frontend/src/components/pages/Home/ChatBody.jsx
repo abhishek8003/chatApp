@@ -77,7 +77,7 @@ function ChatBody() {
         width: "100%",
         border: "2px solid #1976d2",
         borderRadius: "0.75rem",
-        padding: "1rem",
+        padding: "2px",
         background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)",
         boxShadow: "0 0.25rem 1.25rem rgba(0, 0, 0, 0.1)",
       }}
@@ -261,7 +261,7 @@ function ChatBody() {
                           background: isSender
                             ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
                             : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "0.75rem 0.3125rem", // Adjusted from 5px to 0.3125rem
+                          padding: "0.75rem 1rem", // Adjusted from 5px to 0.3125rem
                           borderRadius: "1.125rem",
                           width: "100%",
                           boxSizing: "border-box",
