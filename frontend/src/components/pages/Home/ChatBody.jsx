@@ -69,11 +69,17 @@ function ChatBody() {
         height: "80%",
         overflow: "auto",
         scrollbarWidth: "thin",
+        "&::-webkit-scrollbar": { width: "6px" },
+        "&::-webkit-scrollbar-thumb": {
+          background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+          borderRadius: "8px",
+        },
         width: "100%",
-        border: "2px solid #1976d2",
-        borderRadius: "8px",
-        padding: "8px",
-        backgroundColor: "#f5f5f5",
+        border: "2px solid #1976d2", // Kept your border
+        borderRadius: "12px", // Softer corners
+        padding: "16px", // More padding
+        background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)", // Gradient background
+        boxShadow: "0 4px 20px rgba(0, 0, 0, 0.1)", // Elegant shadow
       }}
     >
       {chats.length > 0 ? (
@@ -94,18 +100,20 @@ function ChatBody() {
                     sx={{
                       display: "flex",
                       justifyContent: "center",
-                      my: 2,
+                      my: 3,
                       width: "100%",
                     }}
                   >
                     <Typography
                       sx={{
-                        backgroundColor: "#e1e1e1",
-                        color: "#555",
-                        fontSize: "0.85rem",
-                        padding: "4px 5px",
-                        borderRadius: "16px",
-                        fontWeight: "bold",
+                        background: "linear-gradient(45deg, #e1e1e1, #ffffff)",
+                        color: "#444",
+                        fontSize: "0.9rem",
+                        padding: "6px 16px",
+                        borderRadius: "20px",
+                        fontWeight: "600",
+                        boxShadow: "0 2px 6px rgba(0, 0, 0, 0.1)",
+                        textShadow: "0 1px 2px rgba(0, 0, 0, 0.05)", // Subtle text shadow
                       }}
                     >
                       {currentMessageDate}
@@ -116,11 +124,13 @@ function ChatBody() {
                 <Box
                   sx={{
                     display: "flex",
-                    gap: "3px",
+                    gap: "6px",
                     flexDirection: isSender ? "row-reverse" : "row",
                     alignItems: "flex-end",
                     width: "100%",
-                    marginBottom: "12px",
+                    marginBottom: "20px", // More spacing
+                    transition: "all 0.3s ease",
+                    "&:hover": { transform: "translateY(-2px)" }, // Lift on hover
                   }}
                 >
                   <Avatar
@@ -128,21 +138,31 @@ function ChatBody() {
                       profilePic ||
                       `${backendUrl}/images/default_profile_icon.png`
                     }
-                    sx={{ width: 40, height: 40 }}
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      border: "2px solid #fff",
+                      boxShadow: "0 0 8px rgba(25, 118, 210, 0.5)", // Glowing effect
+                      transition: "box-shadow 0.3s ease",
+                      "&:hover": { boxShadow: "0 0 12px rgba(25, 118, 210, 0.7)" },
+                    }}
                   />
                   <Box
                     sx={{
                       display: "flex",
                       flexDirection: "column",
                       alignItems: isSender ? "flex-end" : "flex-start",
-                      maxWidth: "100%",
+                      maxWidth: "70%", // Elegant width limit
                     }}
                   >
                     <Typography
                       variant="caption"
                       sx={{
                         color: "text.secondary",
-                        marginBottom: "4px",
+                        marginBottom: "6px",
+                        fontWeight: "500",
+                        textShadow: "0 1px 1px rgba(0, 0, 0, 0.05)",
+                        "&:hover": { color: "#1976d2" },
                       }}
                     >
                       {isSender ? "You" : selectedUser.fullName}
@@ -151,16 +171,21 @@ function ChatBody() {
                     {chat.image && chat.image.cloud_url ? (
                       <Box
                         sx={{
-                          backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
-                          padding: "6px",
-                          borderRadius: "12px",
-                          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+                          background: isSender
+                            ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
+                            : "linear-gradient(45deg, #ffffff, #f5f5f5)",
+                          padding: "10px",
+                          borderRadius: "18px", // Softer corners
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
                           width: "100%",
+                          maxWidth: "400px", // Kept your maxWidth
+                          transition: "all 0.3s ease",
+                          "&:hover": { boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)" },
                         }}
                       >
                         <Card
                           sx={{
-                            borderRadius: "12px",
+                            borderRadius: "18px",
                             boxShadow: "none",
                           }}
                         >
@@ -171,9 +196,11 @@ function ChatBody() {
                             sx={{
                               width: "100%",
                               height: "auto",
-                              borderRadius: "12px",
+                              borderRadius: "14px",
                               cursor: "pointer",
                               maxWidth: "400px",
+                              transition: "transform 0.3s ease",
+                              "&:hover": { transform: "scale(1.03)" },
                             }}
                             onClick={() =>
                               handleImagePreview(chat.image.cloud_url)
@@ -181,13 +208,16 @@ function ChatBody() {
                           />
                         </Card>
                         {chat.text && (
-                          <CardContent sx={{ padding: "4px 8px" }}>
+                          <CardContent sx={{ padding: "6px 10px" }}>
                             <Typography
                               variant="body2"
-                              className="chat-container"
+                              className="chat-container" // Kept your class
                               sx={{
-                                // maxWidth: "250px",//fuck
                                 overflow: "auto",
+                                wordBreak: "break-word",
+                                whiteSpace: "pre-wrap",
+                                fontWeight: "400",
+                                color: "#333",
                               }}
                             >
                               <Box
@@ -201,7 +231,6 @@ function ChatBody() {
                               >
                                 <ReactMarkdown>{chat.text}</ReactMarkdown>
                               </Box>
-                              {/* {chat.text} */}
                             </Typography>
                           </CardContent>
                         )}
@@ -211,9 +240,12 @@ function ChatBody() {
                             sx={{
                               display: "block",
                               textAlign: "right",
-                              color: "#808080",
+                              color: "#888",
                               fontSize: "0.75rem",
-                              marginTop: "4px",
+                              marginTop: "6px",
+                              background: "linear-gradient(90deg, #888, #bbb)",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
                             }}
                           >
                             {formatTime(chat.createdAt)} - {chat.status}
@@ -223,28 +255,35 @@ function ChatBody() {
                     ) : (
                       <Box
                         sx={{
-                          backgroundColor: isSender ? "#dcf8c6" : "#ffffff",
-                          padding: "8px 8px",
-                          borderRadius: "12px",
+                          background: isSender
+                            ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
+                            : "linear-gradient(45deg, #ffffff, #f5f5f5)",
+                          padding: "12px 16px",
+                          borderRadius: "18px",
                           width: "100%",
                           boxSizing: "border-box",
+                          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
+                          transition: "all 0.3s ease",
+                          "&:hover": { boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)" },
                         }}
                       >
                         <Typography
                           variant="body2"
-                          className="chat-container"
+                          className="chat-container" // Kept your class
                           sx={{
                             wordBreak: "break-all",
-                            // maxWidth: "250px",//fuck
                             overflowWrap: "break-all",
                             overflow: "auto",
-                            position:"relative"
+                            position: "relative",
+                            whiteSpace: "pre-wrap",
+                            fontWeight: "400",
+                            color: "#333",
                           }}
                         >
                           <Box
                             sx={{
                               overflowX: "auto",
-                              position:"relative",
+                              position: "relative",
                               wordBreak: "break-word",
                               overflowWrap: "break-word",
                               whiteSpace: "pre-wrap",
@@ -253,7 +292,6 @@ function ChatBody() {
                           >
                             <ReactMarkdown>{chat.text}</ReactMarkdown>
                           </Box>
-                          {/* {chat.text} */}
                         </Typography>
 
                         {isSender && (
@@ -262,9 +300,12 @@ function ChatBody() {
                             sx={{
                               display: "block",
                               textAlign: "right",
-                              color: "#808080",
+                              color: "#888",
                               fontSize: "0.75rem",
-                              marginTop: "4px",
+                              marginTop: "6px",
+                              background: "linear-gradient(90deg, #888, #bbb)",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
                             }}
                           >
                             {formatTime(chat.createdAt)} - {chat.status}
@@ -283,6 +324,7 @@ function ChatBody() {
         <Box
           sx={{
             display: "flex",
+            flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
             height: "100%",
@@ -292,11 +334,25 @@ function ChatBody() {
             variant="h6"
             sx={{
               fontWeight: "bolder",
-              fontSize: "2rem",
-              color: "text.secondary",
+              fontSize: "2.5rem",
+              background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              textShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
             }}
           >
             No messages!
+          </Typography>
+          <Typography
+            variant="body2"
+            sx={{
+              mt: 1,
+              color: "#666",
+              fontStyle: "italic",
+              textShadow: "0 1px 2px rgba(0, 0, 0, 0.05)",
+            }}
+          >
+            Start a beautiful conversation!
           </Typography>
         </Box>
       )}
