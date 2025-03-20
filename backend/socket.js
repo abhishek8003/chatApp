@@ -315,7 +315,11 @@ io_server.on("connection", (clientSocket) => {
             }
 
         } else {
-            let user = await User.find({ email: targetMemberEmail });
+            let user = await User.findOne({ email: targetMemberEmail });
+            io_server.emit("gotKickedFromGroup", {
+                groupId: targetGroupId,
+                member: user
+            });
             console.log(`User ${user._id} is not online.`);
         }
     });

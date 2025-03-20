@@ -28,31 +28,27 @@ function CreateGroup() {
   const [selectedValue, setSelectedValue] = useState(null);
   const [selectedFriends, setSelectedFriends] = useState([]);
   const [loadingUser, setLoadingUsers] = useState(true);
+  const [creatingGroup, setCreatingGroup] = useState(false);
+
   const users = useSelector((store) => store.users);
   const friends = useSelector((store) => store.friends);
   const selectedUser = useSelector((store) => store.selectedUser);
   const toggleGroup = useSelector((store) => store.toggleGroup);
   const onlineUsers = useSelector((store) => store.onlineUsers);
-  const userAuth = useSelector((store) => store.userAuth); // Assuming userAuth is stored in Redux
-  let [creatingGroup, setCreatingGroup] = useState(false);
-
+  const userAuth = useSelector((store) => store.userAuth);
   const clientSocket = useContext(socketContext);
   const backendUrl = useContext(backendContext);
   const dispatch = useDispatch();
   let groupImg = useRef("");
 
   const handleSelectingFriend = (friend) => {
-    if (
-      !selectedFriends.find((e) => {
-        if (e._id == friend._id) return true;
-      })
-    ) {
+    if (!selectedFriends.find((e) => e._id === friend._id)) {
       setSelectedFriends((prevSelectedFriends) => [
         ...prevSelectedFriends,
         friend,
       ]);
     } else {
-      setSelectedValue("");
+      setSelectedValue(null);
       toast.error("Friend already selected");
     }
   };
@@ -74,18 +70,18 @@ function CreateGroup() {
         if (groupImg.current.files.length > 0) {
           formData.append("groupImage", groupImg.current.files[0]);
         }
-        let response=await fetch(`${backendUrl}/api/groups/${userAuth._id}`,{
-          method:"POST",
-          credentials:"include",
-          body:formData
+        let response = await fetch(`${backendUrl}/api/groups/${userAuth._id}`, {
+          method: "POST",
+          credentials: "include",
+          body: formData,
         });
-        let json=await response.json();
-        if(response.status===200){
+        let json = await response.json();
+        if (response.status === 200) {
           console.log(json.newGroup);
           dispatch(addGroup(json.newGroup));
           dispatch(changeGroupBox());
           toast.success(json.message);
-          clientSocket?.emit("addedNewGroup",{newGroup:json.newGroup})
+          clientSocket?.emit("addedNewGroup", { newGroup: json.newGroup });
         }
       } catch (error) {
         toast.error(error.message);
@@ -98,16 +94,17 @@ function CreateGroup() {
   const handleSelectUser = (user) => {
     dispatch(setSelectedUser(user));
   };
+
   useEffect(() => {
     const getAllUsers = async () => {
       try {
         clientSocket?.emit("fetchAllUsers");
         clientSocket?.on("getAllUsersExceptMe", (users) => {
           dispatch(setUsers(users));
+          setLoadingUsers(false);
         });
       } catch (error) {
         toast.error(error.message);
-      } finally {
         setLoadingUsers(false);
       }
     };
@@ -122,197 +119,295 @@ function CreateGroup() {
     <Modal
       open={toggleGroup}
       onClose={() => dispatch(changeGroupBox())}
-      sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
+      sx={{
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        backdropFilter: "blur(4px)", // Standard blur for modals
+        backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent overlay
+      }}
     >
       <Box
         sx={{
-          height: "80%",
-          width: { xs: "350px", sm: "450px", md: "700px" },
-          border: "2px solid #ccc",
-          borderRadius: "8px",
-          overflow: "auto",
-          scrollbarWidth: "thin",
-          backgroundColor: "background.paper",
-          p: 2,
+          width: { xs: "20rem", sm: "25rem", md: "40rem" }, // Compact width
+          maxHeight: "75vh", // Compact height
+          backgroundColor: "#ffffff", // Clean white background
+          borderRadius: "0.5rem", // Subtle rounded corners
+          boxShadow: "0 0.25rem 0.5rem rgba(0, 0, 0, 0.2)", // Light shadow
+          padding: "1.25rem", // Tight padding
+          overflowY: "auto",
+          scrollbarWidth: "none", // No scrollbar
+          "&::-webkit-scrollbar": { display: "none" },
+          border: "none",
         }}
       >
+        {/* Header */}
         <Typography
-          variant="h5"
+          variant="h6"
           sx={{
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            mb: 2,
+            color: "#333", // Dark gray
+            fontWeight: 600,
+            fontSize: "1.25rem", // Small, bold header
+            mb: "1rem", // Tight spacing
           }}
         >
-          Add Group members!
-          <IconButton onClick={() => dispatch(changeGroupBox())}>
-            <CloseIcon />
+          Create New Group
+          <IconButton
+            onClick={() => dispatch(changeGroupBox())}
+            sx={{
+              color: "#666", // Medium gray
+              "&:hover": { color: "#e63946" }, // Red on hover
+            }}
+          >
+            <CloseIcon sx={{ fontSize: "1.25rem" }} /> {/* Small icon */}
           </IconButton>
         </Typography>
+
+        {/* Group Name Input */}
         <TextField
           label="Group Name"
           value={groupName}
           onChange={(e) => setGroupName(e.target.value)}
-          sx={{ width: "100%", marginBottom: "8px" }}
+          sx={{
+            width: "100%",
+            mb: "1rem", // Tight spacing
+            "& .MuiOutlinedInput-root": {
+              borderRadius: "0.25rem", // Subtle rounding
+              "& fieldset": { borderColor: "#e0e0e0" }, // Light gray border
+              "&:hover fieldset": { borderColor: "#bdbdbd" }, // Darker gray on hover
+              "&.Mui-focused fieldset": { borderColor: "#1976d2" }, // Blue on focus
+            },
+            "& .MuiInputLabel-root": { color: "#666" }, // Medium gray label
+            "& .Mui-focused.MuiInputLabel-root": { color: "#1976d2" }, // Blue on focus
+            "& .MuiInputBase-input": {
+              fontSize: "0.875rem", // Small text
+              padding: "0.5rem", // Compact padding
+            },
+          }}
         />
+
+        {/* Group Image Upload */}
         <Box
           sx={{
             display: "flex",
-            width: "100%",
-            justifyContent: "center",
-            margin: "4px 0px",
+            alignItems: "center",
+            justifyContent: "space-between",
+            mb: "1rem", // Tight spacing
           }}
         >
           <Button
             component="label"
-            variant="contained"
+            variant="outlined"
             startIcon={<CloudUploadIcon />}
-            sx={{ margin: "auto" }}
+            sx={{
+              borderColor: "#e0e0e0", // Light gray border
+              color: "#666", // Medium gray text
+              textTransform: "none",
+              fontSize: "0.875rem", // Small text
+              borderRadius: "0.25rem", // Subtle rounding
+              padding: "0.375rem 1rem", // Compact padding
+              "&:hover": {
+                borderColor: "#bdbdbd", // Darker gray on hover
+                backgroundColor: "#f5f5f5", // Light gray hover
+              },
+            }}
           >
-            Upload group image
+            Upload Group Image
             <input
               type="file"
               ref={groupImg}
-              onChange={()=>{
-                let fileReader=new FileReader();
-                fileReader.addEventListener("loadend",(event)=>{
+              onChange={() => {
+                let fileReader = new FileReader();
+                fileReader.addEventListener("loadend", (event) => {
                   console.log(event.target.result);
                   setgroupImgPreview(event.target.result);
                 });
                 fileReader.readAsDataURL(groupImg.current.files[0]);
               }}
               style={{ display: "none" }}
-            ></input>
+            />
           </Button>
-          <img
-            src={groupImgPreview}
-            height={"100px"} width={"100px"}
-            style={{ display: groupImgPreview ? "inline-block" : "none" }}
-          ></img>
+          {groupImgPreview && (
+            <img
+              src={groupImgPreview}
+              alt="Group Preview"
+              style={{
+                width: "3rem", // Small preview
+                height: "3rem",
+                borderRadius: "0.25rem", // Subtle rounding
+                objectFit: "cover",
+              }}
+            />
+          )}
         </Box>
+
+        {/* Autocomplete */}
         <Autocomplete
           value={selectedValue}
           onChange={(event, value) => {
-            if (users.includes(value)) {
+            if (value && users.includes(value)) {
               handleSelectingFriend(value);
-              setSelectedValue("");
+              setSelectedValue(null);
             }
           }}
           options={users || []}
           getOptionLabel={(option) => option?.fullName || ""}
-          sx={{ width: "100%", mb: 2 }}
+          sx={{ width: "100%", mb: "1rem" }} // Tight spacing
           renderInput={(params) => (
-            <TextField {...params} label="Add a friend" />
+            <TextField
+              {...params}
+              label="Add a Friend"
+              variant="outlined"
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  borderRadius: "0.25rem", // Subtle rounding
+                  "& fieldset": { borderColor: "#e0e0e0" }, // Light gray border
+                  "&:hover fieldset": { borderColor: "#bdbdbd" }, // Darker gray on hover
+                  "&.Mui-focused fieldset": { borderColor: "#1976d2" }, // Blue on focus
+                },
+                "& .MuiInputLabel-root": { color: "#666" }, // Medium gray label
+                "& .Mui-focused.MuiInputLabel-root": { color: "#1976d2" }, // Blue on focus
+                "& .MuiInputBase-input": {
+                  fontSize: "0.875rem", // Small text
+                  padding: "0.5rem", // Compact padding
+                },
+              }}
+            />
           )}
         />
+
+        {/* Friend List or Skeleton */}
         {!loadingUser ? (
           <>
-            {selectedFriends && selectedFriends.length > 0
-              ? selectedFriends.map((user) => (
+            {selectedFriends.length > 0 ? (
+              selectedFriends.map((user) => (
+                <Box
+                  key={user._id}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    padding: "0.5rem", // Compact padding
+                    mb: "0.5rem", // Tight spacing
+                    backgroundColor: "#ffffff", // White background
+                    borderRadius: "0.25rem", // Subtle rounding
+                    "&:hover": { backgroundColor: "#f5f5f5" }, // Light gray hover
+                  }}
+                >
                   <Box
-                    key={user._id}
                     sx={{
-                      display: "flex",
-                      height: "70px",
-                      alignItems: "center",
-                      cursor: "pointer",
-                      mb: 1,
+                      position: "relative",
+                      mr: "0.75rem", // Small spacing
                     }}
                   >
-                    <Box
-                      sx={{
-                        display: "flex",
-                        position: "relative",
-                        justifyContent: "center",
-                        alignItems: "center",
+                    <img
+                      src={user.profilePic.cloud_url}
+                      alt="Profile"
+                      style={{
+                        width: "2.25rem", // Small avatar
+                        height: "2.25rem",
+                        borderRadius: "50%",
+                        objectFit: "cover",
                       }}
-                    >
-                      <img
-                        src={user.profilePic.cloud_url}
-                        alt="Profile"
-                        style={{
-                          width: "50px",
-                          height: "50px",
+                    />
+                    {onlineUsers.find((e) => e._id === user._id) ? (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: 0,
+                          right: 0,
+                          width: "0.625rem", // Small status dot
+                          height: "0.625rem",
                           borderRadius: "50%",
+                          backgroundColor: "#2ecc71", // Green for online
+                          border: "2px solid #ffffff", // White border
                         }}
                       />
-                    </Box>
-                    <Box
+                    ) : (
+                      <Box
+                        sx={{
+                          position: "absolute",
+                          bottom: 0,
+                          right: 0,
+                          width: "0.625rem",
+                          height: "0.625rem",
+                          borderRadius: "50%",
+                          backgroundColor: "#e63946", // Red for offline
+                          border: "2px solid #ffffff",
+                        }}
+                      />
+                    )}
+                  </Box>
+                  <Box sx={{ flexGrow: 1 }}>
+                    <Typography
+                      variant="body1"
                       sx={{
-                        flexGrow: "1",
-                        display: "flex",
-                        flexDirection: "column",
-                        wordBreak: "break-all",
-                        ml: 2,
+                        color: "#333", // Dark gray text
+                        fontSize: "0.875rem", // Small text
+                        fontWeight: 500,
                       }}
                     >
-                      <Typography variant="body1">{user.fullName}</Typography>
-                      {onlineUsers &&
-                      onlineUsers.find((e) => e._id === user._id) ? (
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ display: "flex", alignItems: "center" }}
-                        >
-                          <span
-                            style={{
-                              width: "8px",
-                              height: "8px",
-                              borderRadius: "50%",
-                              backgroundColor: "green",
-                              marginRight: "5px",
-                            }}
-                          ></span>
-                          Online
-                        </Typography>
-                      ) : (
-                        <Typography
-                          variant="subtitle2"
-                          sx={{ display: "flex", alignItems: "center" }}
-                        >
-                          <span
-                            style={{
-                              width: "8px",
-                              height: "8px",
-                              borderRadius: "50%",
-                              backgroundColor: "red",
-                              marginRight: "5px",
-                            }}
-                          ></span>
-                          Offline
-                        </Typography>
-                      )}
-                    </Box>
-                    <IconButton
-                      onClick={() => handleRemoveFriends(user._id)}
-                      sx={{ color: "red" }}
-                    >
-                      <CloseIcon />
-                    </IconButton>
+                      {user.fullName}
+                    </Typography>
                   </Box>
-                ))
-              : null}
-            <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
-              <Button
-                sx={{ width: "30%", minWidth: "200px" }}
-                variant="contained"
-                onClick={handleCreateGroup}
-                disabled={creatingGroup}
+                  <IconButton
+                    onClick={() => handleRemoveFriends(user._id)}
+                    sx={{
+                      color: "#e63946", // Red for remove
+                      "&:hover": { color: "#d00000" }, // Darker red on hover
+                    }}
+                  >
+                    <CloseIcon sx={{ fontSize: "1rem" }} /> {/* Small icon */}
+                  </IconButton>
+                </Box>
+              ))
+            ) : (
+              <Typography
+                sx={{
+                  color: "#666", // Medium gray
+                  fontSize: "0.875rem", // Small text
+                  textAlign: "center",
+                  py: "1rem", // Moderate padding
+                }}
               >
-                {creatingGroup ? "Please wait" : "Create New Group"}
-              </Button>
-            </Box>
+                No friends selected yet
+              </Typography>
+            )}
+            {selectedFriends.length > 0 && (
+              <Box sx={{ display: "flex", justifyContent: "center", mt: "1rem" }}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    width: "100%",
+                    maxWidth: "10rem", // Compact button
+                    bgcolor: "#1976d2", // Standard MUI blue
+                    color: "#ffffff",
+                    textTransform: "none",
+                    padding: "0.375rem 1rem", // Compact padding
+                    fontSize: "0.875rem", // Small text
+                    borderRadius: "0.25rem", // Subtle rounding
+                    "&:hover": { bgcolor: "#1565c0" }, // Darker blue on hover
+                    "&:disabled": { bgcolor: "#bdbdbd" }, // Gray when disabled
+                  }}
+                  disabled={creatingGroup}
+                  onClick={handleCreateGroup}
+                >
+                  {creatingGroup ? "Please Wait" : "Create Group"}
+                </Button>
+              </Box>
+            )}
           </>
         ) : (
-          <>
+          <Box sx={{ display: "flex", flexDirection: "column", gap: "0.5rem" }}>
             {new Array(8).fill(null).map((_, index) => (
               <UserCardSkeltion key={index} />
             ))}
-          </>
+          </Box>
         )}
       </Box>
     </Modal>
   );
 }
-
 export default CreateGroup;

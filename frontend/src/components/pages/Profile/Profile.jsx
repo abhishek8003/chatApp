@@ -9,12 +9,16 @@ import { setUser } from "../../../redux/features/userAuth";
 import toast from "react-hot-toast";
 import { AccountCircle, ContactMail } from "@mui/icons-material";
 import { backendContext } from "../../../BackendProvider";
+import { updateOneUser } from "../../../redux/features/users";
+import { updateSelectedUser } from "../../../redux/features/selectedUser";
+import { updateFriends } from "../../../redux/features/friends";
 
 function Profile() {
   let backendUrl = useContext(backendContext);
   let userAuth = useSelector((store) => store.userAuth);
   let dispatch = useDispatch();
   let [uploadingImg, setUploadingImg] = useState(false);
+  let selectedUser=useSelector((store)=>store.selectedUser)
 
   let handleimageUpload = async (event) => {
     if (!event.target.img1.files[0]) {
@@ -35,10 +39,12 @@ function Profile() {
 
       let json = await response.json();
       if (response.status === 200) {
-        // console.log("Before dispatch:", userAuth);
         console.log("new updated user:", json.user);
-        dispatch(setUser(json.user));
-        // console.log("After dispatch:", userAuth);
+        dispatch(updateOneUser(json.user));
+        if (selectedUser?._id === json.user?._id) {
+          dispatch(updateSelectedUserr(json.user));
+        }
+        dispatch(updateFriends(json.user));
         toast.success(json.message);
       } else {
         toast.error(json.message);
@@ -65,13 +71,42 @@ function Profile() {
       <Navbar />
       <div
         className="row flex-column justify-content-center align-items-center"
-        style={{ minHeight: "90vh" }}
+        style={{
+          minHeight: "90vh",
+          backgroundColor: "#f5f5f5", // Light gray background for the page
+        }}
       >
-        <div className="col-md-4 border mb-3 p-3" style={{ minHeight: "40vh" }}>
-          <Typography variant="h5" className="text-center fw-bolder">
+        {/* Profile Section */}
+        <div
+          className="col-md-4 mb-3 p-3"
+          style={{
+            minHeight: "40vh",
+            backgroundColor: "#ffffff", // White background
+            borderRadius: "0.5rem", // Subtle rounded corners
+            boxShadow: "0 0.25rem 0.5rem rgba(0, 0, 0, 0.1)", // Light shadow
+            border: "none",
+          }}
+        >
+          <Typography
+            variant="h5"
+            className="text-center fw-bolder"
+            sx={{
+              color: "#333", // Dark gray for contrast
+              fontSize: "1.25rem", // Small, bold header
+              mb: "0.5rem", // Tight spacing
+            }}
+          >
             Profile
           </Typography>
-          <Typography variant="body1" className="text-center">
+          <Typography
+            variant="body1"
+            className="text-center"
+            sx={{
+              color: "#666", // Muted gray
+              fontSize: "0.875rem", // Small text
+              mb: "1rem", // Tight spacing
+            }}
+          >
             Your profile Information
           </Typography>
 
@@ -82,15 +117,14 @@ function Profile() {
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-
               position: "relative",
             }}
           >
             <img
               src={userAuth.profilePic.cloud_url}
-              height={"140px"}
-              width={"150px"}
-              style={{ borderRadius: "50%" }}
+              height={"120px"} // Compact size
+              width={"120px"}
+              style={{ borderRadius: "50%", border: "2px solid #e0e0e0" }} // Light gray border
             />
             {uploadingImg ? (
               <label
@@ -99,8 +133,8 @@ function Profile() {
                   bottom: "0px",
                   right: "8px",
                   cursor: "pointer",
-                  backgroundColor: "red",
-                  color: "white",
+                  backgroundColor: "#e63946", // Red to match modal's remove button
+                  color: "#ffffff",
                   padding: "5px",
                   borderRadius: "50%",
                 }}
@@ -115,13 +149,21 @@ function Profile() {
                   bottom: "0px",
                   right: "8px",
                   cursor: "pointer",
-                  backgroundColor: "green",
-                  color: "white",
+                  backgroundColor: "#2ecc71", // Green to indicate action
+                  color: "#ffffff",
                   padding: "3px",
                   borderRadius: "50%",
+                  transition: "background-color 0.3s ease",
                 }}
+                onMouseEnter={(e) =>
+                  (e.target.style.backgroundColor = "#27ae60")
+                } // Darker green on hover
+                onMouseLeave={(e) =>
+                  (e.target.style.backgroundColor = "#2ecc71")
+                }
               >
-                <CameraAltIcon />
+                <CameraAltIcon sx={{ fontSize: "1.25rem" }} />{" "}
+                {/* Small icon */}
               </label>
             )}
 
@@ -144,12 +186,26 @@ function Profile() {
               />
             </form>
           </div>
-          <Typography className={"text-center text-muted fs-6"}>
-            Click camera icon to update profile name
+          <Typography
+            className={"text-center"}
+            sx={{
+              color: "#666", // Muted gray
+              fontSize: "0.75rem", // Smaller text
+              mb: "1rem", // Tight spacing
+            }}
+          >
+            Click camera icon to update profile picture
           </Typography>
-          <label htmlFor="fullName" style={{ padding: "0px" }}>
+
+          <label
+            htmlFor="fullName"
+            style={{
+              padding: "0px",
+              color: "#333", // Dark gray
+              fontSize: "0.875rem", // Small text
+            }}
+          >
             Full Name
-            {/* <span className="text-muted fs-6"> (Cant be changed now)</span> */}
           </label>
           <TextField
             id="fullName"
@@ -166,15 +222,42 @@ function Profile() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <AccountCircle />
+                  <AccountCircle sx={{ color: "#666" }} />{" "}
+                  {/* Muted gray icon */}
                 </InputAdornment>
               ),
             }}
-            fullWidth
+            sx={{
+              width: "100%",
+              mb: "1rem", // Tight spacing
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "0.25rem", // Subtle rounding
+                backgroundColor: "#ffffff", // White background
+                "& fieldset": { borderColor: "#e0e0e0" }, // Light gray border
+                "&:hover fieldset": { borderColor: "#bdbdbd" }, // Darker gray on hover
+                "&.Mui-focused fieldset": { borderColor: "#1976d2" }, // Blue on focus
+                "&.Mui-disabled fieldset": { borderColor: "#e0e0e0" }, // Light gray when disabled
+              },
+              "& .MuiInputBase-input": {
+                color: "#333", // Dark gray text
+                fontSize: "0.875rem", // Small text
+                padding: "0.5rem", // Compact padding
+              },
+              "& .MuiInputBase-input.Mui-disabled": {
+                WebkitTextFillColor: "#666", // Muted gray for disabled text
+              },
+            }}
           />
-          <label htmlFor="email" style={{ padding: "0px" }}>
+
+          <label
+            htmlFor="email"
+            style={{
+              padding: "0px",
+              color: "#333", // Dark gray
+              fontSize: "0.875rem", // Small text
+            }}
+          >
             Email
-            {/* <span className="text-muted fs-6"> (Cant be changed now)</span> */}
           </label>
           <TextField
             id="email"
@@ -185,29 +268,95 @@ function Profile() {
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <EmailIcon></EmailIcon>
+                  <EmailIcon sx={{ color: "#666" }} /> {/* Muted gray icon */}
                 </InputAdornment>
               ),
             }}
-            fullWidth
+            sx={{
+              width: "100%",
+              mb: "1rem", // Tight spacing
+              "& .MuiOutlinedInput-root": {
+                borderRadius: "0.25rem", // Subtle rounding
+                backgroundColor: "#ffffff", // White background
+                "& fieldset": { borderColor: "#e0e0e0" }, // Light gray border
+                "&:hover fieldset": { borderColor: "#bdbdbd" }, // Darker gray on hover
+                "&.Mui-focused fieldset": { borderColor: "#1976d2" }, // Blue on focus
+                "&.Mui-disabled fieldset": { borderColor: "#e0e0e0" }, // Light gray when disabled
+              },
+              "& .MuiInputBase-input": {
+                color: "#333", // Dark gray text
+                fontSize: "0.875rem", // Small text
+                padding: "0.5rem", // Compact padding
+              },
+              "& .MuiInputBase-input.Mui-disabled": {
+                WebkitTextFillColor: "#666", // Muted gray for disabled text
+              },
+            }}
           />
         </div>
-        <div className="col-md-4 p-3 border" style={{ minHeight: "20vh" }}>
-          <Typography variant="h5" className="fw-bolder mb-3">
+
+        {/* Account Information Section */}
+        <div
+          className="col-md-4 p-3"
+          style={{
+            minHeight: "20vh",
+            backgroundColor: "#ffffff", // White background
+            borderRadius: "0.5rem", // Subtle rounded corners
+            boxShadow: "0 0.25rem 0.5rem rgba(0, 0, 0, 0.1)", // Light shadow
+            border: "none",
+          }}
+        >
+          <Typography
+            variant="h5"
+            className="fw-bolder mb-3"
+            sx={{
+              color: "#333", // Dark gray
+              fontSize: "1.25rem", // Small, bold header
+            }}
+          >
             Account Information
           </Typography>
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="subtitle-1">Member Since</Typography>
-            <Typography variant="subtitle-1">
-              {new Date(userAuth.createdAt).toLocaleTimeString()}-
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "#666", // Muted gray
+                fontSize: "0.875rem", // Small text
+              }}
+            >
+              Member Since
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "#333", // Dark gray
+                fontSize: "0.875rem", // Small text
+              }}
+            >
+              {new Date(userAuth.createdAt).toLocaleTimeString()} -{" "}
               {new Date(userAuth.createdAt).toLocaleDateString()}
             </Typography>
           </div>
-          <hr></hr>
+          <hr style={{ borderColor: "#e0e0e0", margin: "0.75rem 0" }} />{" "}
+          {/* Light gray separator */}
           <div style={{ display: "flex", justifyContent: "space-between" }}>
-            <Typography variant="subtitle-1">Last modified</Typography>
-            <Typography variant="subtitle-1">
-              {new Date(userAuth.updatedAt).toLocaleTimeString()}-
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "#666", // Muted gray
+                fontSize: "0.875rem", // Small text
+              }}
+            >
+              Last Modified
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              sx={{
+                color: "#333", // Dark gray
+                fontSize: "0.875rem", // Small text
+              }}
+            >
+              {new Date(userAuth.updatedAt).toLocaleTimeString()} -{" "}
               {new Date(userAuth.updatedAt).toLocaleDateString()}
             </Typography>
           </div>

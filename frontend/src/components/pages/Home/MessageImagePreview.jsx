@@ -7,7 +7,9 @@ import CloseIcon from "@mui/icons-material/Close";
 function MessageImagePreview() {
   const dispatch = useDispatch();
   const messageImagePreview = useSelector((store) => store.messageImagePreview);
-  const messageImagePreviewUrl = useSelector((store) => store.messageImagePreviewUrl);
+  const messageImagePreviewUrl = useSelector(
+    (store) => store.messageImagePreviewUrl
+  );
 
   return (
     <Modal
@@ -17,22 +19,23 @@ function MessageImagePreview() {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
-        // backgroundColor: "rgba(0, 0, 0, 0.8)", 
+        backdropFilter: "blur(4px)", // Subtle backdrop blur
+        backgroundColor: "rgba(0, 0, 0, 0.6)", // Dark semi-transparent overlay
       }}
     >
       <Box
         sx={{
-          color: "white",
-          border: "2px solid white",
-          backgroundColor: "black",
           width: { xs: "90%", sm: "80%", md: "70%" },
-          height: { xs: "70%", sm: "80%" }, 
+          height: { xs: "70vh", sm: "80vh" },
+          backgroundColor: "#212121", // Dark gray (softer than black)
+          borderRadius: "0.75rem", // 12px
+          boxShadow: "0 0.25rem 0.5rem rgba(0, 0, 0, 0.3)", // Stronger shadow
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           position: "relative",
-          borderRadius: "8px",
           overflow: "hidden",
+          border: "none", // Removed white border
         }}
       >
         {/* Close Button */}
@@ -40,14 +43,15 @@ function MessageImagePreview() {
           onClick={() => dispatch(messageImagePreviewToggle())}
           sx={{
             position: "absolute",
-            top: "10px",
-            right: "10px",
-            color: "white",
-            fontSize: "2rem",
-            "&:hover": { color: "red" },
+            top: "0.5rem", // 8px
+            right: "0.5rem", // 8px
+            color: "#ffffff", // White
+            "&:hover": {
+              color: "#d32f2f", // Red on hover
+            },
           }}
         >
-          <CloseIcon fontSize="large" />
+          <CloseIcon sx={{ fontSize: "1.75rem" }} /> {/* 28px */}
         </IconButton>
 
         {/* Image Display */}
@@ -59,7 +63,7 @@ function MessageImagePreview() {
             alignItems: "center",
             width: "100%",
             height: "100%",
-            padding: "10px",
+            padding: "1rem", // 16px
           }}
         >
           <img
@@ -69,6 +73,7 @@ function MessageImagePreview() {
               maxWidth: "100%",
               maxHeight: "100%",
               objectFit: "contain",
+              borderRadius: "0.5rem", // 8px subtle rounding
             }}
           />
         </Box>

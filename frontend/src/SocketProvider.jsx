@@ -296,7 +296,7 @@ function SocketProvider({ children }) {
     clientSocket.on("profileUpdated", (data) => {
       console.log("Profile updated:", data);
       dispatch(updateOneUser(data));
-      if (selectedUser?._id === data._id) {
+      if (selectedUser?._id === data?._id) {
         dispatch(updateSelectedUser(data));
       }
       dispatch(updateFriends(data));

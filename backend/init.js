@@ -51,11 +51,8 @@ async function insertUsers(db) {
         await groupNotification.deleteMany({});
         await groups.deleteMany({});
         console.log("Database wiped");
-
-
     }
     catch(err){
         console.log(err);
-        
     }
 })();
