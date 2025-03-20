@@ -101,16 +101,21 @@ function CreateMessage() {
         setMessageText("");
         if (inputFile.current) inputFile.current.value = ""; // Safe reset
 
-        const response = await fetch(`${backendUrl}/api/chats/${selectedUser._id}`, {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        });
+        const response = await fetch(
+          `${backendUrl}/api/chats/${selectedUser._id}`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
         const json = await response.json();
 
         if (response.status === 200) {
           console.log("After saving to database:", json.newMessage);
-          const receiverStatus = onlineUsers.some((u) => u._id === json.newMessage.receiverId);
+          const receiverStatus = onlineUsers.some(
+            (u) => u._id === json.newMessage.receiverId
+          );
           if (!receiverStatus) {
             dispatch(changeStatus(json.newMessage));
           }
@@ -145,11 +150,14 @@ function CreateMessage() {
         setPreview(false);
         setMessageText("");
 
-        const response = await fetch(`${backendUrl}/api/chats/${selectedUser._id}`, {
-          method: "POST",
-          credentials: "include",
-          body: formData,
-        });
+        const response = await fetch(
+          `${backendUrl}/api/chats/${selectedUser._id}`,
+          {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          }
+        );
         const json = await response.json();
 
         if (response.status === 200) {
@@ -269,7 +277,9 @@ function CreateMessage() {
           c.status === "delivered"
       );
 
-      const receiverStatus = onlineUsers.some((e) => e._id === selectedUser._id);
+      const receiverStatus = onlineUsers.some(
+        (e) => e._id === selectedUser._id
+      );
       if (!receiverStatus) {
         targetChats.forEach((chat) =>
           dispatch(changeStatus({ ...chat, status: "delivered" }))
@@ -375,11 +385,28 @@ function CreateMessage() {
               </>
             )}
             {isSendingMessage ? (
-              <Button onClick={(e) => e.preventDefault()}>
+              <Button
+                onClick={(e) => e.preventDefault()}
+                sx={{
+                  minWidth: "auto", // Lets the button shrink to fit content
+                  padding: "0", // Removes extra padding
+                  height: "100%",
+                  width: "100%",
+                  boxSizing: "border-box",
+                  // border: "1px solid black",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
                 <CircularProgress
+                  size={"100%"}
                   sx={{
-                    height: "20.3px !important",
-                    width: "20.3px !important",
+                    padding: "2px;",
+                    margin: "0px",
+                    "& svg": {
+                      margin: "0px",
+                    },
                   }}
                 />
               </Button>
@@ -389,7 +416,9 @@ function CreateMessage() {
                   e.preventDefault();
                   form.current.requestSubmit();
                 }}
-                disabled={!(messageText.length > 0 || preview) || isSendingMessage}
+                disabled={
+                  !(messageText.length > 0 || preview) || isSendingMessage
+                }
               >
                 <SendIcon />
               </Button>
