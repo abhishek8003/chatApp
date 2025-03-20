@@ -220,7 +220,7 @@ auth_router.put("/update-profile", isAuthenticated, upload_profile_pics.single("
         res.status(500).json({ message: err.message })
     }
 })
-auth_router.get("/check", isAuthenticated, (req, res, next) => {
+auth_router.get("/check", isAuthenticated,initAI, (req, res, next) => {
     try {
         // setTimeout(()=>{
         // console.log("hi");
