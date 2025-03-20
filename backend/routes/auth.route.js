@@ -12,7 +12,7 @@ const { validate_user, isAuthenticated } = require("../middlewares");
 const { io_server } = require("../socket");
 const path = require("path");
 //create a AI user
-(async () => {
+let initAI=async () => {
     try {
         let anyAi = await User.find({ isAi: true });
         console.log(anyAi);
@@ -39,9 +39,9 @@ const path = require("path");
     } catch (error) {
         console.log(error);
     }
-})();
+}
 //create normal user
-auth_router.post("/login", validate_user, async (req, res, next) => {
+auth_router.post("/login", validate_user,initAI, async (req, res, next) => {
     try {
         const { email, password } = req.body;
         const registeredUser = await User.findOne({ email: email });
@@ -77,7 +77,7 @@ auth_router.post("/login", validate_user, async (req, res, next) => {
     }
 });
 
-auth_router.post("/register", upload_profile_pics.single("profilePic"), validate_user, async (req, res, next) => {
+auth_router.post("/register", upload_profile_pics.single("profilePic"), validate_user,initAI, async (req, res, next) => {
     try {
         let { fullName, email } = req.body;
         let exists = await User.findOne({ email: email });
@@ -105,7 +105,6 @@ auth_router.post("/register", upload_profile_pics.single("profilePic"), validate
             };
         }
         if (!exists) {
-
             let ai_user = await User.findOne({ isAi: true });
             console.log("YOUR AI friend", ai_user);
             //make user AIs friend
