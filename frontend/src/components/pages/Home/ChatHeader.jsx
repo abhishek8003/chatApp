@@ -5,84 +5,119 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Box, Typography } from "@mui/material";
 import AccountInfo from "./AccountInfo";
 import { setaccountInfoToggle } from "../../../redux/features/accountInfoToggle";
+
 function ChatHeader() {
-  let selectedUser = useSelector((store) => {
-    return store.selectedUser;
-  });
+  let selectedUser = useSelector((store) => store.selectedUser);
   let dispatch = useDispatch();
-  let typing=useSelector((store)=>{
-    return store.typing;
-  })
+  let typing = useSelector((store) => store.typing);
   let anchorElement = useRef();
+
   return (
     <div
       className="chat-head-main"
       style={{
-        border: "2px solid brown",
         position: "relative",
-        width:"100%",
-        // padding: "10px",
+        width: "100%",
         display: "flex",
         justifyContent: "space-between",
+        alignItems: "center",
+        background: "#ffffff", // Clean white background
+        borderBottom: "0.0625rem solid #e0e0e0", // 1px subtle border
+        boxShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.05)", // 2px 4px soft shadow
+        padding: "0.75rem", // 12px
+        borderRadius: "0.5rem 0.5rem 0 0", // 8px top corners only
       }}
     >
+      {/* Left Section (User Info) */}
       <div
         style={{
-          //   width: "301px",
-          //   border: "2px solid red",
-          padding: "0.5rem",
+          padding: "0.25rem", // 4px
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+          transition: "background 0.2s ease",
+          "&:hover": {
+            background: "#f5f5f5", // Light gray hover
+            borderRadius: "0.5rem", // 8px
+          },
+        }}
+        ref={anchorElement}
+        onClick={() => {
+          console.log("Opening account info");
+          dispatch(setaccountInfoToggle());
         }}
       >
-        <div
-          style={{
+        <Typography
+          variant="h6"
+          className="people_img"
+          sx={{
             display: "flex",
-            color: "black",
-            // border: "2px solid red",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: "0.75rem", // 12px
           }}
-          ref={anchorElement}
-          onClick={() => {
-            console.log("tiiiajfajfaimfpamsf");
-            dispatch(setaccountInfoToggle());
+        >
+          <img
+            src={selectedUser.profilePic.cloud_url}
+            alt="Profile"
+            style={{
+              width: "2.5rem", // 40px
+              height: "2.5rem", // 40px
+              borderRadius: "50%",
+              objectFit: "cover",
+              border: "0.0625rem solid #e0e0e0", // 1px subtle border
+              transition: "transform 0.2s ease",
+              "&:hover": {
+                transform: "scale(1.05)", // Slight enlarge on hover
+              },
+            }}
+          />
+        </Typography>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
           }}
         >
           <Typography
-            variant="h6"
-            className="people_img"
+            variant="body1"
             sx={{
-              display: "flex",
-              height: "70px",
-              justifyContent: "center",
-              alignItems: "center",
+              color: "#333", // Dark gray for contrast
+              fontWeight: "500",
+              fontSize: "1.125rem", // 18px
+              textTransform: "capitalize",
             }}
           >
-            <img src={selectedUser.profilePic.cloud_url} alt="Profile" />
+            {selectedUser.fullName[0].toUpperCase() + selectedUser.fullName.slice(1)}
           </Typography>
-          <Box
-            sx={{
-              height: "70px",
-              display:"flex",
-              justifyContent:"flex-start",
-              alignItems:"center",
-              flexDirection:"column"
-            }}
-          >
+          {typing ? (
             <Typography
-              variant="body1"
               sx={{
-                flexGrow: "1",
-                display: "flex",
-                alignItems: "center",
+                color: "#757575", // Medium gray
+                fontSize: "0.75rem", // 12px
+                fontStyle: "italic",
+                marginTop: "0.125rem", // 2px
               }}
             >
-              {selectedUser.fullName[0].toUpperCase().concat(selectedUser.fullName.slice(1))}
+              Typing...
             </Typography>
-            {typing?<p style={{margin:"2px"}}>Typing...</p>:null}
-          </Box>
-        </div>
+          ) : null}
+        </Box>
       </div>
+
+      {/* Right Section (Close Button) */}
       <div
         style={{
-          padding: "0.5rem",
+          padding: "0.25rem", // 4px
+          display: "flex",
+          alignItems: "center",
+          cursor: "pointer",
+          transition: "background 0.2s ease",
+          "&:hover": {
+            background: "#f5f5f5", // Light gray hover
+            borderRadius: "50%", // Circular hover area
+          },
         }}
         onClick={() => {
           dispatch(setSelectedUser(null));
@@ -90,13 +125,17 @@ function ChatHeader() {
       >
         <CloseIcon
           sx={{
-            height: "70px",
-            fontSize: "2.5rem",
-            // border:"2px solid pink"
+            fontSize: "1.75rem", // 28px
+            color: "#757575", // Medium gray
+            transition: "color 0.2s ease",
+            "&:hover": {
+              color: "#d32f2f", // Soft red on hover
+            },
           }}
-        ></CloseIcon>
+        />
       </div>
-      <AccountInfo targetElement={anchorElement}></AccountInfo>
+
+      <AccountInfo targetElement={anchorElement} />
     </div>
   );
 }

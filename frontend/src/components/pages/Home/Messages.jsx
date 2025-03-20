@@ -146,7 +146,7 @@ function Messages() {
         minWidth: "10px",
         width:"100%",
         position: "relative",
-        border:"2px solid green"
+        // border:"2px solid green"
       }}
     >
       {selectedUser ? (

@@ -75,7 +75,7 @@ function ChatBody() {
           borderRadius: "0.5rem",
         },
         width: "100%",
-        border: "2px solid #1976d2",
+        // border: "2px solid #1976d2",
         borderRadius: "0.75rem",
         padding: "2px",
         background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)",

@@ -92,7 +92,7 @@ function Home() {
         <div
           className="p-1"
           style={{
-            border: "2px solid green",
+            // border: "2px solid green",
             display: "flex",
             flexWrap: "nowrap",
             width:"100%",
@@ -103,7 +103,7 @@ function Home() {
           <div className="message-container"
             style={{
               flexGrow: "1",
-              border:"2px solid yellow",
+              // border:"2px solid yellow",
             }}
           >
             {!selectedUser && !selectedGroup ? (

@@ -60,7 +60,6 @@ function CreateMessage() {
     const time = new Date(Date.now()).toISOString();
     const text = myForm.newMessage.value;
     const imgTempUrl = previewUrl;
-
     try {
       if (selectedUser && !selectedUser.isAi) {
         // Regular user chat
@@ -99,7 +98,7 @@ function CreateMessage() {
 
         setPreview(false);
         setMessageText("");
-        if (inputFile.current) inputFile.current.value = ""; // Safe reset
+        if (inputFile.current) inputFile.current.value = "";
 
         const response = await fetch(
           `${backendUrl}/api/chats/${selectedUser._id}`,
@@ -119,12 +118,13 @@ function CreateMessage() {
           if (!receiverStatus) {
             dispatch(changeStatus(json.newMessage));
           }
+          setSendingMessage(false);
           setPreviewUrl(null);
         } else {
           throw new Error("Failed to save message");
         }
       } else if (selectedUser && selectedUser.isAi) {
-        // AI chat
+        // AI chat (no image support)
         if (!text) {
           toast.error("Message text required for AI chat!");
           setSendingMessage(false);
@@ -136,7 +136,7 @@ function CreateMessage() {
             senderId: userAuth._id,
             receiverId: selectedUser._id,
             text,
-            image: { local_url: "", cloud_url: imgTempUrl },
+            image: { local_url: "", cloud_url: "" }, // No image for AI
             createdAt: time,
             status: "pending",
             isGroupChat: false,
@@ -167,7 +167,7 @@ function CreateMessage() {
               senderId: userAuth._id,
               receiverId: selectedUser._id,
               text,
-              image: { local_url: "", cloud_url: imgTempUrl },
+              image: { local_url: "", cloud_url: "" },
               createdAt: time,
               status: "processed",
               isGroupChat: false,
@@ -176,12 +176,13 @@ function CreateMessage() {
           if (selectedUser._id === json.newMessage.senderId) {
             dispatch(updateChats(json.newMessage));
           }
+          setSendingMessage(false);
           setPreviewUrl(null);
         } else {
           throw new Error("Failed to save AI message");
         }
       } else if (selectedGroup) {
-        // Group chat
+        // Group chat (with image support)
         if (!selectedGroup._id || !Array.isArray(selectedGroup.pastMembers)) {
           console.error("Invalid selectedGroup:", selectedGroup);
           toast.error("Invalid group selected!");
@@ -211,7 +212,7 @@ function CreateMessage() {
 
         dispatch(
           updateGroupChat({
-            senderId: userAuth, // completed userAuth becuse senderId is a populated OBJECT
+            senderId: userAuth,
             receiverId: selectedGroup._id,
             text,
             image: { local_url: "", cloud_url: imgTempUrl },
@@ -228,13 +229,13 @@ function CreateMessage() {
             messageImage: previewUrl,
             createdAt: time,
             status: "pending",
-            isGroupChat: true, // Fixed to true
+            isGroupChat: true,
           },
         });
 
         setPreview(false);
         setMessageText("");
-        if (inputFile.current) inputFile.current.value = ""; // Safe reset
+        if (inputFile.current) inputFile.current.value = "";
 
         const response = await fetch(
           `${backendUrl}/api/groups/group/${selectedGroup._id}/message`,
@@ -245,11 +246,11 @@ function CreateMessage() {
           }
         );
         const json = await response.json();
-
         if (response.status === 200) {
           console.log("Group message saved:", json.newMessage);
           dispatch(changeGroupMessageStatus(json.newMessage));
           setPreviewUrl(null);
+          setSendingMessage(false);
         } else {
           throw new Error("Failed to save group message");
         }
@@ -294,30 +295,66 @@ function CreateMessage() {
   }, [onlineUsers, selectedUser, chats, dispatch, userAuth._id]);
 
   return (
-    <>
-      <Box sx={{ width: "100%" }}>
-        {preview && inputFile.current?.files[0] && (
-          <div style={{ position: "absolute", bottom: "80px", left: "10px" }}>
-            <img src={previewUrl} height="100px" width="100px" alt="Preview" />
-            <i
-              onClick={() => {
-                if (inputFile.current) inputFile.current.value = "";
-                setPreview(false);
-                setPreviewUrl(null);
-              }}
-              className="fa-solid fa-square-xmark"
-              style={{
-                position: "absolute",
-                right: "-11px",
-                top: "-11px",
-                fontSize: "1.25rem",
-                color: "red",
-                cursor: "pointer",
-              }}
-            />
-          </div>
-        )}
-      </Box>
+    <Box
+      sx={{
+        width: "100%",
+        position: "relative",
+        padding: "0.5rem", // 8px
+        background: "#ffffff", // Clean white background
+        borderTop: "0.0625rem solid #e0e0e0", // 1px subtle border
+        boxShadow: "0 -0.125rem 0.25rem rgba(0, 0, 0, 0.05)", // 2px 4px soft shadow
+      }}
+    >
+      {/* File Preview */}
+      {preview && inputFile.current?.files[0] && (
+        <Box
+          sx={{
+            position: "absolute",
+            bottom: "4.5rem", // 72px, above input area
+            left: "0.75rem", // 12px
+            display: "flex",
+            alignItems: "center",
+            gap: "0.5rem", // 8px
+            background: "#fafafa", // Light gray background
+            padding: "0.5rem", // 8px
+            borderRadius: "0.5rem", // 8px
+            boxShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.1)", // 2px 4px
+            border: "0.0625rem solid #e0e0e0", // 1px subtle border
+            zIndex: 10,
+          }}
+        >
+          <img
+            src={previewUrl}
+            alt="Preview"
+            style={{
+              height: "6.25rem", // 100px
+              width: "6.25rem", // 100px
+              objectFit: "cover",
+              borderRadius: "0.25rem", // 4px
+            }}
+          />
+          <Box
+            component="i"
+            className="fa-solid fa-square-xmark"
+            sx={{
+              color: "#d32f2f", // Soft red
+              fontSize: "1.5rem", // 24px
+              cursor: "pointer",
+              transition: "color 0.2s ease",
+              "&:hover": {
+                color: "#b71c1c", // Darker red on hover
+              },
+            }}
+            onClick={() => {
+              if (inputFile.current) inputFile.current.value = "";
+              setPreview(false);
+              setPreviewUrl(null);
+            }}
+          />
+        </Box>
+      )}
+
+      {/* Message Input Form */}
       <form
         ref={form}
         onSubmit={(e) => {
@@ -325,15 +362,19 @@ function CreateMessage() {
           handleSendMessage(form.current);
         }}
       >
-        <div
-          style={{
-            minHeight: "70px",
-            position: "relative",
-            border: "2px solid orange",
-            width: "100%",
+        <Box
+          sx={{
             display: "flex",
-            justifyContent: "center",
             alignItems: "center",
+            gap: "0.5rem", // 8px
+            minHeight: "3.5rem", // 56px
+            background: "#fff", // White input area
+            borderRadius: "0.75rem", // 12px
+            padding: "0.25rem 0.75rem", // 4px 12px
+            border: "0.0625rem solid #e0e0e0", // 1px subtle border
+            "&:hover": {
+              borderColor: "#bdbdbd", // Slightly darker on hover
+            },
           }}
         >
           <TextField
@@ -349,27 +390,43 @@ function CreateMessage() {
                 }
               }
             }}
-            sx={{ flexGrow: "1", border: "" }}
-          />
-          <Box
-            style={{
-              width: "fit-content",
-              display: "flex",
-              justifyContent: "space-around",
-              alignItems: "center",
-            }}
             sx={{
-              "& svg": {
-                height: "56px",
-                margin: "0px 0.4rem",
-                fontSize: "2.2rem",
+              flexGrow: 1,
+              "& .MuiInputBase-root": {
+                background: "transparent",
+                "& fieldset": { border: "none" }, // Remove default border
+                "&:hover fieldset": { border: "none" },
+                "&.Mui-focused fieldset": { border: "none" },
+              },
+              "& .MuiInputBase-input": {
+                padding: "0.5rem 0", // 8px vertical padding
+                fontSize: "0.875rem", // 14px
+                color: "#333", // Dark gray text
               },
             }}
+          />
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: "0.5rem", // 8px
+            }}
           >
-            {selectedUser && !selectedUser.isAi && (
+            {/* Show file input for both regular user chats and group chats */}
+            {(selectedUser && !selectedUser.isAi) || selectedGroup ? (
               <>
                 <label htmlFor="messageFile">
-                  <CollectionsIcon />
+                  <CollectionsIcon
+                    sx={{
+                      fontSize: "1.75rem", // 28px
+                      color: "#757575", // Medium gray
+                      cursor: "pointer",
+                      transition: "color 0.2s ease",
+                      "&:hover": {
+                        color: "#333", // Dark gray on hover
+                      },
+                    }}
+                  />
                 </label>
                 <input
                   type="file"
@@ -383,50 +440,45 @@ function CreateMessage() {
                   style={{ display: "none" }}
                 />
               </>
-            )}
+            ) : null}
             {isSendingMessage ? (
-              <Button
-                onClick={(e) => e.preventDefault()}
+              <CircularProgress
+                size="1.75rem" // 28px
                 sx={{
-                  minWidth: "auto", // Lets the button shrink to fit content
-                  padding: "0", // Removes extra padding
-                  height: "100%",
-                  width: "100%",
-                  boxSizing: "border-box",
-                  // border: "1px solid black",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
+                  color: "#757575", // Medium gray
+                  padding: "0.25rem", // 4px
                 }}
-              >
-                <CircularProgress
-                  size={"100%"}
-                  sx={{
-                    padding: "2px;",
-                    margin: "0px",
-                    "& svg": {
-                      margin: "0px",
-                    },
-                  }}
-                />
-              </Button>
+              />
             ) : (
               <Button
                 onClick={(e) => {
                   e.preventDefault();
                   form.current.requestSubmit();
                 }}
-                disabled={
-                  !(messageText.length > 0 || preview) || isSendingMessage
-                }
+                disabled={!(messageText.length > 0 || preview) || isSendingMessage}
+                sx={{
+                  minWidth: "auto",
+                  padding: "0",
+                }}
               >
-                <SendIcon />
+                <SendIcon
+                  sx={{
+                    fontSize: "1.75rem", // 28px
+                    color:
+                      messageText.length > 0 || preview ? "#1976d2" : "#bdbdbd", // Blue when active, gray when disabled
+                    transition: "color 0.2s ease",
+                    "&:hover": {
+                      color:
+                        messageText.length > 0 || preview ? "#115293" : "#bdbdbd", // Darker blue on hover
+                    },
+                  }}
+                />
               </Button>
             )}
           </Box>
-        </div>
+        </Box>
       </form>
-    </>
+    </Box>
   );
 }
 

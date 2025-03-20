@@ -79,7 +79,7 @@ function GroupBody() {
           borderRadius: "0.5rem", // 8px
         },
         width: "100%",
-        border: "0.125rem solid #1976d2", // 2px
+        // border: "0.125rem solid #1976d2", // 2px
         borderRadius: "0.75rem", // 12px
         padding: "1rem", // 16px
         background: "linear-gradient(135deg, #f0f4f8 0%, #e3f2fd 100%)",
