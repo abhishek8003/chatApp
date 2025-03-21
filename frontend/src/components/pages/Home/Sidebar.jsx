@@ -165,22 +165,18 @@ function Sidebar() {
   return (
     <Box
       sx={{
-        gap: "0.75rem", // 12px
+        gap: "0.5rem", // 8px
         height: "80vh",
         overflow: "auto",
         scrollbarWidth: "thin",
         "&::-webkit-scrollbar": { width: "0.5rem" }, // 8px
         "&::-webkit-scrollbar-thumb": {
-          background: "linear-gradient(135deg, #00c4cc, #7b1fa2)",
+          background: "#bdbdbd", // Subtle gray scrollbar
           borderRadius: "1rem", // 16px
-          boxShadow: "inset 0 0 0.25rem rgba(255, 255, 255, 0.3)", // 4px
         },
-        borderRadius: "1rem", // 16px
-        background: "linear-gradient(145deg, rgba(240, 244, 248, 0.9) 0%, rgba(227, 242, 253, 0.9) 100%)",
-        backdropFilter: "blur(10px)", // Glassmorphism effect
-        border: "0.0625rem solid rgba(255, 255, 255, 0.2)", // 1px subtle border
-        boxShadow: "0 0.5rem 2rem rgba(0, 0, 0, 0.15)", // 8px 32px
-        padding: "0.75rem", // 12px
+        backgroundColor: "#f5f7fa", // Light gray background
+        borderRight: "1px solid #e0e0e0", // Subtle border on the right
+        padding: "0.5rem", // 8px
         "@media (min-width:0px) and (max-width:633px)": {
           minWidth: "5.3125rem", // 85px
           maxWidth: "5.375rem", // 86px
@@ -205,15 +201,10 @@ function Sidebar() {
           display: "flex",
           gap: "0.5rem", // 8px
           padding: "0.75rem", // 12px
-          height: "4.375rem", // 70px
-          marginBottom: "0.75rem", // 12px
-          background: "linear-gradient(135deg, #00c4cc, #7b1fa2)",
-          borderRadius: "0.75rem", // 12px
-          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.2)", // 4px 12px
-          transition: "all 0.3s ease",
-          "&:hover": {
-            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.25)", // 6px 16px
-          },
+          height: "3.5rem", // 56px
+          marginBottom: "0.5rem", // 8px
+          backgroundColor: "#ffffff", // White background
+          borderBottom: "1px solid #e0e0e0", // Subtle border
         }}
       >
         <Typography
@@ -223,10 +214,10 @@ function Sidebar() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            color: "#fff",
+            color: "#1976d2", // Professional blue
           }}
         >
-          <PeopleIcon sx={{ fontSize: "2.5rem", filter: "drop-shadow(0 0 0.25rem rgba(255, 255, 255, 0.5))" }} />
+          <PeopleIcon sx={{ fontSize: "2rem" }} /> {/* Slightly smaller icon */}
         </Typography>
         <Typography
           variant="h6"
@@ -234,12 +225,9 @@ function Sidebar() {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            color: "#fff",
-            fontWeight: "700",
-            background: "linear-gradient(45deg, #fff, #e0f7fa)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.2)", // 2px 4px
+            color: "#333", // Dark gray for professionalism
+            fontWeight: "600",
+            fontSize: "1.25rem", // 20px
             "@media (max-width:633px)": {
               display: "none",
             },
@@ -257,20 +245,16 @@ function Sidebar() {
         <Typography
           sx={{
             textAlign: "center",
-            padding: "1.5rem", // 24px
-            fontSize: "1.125rem", // 18px
+            padding: "1rem", // 16px
+            fontSize: "0.875rem", // 14px
+            color: "#666", // Muted gray
             fontStyle: "italic",
-            background: "linear-gradient(45deg, #00c4cc, #7b1fa2)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.1)", // 2px 4px
-            animation: "pulse 2s infinite",
             "@media (min-width:1px) and (max-width:633px)": {
               display: "none",
             },
           }}
         >
-          No Groups or Friends yet? Start connecting!
+          No groups or friends yet. Start connecting!
         </Typography>
       ) : null}
 
@@ -283,21 +267,18 @@ function Sidebar() {
               className="people_cont"
               style={{
                 display: "flex",
-                height: "4.375rem", // 70px
+                height: "3.5rem", // 56px, slightly smaller for a tighter layout
                 alignItems: "center",
-                background: selectedGroup && selectedGroup._id === group._id
-                  ? "linear-gradient(135deg, #7b1fa2, #ab47bc)"
-                  : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 245, 245, 0.9))",
-                backdropFilter: "blur(5px)", // Glass effect
-                borderRadius: "0.75rem", // 12px
-                marginBottom: "0.75rem", // 12px
-                boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
-                border: "0.0625rem solid rgba(255, 255, 255, 0.3)", // 1px
+                backgroundColor:
+                  selectedGroup && selectedGroup._id === group._id
+                    ? "#e3f2fd" // Light blue for selected state
+                    : "#ffffff", // White background
+                borderRadius: "0.5rem", // 8px
+                marginBottom: "0.5rem", // 8px
                 cursor: "pointer",
-                transition: "all 0.3s ease",
+                transition: "background-color 0.2s ease",
                 "&:hover": {
-                  transform: "scale(1.02) translateY(-0.125rem)", // Slight scale + lift
-                  boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.2)", // 6px 16px
+                  backgroundColor: "#f1f5f9", // Subtle hover effect
                 },
               }}
               onClick={() => handleSelectGroup(group)}
@@ -310,21 +291,18 @@ function Sidebar() {
                   position: "relative",
                   justifyContent: "center",
                   alignItems: "center",
-                  padding: "0.375rem", // 6px
+                  padding: "0.25rem", // 4px
                 }}
               >
                 <img
                   src={group.groupIcon.cloud_url}
                   alt="Group"
                   style={{
-                    width: "2.75rem", // 44px
-                    height: "2.75rem", // 44px
+                    width: "2.25rem", // 36px, slightly smaller
+                    height: "2.25rem", // 36px
                     borderRadius: "50%",
                     objectFit: "cover",
-                    border: "0.125rem solid #fff", // 2px
-                    boxShadow: "0 0 0.5rem rgba(123, 31, 162, 0.7)", // 8px
-                    transition: "transform 0.3s ease",
-                    "&:hover": { transform: "rotate(5deg)" },
+                    border: "2px solid #e0e0e0", // Subtle border
                   }}
                 />
               </Typography>
@@ -335,10 +313,10 @@ function Sidebar() {
                   display: "flex",
                   flexDirection: "column",
                   wordBreak: "break-all",
-                  padding: "0.625rem", // 10px
-                  color: selectedGroup && selectedGroup._id === group._id ? "#fff" : "#333",
-                  fontWeight: "600",
-                  textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.1)", // 1px 2px
+                  padding: "0.5rem", // 8px
+                  color: "#333", // Dark gray
+                  fontWeight: "500",
+                  fontSize: "0.875rem", // 14px
                   "@media (max-width:633px)": {
                     display: "none",
                   },
@@ -366,21 +344,18 @@ function Sidebar() {
               className="people_cont"
               style={{
                 display: "flex",
-                height: "4.375rem", // 70px
+                height: "3.5rem", // 56px
                 alignItems: "center",
-                background: selectedUser && selectedUser._id === user._id
-                  ? "linear-gradient(135deg, #7b1fa2, #ab47bc)"
-                  : "linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(245, 245, 245, 0.9))",
-                backdropFilter: "blur(5px)", // Glass effect
-                borderRadius: "0.75rem", // 12px
-                marginBottom: "0.75rem", // 12px
-                boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
-                border: "0.0625rem solid rgba(255, 255, 255, 0.3)", // 1px
+                backgroundColor:
+                  selectedUser && selectedUser._id === user._id
+                    ? "#e3f2fd" // Light blue for selected state
+                    : "#ffffff", // White background
+                borderRadius: "0.5rem", // 8px
+                marginBottom: "0.5rem", // 8px
                 cursor: "pointer",
-                transition: "all 0.3s ease",
+                transition: "background-color 0.2s ease",
                 "&:hover": {
-                  transform: "scale(1.02) translateY(-0.125rem)", // Slight scale + lift
-                  boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.2)", // 6px 16px
+                  backgroundColor: "#f1f5f9", // Subtle hover effect
                 },
               }}
               onClick={() => handleSelectUser(user)}
@@ -393,21 +368,18 @@ function Sidebar() {
                   position: "relative",
                   justifyContent: "center",
                   alignItems: "center",
-                  padding: "0.375rem", // 6px
+                  padding: "0.25rem", // 4px
                 }}
               >
                 <img
                   src={user.profilePic.cloud_url}
                   alt="Profile"
                   style={{
-                    width: "2.75rem", // 44px
-                    height: "2.75rem", // 44px
+                    width: "2.25rem", // 36px
+                    height: "2.25rem", // 36px
                     borderRadius: "50%",
                     objectFit: "cover",
-                    border: "0.125rem solid #fff", // 2px
-                    boxShadow: "0 0 0.5rem rgba(123, 31, 162, 0.7)", // 8px
-                    transition: "transform 0.3s ease",
-                    "&:hover": { transform: "rotate(5deg)" },
+                    border: "2px solid #e0e0e0", // Subtle border
                   }}
                 />
                 {(onlineUsers &&
@@ -423,15 +395,14 @@ function Sidebar() {
                   >
                     <span
                       style={{
-                        width: "1.125rem", // 18px
-                        height: "1.125rem", // 18px
+                        width: "0.75rem", // 12px
+                        height: "0.75rem", // 12px
                         borderRadius: "50%",
-                        background: "linear-gradient(45deg, #00e676, #76ff03)",
+                        backgroundColor: "#4caf50", // Green for online
                         position: "absolute",
-                        bottom: "0.5rem", // 8px
+                        bottom: "0.25rem", // 4px
                         right: "0", // 0px
-                        boxShadow: "0 0 0.375rem rgba(0, 230, 118, 0.8)", // 6px
-                        border: "0.0625rem solid #fff", // 1px
+                        border: "2px solid #ffffff", // White border
                       }}
                     />
                   </Typography>
@@ -446,15 +417,14 @@ function Sidebar() {
                   >
                     <span
                       style={{
-                        width: "1.125rem", // 18px
-                        height: "1.125rem", // 18px
+                        width: "0.75rem", // 12px
+                        height: "0.75rem", // 12px
                         borderRadius: "50%",
-                        background: "linear-gradient(45deg, #ff1744, #f44336)",
+                        backgroundColor: "#ef5350", // Red for offline
                         position: "absolute",
-                        bottom: "0.5rem", // 8px
+                        bottom: "0.25rem", // 4px
                         right: "0", // 0px
-                        boxShadow: "0 0 0.375rem rgba(255, 23, 68, 0.8)", // 6px
-                        border: "0.0625rem solid #fff", // 1px
+                        border: "2px solid #ffffff", // White border
                       }}
                     />
                   </Typography>
@@ -467,10 +437,10 @@ function Sidebar() {
                   display: "flex",
                   flexDirection: "column",
                   wordBreak: "break-all",
-                  padding: "0.625rem", // 10px
-                  color: selectedUser && selectedUser._id === user._id ? "#fff" : "#333",
-                  fontWeight: "600",
-                  textShadow: "0 0.0625rem 0.125rem rgba(0, 0, 0, 0.1)", // 1px 2px
+                  padding: "0.5rem", // 8px
+                  color: "#333", // Dark gray
+                  fontWeight: "500",
+                  fontSize: "0.875rem", // 14px
                   "@media (max-width:633px)": {
                     display: "none",
                   },
@@ -485,19 +455,18 @@ function Sidebar() {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      color: selectedUser && selectedUser._id === user._id ? "#fff" : "#00e676",
-                      fontSize: "0.875rem", // 14px
-                      fontWeight: "500",
+                      color: "#4caf50", // Green for online
+                      fontSize: "0.75rem", // 12px
+                      fontWeight: "400",
                     }}
                   >
                     <span
                       style={{
-                        width: "0.625rem", // 10px
-                        height: "0.625rem", // 10px
+                        width: "0.5rem", // 8px
+                        height: "0.5rem", // 8px
                         borderRadius: "50%",
-                        background: "linear-gradient(45deg, #00e676, #76ff03)",
-                        marginRight: "0.375rem", // 6px
-                        boxShadow: "0 0 0.25rem rgba(0, 230, 118, 0.8)", // 4px
+                        backgroundColor: "#4caf50", // Green dot
+                        marginRight: "0.25rem", // 4px
                       }}
                     />
                     Online
@@ -508,19 +477,18 @@ function Sidebar() {
                     sx={{
                       display: "flex",
                       alignItems: "center",
-                      color: selectedUser && selectedUser._id === user._id ? "#fff" : "#ff1744",
-                      fontSize: "0.875rem", // 14px
-                      fontWeight: "500",
+                      color: "#ef5350", // Red for offline
+                      fontSize: "0.75rem", // 12px
+                      fontWeight: "400",
                     }}
                   >
                     <span
                       style={{
-                        width: "0.625rem", // 10px
-                        height: "0.625rem", // 10px
+                        width: "0.5rem", // 8px
+                        height: "0.5rem", // 8px
                         borderRadius: "50%",
-                        background: "linear-gradient(45deg, #ff1744, #f44336)",
-                        marginRight: "0.375rem", // 6px
-                        boxShadow: "0 0 0.25rem rgba(255, 23, 68, 0.8)", // 4px
+                        backgroundColor: "#ef5350", // Red dot
+                        marginRight: "0.25rem", // 4px
                       }}
                     />
                     Offline
@@ -534,20 +502,16 @@ function Sidebar() {
           <div
             style={{
               display: "flex",
-              height: "4.375rem", // 70px
+              height: "3.5rem", // 56px
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(135deg, #00c4cc, #7b1fa2)",
-              borderRadius: "0.75rem", // 12px
-              marginBottom: "0.75rem", // 12px
-              boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.2)", // 4px 12px
-              border: "0.0625rem solid rgba(255, 255, 255, 0.3)", // 1px
+              backgroundColor: "#1976d2", // Professional blue
+              borderRadius: "0.5rem", // 8px
+              marginBottom: "0.5rem", // 8px
               cursor: "pointer",
-              transition: "all 0.3s ease",
+              transition: "background-color 0.2s ease",
               "&:hover": {
-                transform: "scale(1.03) translateY(-0.125rem)", // Slight scale + lift
-                boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.25)", // 6px 16px
-                background: "linear-gradient(135deg, #00e676, #ab47bc)",
+                backgroundColor: "#1565c0", // Darker blue on hover
               },
             }}
             onClick={() => {
@@ -556,10 +520,9 @@ function Sidebar() {
           >
             <Typography
               sx={{
-                color: "#fff",
-                fontWeight: "700",
-                fontSize: "1.25rem", // 20px
-                textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.2)", // 2px 4px
+                color: "#ffffff",
+                fontWeight: "500",
+                fontSize: "0.875rem", // 14px
                 "@media (max-width:633px)": {
                   display: "none",
                 },
@@ -568,14 +531,13 @@ function Sidebar() {
                 },
               }}
             >
-              Create new DM
+              Create New DM
             </Typography>
             <ControlPointIcon
               className="add_dm_icon"
               sx={{
-                color: "#fff",
-                fontSize: "2rem", // 32px
-                filter: "drop-shadow(0 0 0.25rem rgba(255, 255, 255, 0.5))",
+                color: "#ffffff",
+                fontSize: "1.5rem", // 24px
                 "@media (max-width:633px)": {
                   display: "block",
                 },
@@ -590,19 +552,15 @@ function Sidebar() {
           <div
             style={{
               display: "flex",
-              height: "4.375rem", // 70px
+              height: "3.5rem", // 56px
               alignItems: "center",
               justifyContent: "center",
-              background: "linear-gradient(135deg, #00c4cc, #7b1fa2)",
-              borderRadius: "0.75rem", // 12px
-              boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.2)", // 4px 12px
-              border: "0.0625rem solid rgba(255, 255, 255, 0.3)", // 1px
+              backgroundColor: "#1976d2", // Professional blue
+              borderRadius: "0.5rem", // 8px
               cursor: "pointer",
-              transition: "all 0.3s ease",
+              transition: "background-color 0.2s ease",
               "&:hover": {
-                transform: "scale(1.03) translateY(-0.125rem)", // Slight scale + lift
-                boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.25)", // 6px 16px
-                background: "linear-gradient(135deg, #00e676, #ab47bc)",
+                backgroundColor: "#1565c0", // Darker blue on hover
               },
             }}
             onClick={() => {
@@ -611,10 +569,9 @@ function Sidebar() {
           >
             <Typography
               sx={{
-                color: "#fff",
-                fontWeight: "700",
-                fontSize: "1.25rem", // 20px
-                textShadow: "0 0.125rem 0.25rem rgba(0, 0, 0, 0.2)", // 2px 4px
+                color: "#ffffff",
+                fontWeight: "500",
+                fontSize: "0.875rem", // 14px
                 "@media (max-width:633px)": {
                   display: "none",
                 },
@@ -623,14 +580,13 @@ function Sidebar() {
                 },
               }}
             >
-              Create new Group!
+              Create New Group
             </Typography>
             <GroupAddIcon
               className="add_dm_icon"
               sx={{
-                color: "#fff",
-                fontSize: "2rem", // 32px
-                filter: "drop-shadow(0 0 0.25rem rgba(255, 255, 255, 0.5))",
+                color: "#ffffff",
+                fontSize: "1.5rem", // 24px
                 "@media (max-width:633px)": {
                   display: "inline-block",
                 },
