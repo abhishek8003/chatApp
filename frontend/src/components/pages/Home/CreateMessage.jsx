@@ -60,7 +60,7 @@ function CreateMessage() {
     const time = new Date(Date.now()).toISOString();
     const text = myForm.newMessage.value;
     const imgTempUrl = previewUrl;
-    window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
+    window.scrollTo({ bottom: document.body.scrollHeight, behavior: "smooth" });
     try {
       if (selectedUser && !selectedUser.isAi) {
         // Regular user chat
