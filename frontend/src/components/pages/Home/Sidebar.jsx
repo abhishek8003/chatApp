@@ -505,7 +505,7 @@ function Sidebar() {
               height: "3.5rem", // 56px
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "#1976d2", // Professional blue
+              backgroundColor: "black", // Professional blue
               borderRadius: "0.5rem", // 8px
               marginBottom: "0.5rem", // 8px
               cursor: "pointer",
@@ -555,7 +555,7 @@ function Sidebar() {
               height: "3.5rem", // 56px
               alignItems: "center",
               justifyContent: "center",
-              backgroundColor: "#1976d2", // Professional blue
+              backgroundColor: "black", // Professional blue
               borderRadius: "0.5rem", // 8px
               cursor: "pointer",
               transition: "background-color 0.2s ease",
