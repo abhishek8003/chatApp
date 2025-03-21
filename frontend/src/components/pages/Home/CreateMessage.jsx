@@ -22,7 +22,7 @@ import { setKeepAliveInterval } from "../../../redux/features/keepAliveInterval"
 import { addNewMessageInSelectedGroup } from "../../../redux/features/selectedGroup";
 import { addNewMessageInGroups } from "../../../redux/features/groups";
 
-function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a prop
+function CreateMessage() {
   const selectedGroup = useSelector((store) => store.selectedGroup);
   const backendUrl = useContext(backendContext);
   const selectedUser = useSelector((store) => store.selectedUser);
@@ -39,7 +39,6 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
   const userAuth = useSelector((store) => store.userAuth);
   const dispatch = useDispatch();
   const form = useRef();
-  const textFieldRef = useRef(null); // Ref for the TextField input
 
   const handleFilePreview = async () => {
     setTimeout(() => {
@@ -56,29 +55,12 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
     }, 0);
   };
 
-  // Function to scroll to the bottom of the chat container
-  const scrollToBottom = () => {
-    if (chatContainerRef && chatContainerRef.current) {
-      // Scroll the chat container to the bottom
-      chatContainerRef.current.scrollTo({
-        top: chatContainerRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-    } else {
-      // Fallback: Scroll the entire page to the bottom
-      window.scrollTo({
-        top: document.body.scrollHeight,
-        behavior: "smooth",
-      });
-    }
-  };
-
   const handleSendMessage = async (myForm) => {
     setSendingMessage(true);
     const time = new Date(Date.now()).toISOString();
     const text = myForm.newMessage.value;
     const imgTempUrl = previewUrl;
-
+    // window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     try {
       if (selectedUser && !selectedUser.isAi) {
         // Regular user chat
@@ -102,7 +84,7 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
           message_image: imgTempUrl,
           createdAt: time,
         });
-
+      
         const file = myForm.messageFile?.files[0];
         if (!text && !file) {
           toast.error("Message or file required!");
@@ -139,8 +121,6 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
           }
           setSendingMessage(false);
           setPreviewUrl(null);
-          // Scroll to bottom after message is sent
-          setTimeout(scrollToBottom, 100); // Delay to account for keyboard closing
         } else {
           throw new Error("Failed to save message");
         }
@@ -199,8 +179,6 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
           }
           setSendingMessage(false);
           setPreviewUrl(null);
-          // Scroll to bottom after message is sent
-          setTimeout(scrollToBottom, 100); // Delay to account for keyboard closing
         } else {
           throw new Error("Failed to save AI message");
         }
@@ -274,8 +252,6 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
           dispatch(changeGroupMessageStatus(json.newMessage));
           setPreviewUrl(null);
           setSendingMessage(false);
-          // Scroll to bottom after message is sent
-          setTimeout(scrollToBottom, 100); // Delay to account for keyboard closing
         } else {
           throw new Error("Failed to save group message");
         }
@@ -318,32 +294,6 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
       }
     }
   }, [onlineUsers, selectedUser, chats, dispatch, userAuth._id]);
-
-  // Handle keyboard close and ensure scrolling
-  useEffect(() => {
-    const textField = textFieldRef.current;
-
-    const handleBlur = () => {
-      // Small delay to ensure the keyboard has fully closed
-      setTimeout(scrollToBottom, 100); // 100ms delay to account for keyboard closing animation
-    };
-
-    if (textField) {
-      const inputElement = textField.querySelector("input");
-      if (inputElement) {
-        inputElement.addEventListener("blur", handleBlur);
-      }
-    }
-
-    return () => {
-      if (textField) {
-        const inputElement = textField.querySelector("input");
-        if (inputElement) {
-          inputElement.removeEventListener("blur", handleBlur);
-        }
-      }
-    };
-  }, []);
 
   return (
     <Box
@@ -441,7 +391,6 @@ function CreateMessage({ chatContainerRef }) { // Accept chatContainerRef as a p
                 }
               }
             }}
-            inputRef={textFieldRef} // Attach ref to TextField
             sx={{
               flexGrow: 1,
               "& .MuiInputBase-root": {
