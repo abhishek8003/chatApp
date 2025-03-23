@@ -123,36 +123,8 @@ function GroupBody() {
       let json = await response.json();
       if (response.status == 200) {
         console.log("MEssage after saving to database:", json.message);//json.message is an Array
-        const receiverStatus = onlineUsers.some(
-          (u) => u._id === json.message.receiverId
-        );
-        if (!receiverStatus || selectedUser.isAi) {
-          json.message.forEach((e)=>{
-            dispatch(editChats(e));
-          })
-        //   if (c.senderId === action.payload.senderId &&
-        //     c.isGroupChat === action.payload.isGroupChat &&
-        //     c.receiverId === action.payload.receiverId &&
-        //     c.createdAt === action.payload.createdAt) {
-        //      false
-        // }
-          if(selectedUser.isAi){
-            console.log("AI HCATASFMAJFPAJWF");
-            json.message.forEach((e)=>{
-              dispatch(editChats({...e,status:"processed"}));
-            });
-            console.log("CHATS",chats);
+        dispatch(editGroupChat(json.message))
 
-            chats.forEach((e)=>{
-              dispatch(removeChats({
-                senderId:json.message[0].receiverId,
-                receiverId:json.message[0].senderId,
-                createdAt:json.message[0].createdAt,
-                isGroupChat:json.message[0].isGroupChat
-              }));
-            })
-          }
-        }
       } else {
         throw new Error(json.message);
       }

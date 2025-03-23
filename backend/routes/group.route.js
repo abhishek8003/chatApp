@@ -53,7 +53,7 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
         let groupId = req.params.group_id;
         let senderId = req.user._id;
         let message_text = req.body.messageText;
-        let time=req.body.messageTime
+        let time = req.body.messageTime
         let image;
         // Check if group exists
         let groupExists = await Group.findById(groupId);
@@ -92,7 +92,7 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             text: message_text,
             image: image,
             status: "delivered",
-            createdAt:time
+            createdAt: time
         });
 
         let notificationImage = image ? image.cloud_url : "";
@@ -110,7 +110,7 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             receiverId: updatedGroup._id,
             text: message_text,
             image: notificationImage,
-            createdAt:time
+            createdAt: time
         });
         try {
             let response = await notification.save();
@@ -118,7 +118,7 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
         catch (err) {
             console.log(err);
         }
-        res.json({ newMessage: updatedGroup.groupMessages[updatedGroup.groupMessages.length-1], message: "Group message saved!" });
+        res.json({ newMessage: updatedGroup.groupMessages[updatedGroup.groupMessages.length - 1], message: "Group message saved!" });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: error.message });
@@ -321,12 +321,12 @@ group_route.put("/:group_id/addMember/:member_id", isAuthenticated, async (req, 
 group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res) => {
     try {
         const { isGroupChat, senderId, receiverId, createdAt } = req.body;
-        console.log("BOTY TO BE  DELTD",req.body);
-         
+        console.log("BOTY TO BE  DELTD", req.body);
+
         let newMessage = await Message.updateMany(
             {
                 isGroupChat,
-                senderId:senderId._id,
+                senderId: senderId._id,
                 receiverId,
                 createdAt,
             },
@@ -346,8 +346,18 @@ group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res
                 $set: { text: "This message was deleted" }
             });
         console.log(newMessage);
-        
-        
+        let targetUpdatedMessage = await Message.find({
+            isGroupChat,
+            senderId: senderId._id,
+            receiverId,
+            createdAt,
+        });
+        if(targetUpdatedMessage){
+            res.status(200).json({message:targetUpdatedMessage});
+        }
+        else{
+            res.status(404).json({message:"Message not Found!"});
+        }
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: 'An error occurred while deleting the member' });
