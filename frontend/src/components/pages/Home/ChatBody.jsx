@@ -91,6 +91,7 @@ let onlineUsers=useSelector((store)=>store.onlineUsers)
   // Handle edit and delete
   const handleEdit = () => {
     console.log("Edit message:", selectedChat);
+    alert("coming soon")
     handleClose();
   };
 
