@@ -62,31 +62,43 @@
 }
 @media (min-width:0px) and (max-width:250px) {
   .chat-container {
-    max-width: 70vw;
+    min-width: 50px;
+    max-width: 80px;
     /* border:2px solid red; */
   }
 }
-@media (min-width:251px) and (max-width:370px) {
+@media (min-width:250px) and (max-width:280px) {
   .chat-container {
+    min-width: 90px;
+    max-width: 140px;
+    /* border:2px solid red; */
+  }
+}
+@media (min-width:280px) and (max-width:370px) {
+  .chat-container {
+    min-width: 142px;
     max-width: 150px;
+    /* border:2px solid yellow; */
+  }
+}
+@media (min-width:370px) and (max-width:420px) {
+  .chat-container {
+    min-width: 190px;
+    max-width: 220px;
     /* border:2px solid red; */
   }
 }
-@media (min-width:371px) and (max-width:420px) {
+@media (min-width:420px) and (max-width:533px) {
   .chat-container {
-    max-width: 190px;
-    /* border:2px solid red; */
-  }
-}
-@media (min-width:421px) and (max-width:533px) {
-  .chat-container {
-    max-width: 245px;
+    min-width: 240px;
+    max-width: 300px;
     /* border:2px solid orange; */
   }
 }
 @media (min-width:534px) and (max-width:680px) {
   .chat-container {
-    max-width: 300px;
+    min-width: 320px;
+    max-width: 350px;
     /* border:2px solid rebeccapurple; */
   }
 }
@@ -99,6 +111,61 @@
 @media (min-width:1035px) {
   .chat-container {
     max-width: 600px;
+    /* border:2px solid blue; */
+  }
+}
+@media (min-width:0px) and (max-width:250px) {
+  .chat-container-main {
+    min-width: 83%;
+    max-width: 84%;
+    /* max-width: 40vw; */
+    /* border:2px solid red; */
+  }
+}
+@media (min-width:249px) and (max-width:370px) {
+  .chat-container-main {
+    /* min-width: 90px; */
+    min-width: 90%;
+    /* max-width: 150px; */
+    /* border:2px solid blueviolet; */
+  }
+}
+@media (min-width:370px) and (max-width:420px) {
+  .chat-container-main {
+    /* min-width: 170px; */
+    min-width: 90%;
+    /* max-width: 190px; */
+    /* border:2px solid red; */
+  }
+}
+@media (min-width:420px) and (max-width:533px) {
+  .chat-container-main {
+    min-width: 230px;
+    max-width: 320px;
+    /* min-width: 70%; */
+    /* border:2px solid orange; */
+  }
+}
+@media (min-width:534px) and (max-width:680px) {
+  .chat-container-main {
+    /* min-width: 200px; */
+    /* max-width: 300px; */
+    min-width: 320px;
+    max-width: 380px;
+    /* border:2px solid rebeccapurple; */
+  }
+}
+@media (min-width:681px) and (max-width:1034px) {
+  .chat-container-main {
+    min-width: 380px;
+    max-width: 420px;
+    /* border:2px solid yellow; */
+  }
+}
+@media (min-width:1035px) {
+  .chat-container-main {
+    min-width: 420px;
+    max-width: 480px;
     /* border:2px solid blue; */
   }
 }

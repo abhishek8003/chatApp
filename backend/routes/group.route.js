@@ -53,6 +53,7 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
         let groupId = req.params.group_id;
         let senderId = req.user._id;
         let message_text = req.body.messageText;
+        let time=req.body.messageTime
         let image;
         // Check if group exists
         let groupExists = await Group.findById(groupId);
@@ -90,7 +91,8 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             receiverId: groupId,
             text: message_text,
             image: image,
-            status: "delivered"
+            status: "delivered",
+            createdAt:time
         });
 
         let notificationImage = image ? image.cloud_url : "";
@@ -107,7 +109,8 @@ group_route.post("/group/:group_id/message", upload_message_images.single("messa
             senderId: senderId,
             receiverId: updatedGroup._id,
             text: message_text,
-            image: notificationImage
+            image: notificationImage,
+            createdAt:time
         });
         try {
             let response = await notification.save();
@@ -313,6 +316,42 @@ group_route.put("/:group_id/addMember/:member_id", isAuthenticated, async (req, 
         return res.status(500).json({ message: 'An error occurred while deleting the member' });
     }
 });
+//delete Group message
 
+group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res) => {
+    try {
+        const { isGroupChat, senderId, receiverId, createdAt } = req.body;
+        console.log("BOTY TO BE  DELTD",req.body);
+         
+        let newMessage = await Message.updateMany(
+            {
+                isGroupChat,
+                senderId:senderId._id,
+                receiverId,
+                createdAt,
+            },
+            {
+                text: "This message was deleted",
+                status: "delivered" // Ensure this is the correct status you want
+            },
+            { new: true } // Returns the updated document
+        );
+        await groupNotification.updateOne({
+            senderId: senderId._id,
+            receiverId: receiverId,
+            createdAt: createdAt,
+            isGroupChat: isGroupChat
+        },
+            {
+                $set: { text: "This message was deleted" }
+            });
+        console.log(newMessage);
+        
+        
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: 'An error occurred while deleting the member' });
+    }
+});
 
 module.exports = group_route;

@@ -6,12 +6,17 @@ import {
   CardMedia,
   CardContent,
   Alert,
+  Menu,
+  MenuItem,
 } from "@mui/material";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setmessageImagePreviewUrl } from "../../../redux/features/messageImagePreviewUrl";
 import { messageImagePreviewToggle } from "../../../redux/features/messageImagePreview";
 import { backendContext } from "../../../BackendProvider";
+import { editGroupChat } from "../../../redux/features/groupChats";
+import { socketContext } from "../../../SocketProvider";
+import toast from "react-hot-toast";
 
 function GroupBody() {
   const userAuth = useSelector((store) => store.userAuth);
@@ -22,6 +27,8 @@ function GroupBody() {
   const dispatch = useDispatch();
   const backendUrl = useContext(backendContext);
   let selectedGroup = useSelector((store) => store.selectedGroup);
+  let [selectedGroupChat, setSelectedGroupChat] = useState(null);
+  let clientSocket=useContext(socketContext)
 
   useEffect(() => {
     if (chatContainer.current) {
@@ -65,7 +72,113 @@ function GroupBody() {
   };
 
   let lastDate = null;
+  const [contextMenu, setContextMenu] = useState(null);
+  const handleContextMenu = (event, chat) => {
+    event.preventDefault();
+    console.log("selected group chat:", chat);
+    setSelectedGroupChat(chat);
+    setContextMenu({
+      mouseX: event.clientX,
+      mouseY: event.clientY,
+    });
+  };
 
+  // Handle menu close
+  const handleClose = () => {
+    setContextMenu(null);
+    setSelectedGroupChat(null);
+  };
+
+  // Handle edit and delete
+  const handleEdit = () => {
+    console.log("Edit message:", selectedGroupChat);
+    handleClose();
+  };
+
+  const handleDelete = async () => {
+    console.log("Delete message:", selectedGroupChat);
+    dispatch(
+      editGroupChat({
+        createdAt: selectedGroupChat.createdAt,
+        isGroupChat: selectedGroupChat.isGroupChat,
+        receiverId: selectedGroupChat.receiverId,
+        senderId: selectedGroupChat.senderId,
+        status: "pending",
+        text: "This message was deleted",
+      })
+    );
+
+    
+    clientSocket?.emit("deleteGroupMessage", {...selectedGroupChat,text: "This message was deleted",});
+    try {
+      // /:group_id/deleteMessage/
+      const response = await fetch(`${backendUrl}/api/groups/${selectedGroup._id}/deleteMessage`, {
+        method: "DELETE",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({...selectedGroupChat, image: { local_url: "", cloud_url: "" },}),
+      });
+      let json = await response.json();
+      if (response.status == 200) {
+        console.log("MEssage after saving to database:", json.message);//json.message is an Array
+        const receiverStatus = onlineUsers.some(
+          (u) => u._id === json.message.receiverId
+        );
+        if (!receiverStatus || selectedUser.isAi) {
+          json.message.forEach((e)=>{
+            dispatch(editChats(e));
+          })
+        //   if (c.senderId === action.payload.senderId &&
+        //     c.isGroupChat === action.payload.isGroupChat &&
+        //     c.receiverId === action.payload.receiverId &&
+        //     c.createdAt === action.payload.createdAt) {
+        //      false
+        // }
+          if(selectedUser.isAi){
+            console.log("AI HCATASFMAJFPAJWF");
+            json.message.forEach((e)=>{
+              dispatch(editChats({...e,status:"processed"}));
+            });
+            console.log("CHATS",chats);
+
+            chats.forEach((e)=>{
+              dispatch(removeChats({
+                senderId:json.message[0].receiverId,
+                receiverId:json.message[0].senderId,
+                createdAt:json.message[0].createdAt,
+                isGroupChat:json.message[0].isGroupChat
+              }));
+            })
+          }
+        }
+      } else {
+        throw new Error(json.message);
+      }
+    } catch (error) {
+      console.error("Error in delete Message:", error.message);
+      toast.error(error.message);
+    } finally {
+      handleClose();
+    }
+  
+  };
+  let pressTimer = null;
+  const handleTouchStart = (event, chat) => {
+    pressTimer = setTimeout(() => {
+      const touch = event.touches[0]; // Get touch position
+      setSelectedGroupChat(chat);
+      setContextMenu({
+        mouseX: touch.clientX,
+        mouseY: touch.clientY,
+      });
+    }, 1000); // Trigger after 200ms
+  };
+
+  const handleTouchEnd = () => {
+    clearTimeout(pressTimer); // Clear if the user releases early
+  };
   return (
     <Box
       ref={chatContainer}
@@ -144,176 +257,216 @@ function GroupBody() {
                     "&:hover": { transform: "translateY(-0.125rem)" }, // -2px
                   }}
                 >
-                  <Avatar
-                    src={
-                      profilePic ||
-                      `${backendUrl}/images/default_group_icon.png`
-                    }
-                    sx={{
-                      width: 40,
-                      height: 40,
-                      border: "0.125rem solid #fff", // 2px
-                      boxShadow: "0 0 0.5rem rgba(25, 118, 210, 0.5)", // 8px
-                      transition: "box-shadow 0.3s ease",
-                      "&:hover": {
-                        boxShadow: "0 0 0.75rem rgba(25, 118, 210, 0.7)", // 12px
-                      },
-                    }}
-                  />
                   <Box
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      alignItems: isSender ? "flex-end" : "flex-start",
-                      maxWidth: "70%",
-                    }}
+                    className="chat-container-main "
+                    onContextMenu={
+                      isSender ? (e) => handleContextMenu(e, chat) : () => {}
+                    }
+                    onTouchStart={
+                      isSender ? (e) => handleTouchStart(e, chat) : () => {}
+                    } // Mobile (Start long press)
+                    onTouchEnd={handleTouchEnd} // Cancel if released early
                   >
-                    {/* Sender Name */}
-                    <Typography
-                      variant="caption"
+                    <Avatar
+                      src={
+                        profilePic ||
+                        `${backendUrl}/images/default_group_icon.png`
+                      }
                       sx={{
-                        color: "text.secondary",
-                        marginBottom: "0.375rem", // 6px
-                        fontWeight: "500",
-                        textShadow: "0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.05)", // 1px 1px
-                        "&:hover": { color: "#1976d2" },
+                        justifySelf: isSender ? "flex-end" : "flex-start",
+                        width: 40,
+                        height: 40,
+                        border: "0.125rem solid #fff", // 2px
+                        boxShadow: "0 0 0.5rem rgba(25, 118, 210, 0.5)", // 8px
+                        transition: "box-shadow 0.3s ease",
+                        "&:hover": {
+                          boxShadow: "0 0 0.75rem rgba(25, 118, 210, 0.7)", // 12px
+                        },
+                      }}
+                    />
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: isSender ? "flex-end" : "flex-start",
+                        maxWidth: "100%",
                       }}
                     >
-                      {isSender ? "You" : senderName} {isKicked ? "(Kicked)" : null}
-                    </Typography>
-
-                    {/* Image Message */}
-                    {chat.image && chat.image.cloud_url ? (
-                      <Box
+                      {/* Sender Name */}
+                      <Typography
+                        variant="caption"
                         sx={{
-                          background: isSender
-                            ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
-                            : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "0.625rem", // 10px
-                          borderRadius: "1.125rem", // 18px
-                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
-                          width: "100%",
-                          maxWidth: "400px",
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
-                          },
+                          color: "text.secondary",
+                          marginBottom: "0.375rem", // 6px
+                          fontWeight: "500",
+                          textShadow:
+                            "0 0.0625rem 0.0625rem rgba(0, 0, 0, 0.05)", // 1px 1px
+                          "&:hover": { color: "#1976d2" },
                         }}
                       >
-                        <Card
+                        {isSender ? "You" : senderName}{" "}
+                        {isKicked ? "(Kicked)" : null}
+                      </Typography>
+
+                      {/* Image Message */}
+                      {chat.image && chat.image.cloud_url ? (
+                        <Box
                           sx={{
+                            width: "100%",
+                            background: isSender
+                              ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
+                              : "linear-gradient(45deg, #ffffff, #f5f5f5)",
+                            padding: "0.625rem", // 10px
                             borderRadius: "1.125rem", // 18px
-                            boxShadow: "none",
+                            boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
+                            // width: "100%",
+                            // maxWidth: "400px",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                            },
                           }}
                         >
-                          <CardMedia
-                            component="img"
-                            image={chat.image.cloud_url}
-                            alt="Chat Image"
+                          <Card
                             sx={{
-                              width: "100%",
-                              height: "auto",
-                              borderRadius: "0.875rem", // 14px
-                              cursor: "pointer",
-                              maxWidth: "400px",
-                              transition: "transform 0.3s ease",
-                              "&:hover": { transform: "scale(1.03)" },
+                              borderRadius: "1.125rem", // 18px
+                              boxShadow: "none",
                             }}
-                            onClick={() =>
-                              handleImagePreview(chat.image.cloud_url)
-                            }
-                          />
-                        </Card>
-
-                        {/* Text below image */}
-                        {chat.text && (
-                          <CardContent sx={{ padding: "0.375rem 0.625rem" }}>
-                            <Typography
-                              variant="body2"
+                          >
+                            <CardMedia
+                              component="img"
+                              image={chat.image.cloud_url}
+                              alt="Chat Image"
                               sx={{
-                                overflow: "auto",
-                                wordBreak: "break-word",
-                                whiteSpace: "pre-wrap",
-                                fontWeight: "400",
-                                color: "#333",
+                                width: "100%",
+                                height: "auto",
+                                borderRadius: "0.875rem", // 14px
+                                cursor: "pointer",
+                                // maxWidth: "400px",
+                                transition: "transform 0.3s ease",
+                                "&:hover": { transform: "scale(1.03)" },
                               }}
-                            >
-                              {chat.text}
-                            </Typography>
-                          </CardContent>
-                        )}
+                              onClick={() =>
+                                handleImagePreview(chat.image.cloud_url)
+                              }
+                            />
+                          </Card>
 
-                        {/* Timestamp for Image */}
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            display: "block",
-                            textAlign: isSender ? "right" : "left",
-                            color: "#888",
-                            fontSize: "0.75rem",
-                            marginTop: "0.375rem", // 6px
-                            background: "linear-gradient(90deg, #888, #bbb)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
-                          }}
-                        >
-                          {formatTime(chat.createdAt)}
-                          {isSender && ` - ${chat.status}`}
-                        </Typography>
-                      </Box>
-                    ) : (
-                      /* Text Message */
-                      <Box
-                        sx={{
-                          background: isSender
-                            ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
-                            : "linear-gradient(45deg, #ffffff, #f5f5f5)",
-                          padding: "0.75rem 1rem", // 12px 16px
-                          borderRadius: "1.125rem", // 18px
-                          width: "100%",
-                          boxSizing: "border-box",
-                          boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
-                          transition: "all 0.3s ease",
-                          "&:hover": {
-                            boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
-                          },
-                        }}
-                      >
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            wordBreak: "break-all",
-                            overflowWrap: "break-all",
-                            overflow: "auto",
-                            position: "relative",
-                            whiteSpace: "pre-wrap",
-                            fontWeight: "400",
-                            color: "#333",
-                          }}
-                        >
-                          {chat.text}
-                        </Typography>
+                          {/* Text below image */}
+                          {chat.text && (
+                            <CardContent sx={{ padding: "0.375rem 0.625rem" }}>
+                              <Typography
+                                variant="body2"
+                                className="chat-container "
+                                sx={{
+                                  overflow: "auto",
+                                  wordBreak: "break-word",
+                                  whiteSpace: "pre-wrap",
+                                  fontWeight: "400",
+                                  color: "#333",
+                                }}
+                              >
+                                {chat.text}
+                              </Typography>
+                            </CardContent>
+                          )}
 
-                        {/* Timestamp for Text */}
-                        <Typography
-                          variant="caption"
+                          {/* Timestamp for Image */}
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              textAlign: isSender ? "right" : "left",
+                              color: "#888",
+                              fontSize: "0.75rem",
+                              marginTop: "0.375rem", // 6px
+                              background: "linear-gradient(90deg, #888, #bbb)",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                            }}
+                          >
+                            {formatTime(chat.createdAt)}
+                            {isSender && ` - ${chat.status}`}
+                          </Typography>
+                        </Box>
+                      ) : (
+                        /* Text Message */
+                        <Box
                           sx={{
-                            display: "block",
-                            textAlign: isSender ? "right" : "left",
-                            color: "#888",
-                            fontSize: "0.75rem",
-                            marginTop: "0.375rem", // 6px
-                            background: "linear-gradient(90deg, #888, #bbb)",
-                            WebkitBackgroundClip: "text",
-                            WebkitTextFillColor: "transparent",
+                            background: isSender
+                              ? "linear-gradient(45deg, #dcf8c6, #e8f5e9)"
+                              : "linear-gradient(45deg, #ffffff, #f5f5f5)",
+                            padding: "0.75rem 1rem", // 12px 16px
+                            borderRadius: "1.125rem", // 18px
+                            width: "100%",
+                            boxSizing: "border-box",
+                            boxShadow: "0 0.25rem 0.75rem rgba(0, 0, 0, 0.1)", // 4px 12px
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              boxShadow: "0 0.375rem 1rem rgba(0, 0, 0, 0.15)", // 6px 16px
+                            },
                           }}
                         >
-                          {formatTime(chat.createdAt)}
-                          {isSender && ` - ${chat.status}`}
-                        </Typography>
-                      </Box>
-                    )}
+                          <Typography
+                            variant="body2"
+                            className="chat-container"
+                            sx={{
+                              wordBreak: "break-all",
+                              overflowWrap: "break-all",
+                              overflow: "auto",
+                              position: "relative",
+                              whiteSpace: "pre-wrap",
+                              fontWeight: "400",
+                              color: "#333",
+                            }}
+                          >
+                            {chat.text}
+                          </Typography>
+
+                          {/* Timestamp for Text */}
+                          <Typography
+                            variant="caption"
+                            sx={{
+                              display: "block",
+                              textAlign: isSender ? "right" : "left",
+                              color: "#888",
+                              fontSize: "0.75rem",
+                              marginTop: "0.375rem", // 6px
+                              background: "linear-gradient(90deg, #888, #bbb)",
+                              WebkitBackgroundClip: "text",
+                              WebkitTextFillColor: "transparent",
+                            }}
+                          >
+                            {formatTime(chat.createdAt)}
+                            {isSender && ` - ${chat.status}`}
+                          </Typography>
+                        </Box>
+                      )}
+                    </Box>
                   </Box>
+                  <Menu
+                    open={contextMenu}
+                    onClose={handleClose}
+                    anchorReference="anchorPosition"
+                    sx={{
+                      "& .MuiPaper-root": {
+                        boxShadow: "none", // Removes shadow
+                        border: "1px solid #ccc", // Optional: adds a subtle border for better visibility
+                        backgroundColor: "#fff", // Optional: Ensures consistent background color
+                      },
+                    }}
+                    anchorPosition={
+                      contextMenu
+                        ? {
+                            top: contextMenu.mouseY,
+                            left: contextMenu.mouseX,
+                          }
+                        : undefined
+                    }
+                  >
+                    <MenuItem onClick={handleEdit}>Edit</MenuItem>
+                    <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                  </Menu>
                 </Box>
               </React.Fragment>
             );

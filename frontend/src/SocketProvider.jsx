@@ -6,6 +6,7 @@ import { addNewUser, setUsers, updateOneUser } from "./redux/features/users";
 import {
   changeStatus,
   changeStatusOfAll,
+  editChats,
   updateChats,
 } from "./redux/features/Chats";
 import { backendContext } from "./BackendProvider";
@@ -18,7 +19,12 @@ import {
   addNewFriend,
   updateFriends,
 } from "./redux/features/friends";
-import { addNotification } from "./redux/features/notifications";
+import {
+  addNotification,
+  deleteNotificationOfGroup,
+  editNotificationOfGroup,
+  editNotificationOfUser,
+} from "./redux/features/notifications";
 import {
   addGroup,
   addMemberInGroups,
@@ -28,6 +34,7 @@ import {
 import {
   addMemberInGroupChat,
   changeGroupMessageStatus,
+  editGroupChat,
   removeMemberFromGroupChat,
   setGroupChat,
   updateGroupChat,
@@ -123,7 +130,7 @@ function SocketProvider({ children }) {
         console.log("New friend without reload:", data);
         dispatch(addNewFriend(data));
       });
-    
+
       setInterval(() => {
         console.log("FIRING KEEP ALIVE!");
         socket.emit("keepAlive");
@@ -292,6 +299,38 @@ function SocketProvider({ children }) {
         console.log("i  told sender that message was reicived!");
       }
     });
+    clientSocket.on("recieveMessageDeleteLive", (newMessage) => {
+      console.log("a message Deleted:", newMessage);
+      if (selectedUser?._id === newMessage.senderId.toString()) {
+        dispatch(
+          editChats({
+            senderId: newMessage.senderId,
+            isGroupChat: false,
+            receiverId: newMessage.receiverId,
+            text: newMessage.text,
+            image: {
+              local_url: "",
+              cloud_url: newMessage.image ? newMessage.image : null,
+            },
+            createdAt: newMessage.createdAt,
+            status: newMessage.status,
+          })
+        );
+        console.log("i will tell sender that message was deleted!");
+        clientSocket.emit("messagesSeenByUser", selectedUser); //selectedUser is target user
+        console.log("i  told sender that message was deleted!");
+      }
+      clientSocket.on("recieveMessageNotificationDeleteLive", (message) => {
+        console.log("notification to be deleted",message);
+        
+        dispatch(editNotificationOfUser(message));
+        // console.log("New notification:", message);
+        // Play notification sound
+        notificationSound.current.play().catch((error) => {
+          console.error("Audio play failed:", error);
+        });
+      });
+    });
 
     clientSocket.on("profileUpdated", (data) => {
       console.log("Profile updated:", data);
@@ -340,14 +379,18 @@ function SocketProvider({ children }) {
       if (selectedGroup?._id === data.receiverId.toString()) {
         console.log("Received group message:", data);
         dispatch(updateGroupChat(data));
-        dispatch(addNewMessageInSelectedGroup({...data,senderId:data.senderId._id}))
-        dispatch(addNewMessageInGroups({...data,senderId:data.senderId._id}))
+        dispatch(
+          addNewMessageInSelectedGroup({ ...data, senderId: data.senderId._id })
+        );
+        dispatch(
+          addNewMessageInGroups({ ...data, senderId: data.senderId._id })
+        );
         //todo selectedGroup message push and groups message push
       }
     });
     clientSocket.on("groupMessageSent", (data) => {
       console.log("EVNR SENT");
-      
+
       if (selectedGroup?._id === data.receiverId.toString()) {
         console.log(" group message was sent:", data);
         dispatch(changeGroupMessageStatus(data));
@@ -378,6 +421,14 @@ function SocketProvider({ children }) {
         console.error("Audio play failed:", error);
       });
     });
+    clientSocket.on("recieveGroupMessageDeleteLive",(message)=>{
+      console.log("Group message was deleted:",message);
+      dispatch(editGroupChat(message));
+    });
+    clientSocket.on("deleteGroupNotification",(messsage)=>{
+      console.log("Group Notification to be edited:",messsage);
+      dispatch(editNotificationOfGroup(messsage));
+    })
     // Cleanup event listener
     return () => {
       clientSocket.off("recieveGroupMessageLive");

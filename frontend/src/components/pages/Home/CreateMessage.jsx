@@ -76,7 +76,6 @@ function CreateMessage() {
           })
         );
         dispatch(uploadingToggle(true));
-
         clientSocket?.emit("sendMessage", {
           senderId: userAuth._id,
           recieverId: selectedUser._id,
@@ -84,7 +83,7 @@ function CreateMessage() {
           message_image: imgTempUrl,
           createdAt: time,
         });
-      
+
         const file = myForm.messageFile?.files[0];
         if (!text && !file) {
           toast.error("Message or file required!");
@@ -182,7 +181,7 @@ function CreateMessage() {
         } else {
           throw new Error("Failed to save AI message");
         }
-      } else if (selectedGroup) {
+      } else if (selectedGroup._id) {
         // Group chat (with image support)
         if (!selectedGroup._id || !Array.isArray(selectedGroup.pastMembers)) {
           console.error("Invalid selectedGroup:", selectedGroup);
@@ -210,6 +209,7 @@ function CreateMessage() {
         const formData = new FormData();
         if (text) formData.append("messageText", text);
         if (file) formData.append("messageImage", file);
+        formData.append("messageTime",time)
 
         dispatch(
           updateGroupChat({
@@ -456,7 +456,9 @@ function CreateMessage() {
                   e.preventDefault();
                   form.current.requestSubmit();
                 }}
-                disabled={!(messageText.length > 0 || preview) || isSendingMessage}
+                disabled={
+                  !(messageText.length > 0 || preview) || isSendingMessage
+                }
                 sx={{
                   minWidth: "auto",
                   padding: "0",
@@ -470,7 +472,9 @@ function CreateMessage() {
                     transition: "color 0.2s ease",
                     "&:hover": {
                       color:
-                        messageText.length > 0 || preview ? "#115293" : "#bdbdbd", // Darker blue on hover
+                        messageText.length > 0 || preview
+                          ? "#115293"
+                          : "#bdbdbd", // Darker blue on hover
                     },
                   }}
                 />

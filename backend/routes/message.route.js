@@ -8,6 +8,7 @@ const { io_server } = require("../socket");
 const chatNotification = require("../models/chatNotification");
 const message_router = express.Router();
 const gemini_ai = require("../ai-config/geminiConfig");
+const { default: mongoose } = require("mongoose");
 message_router.get("/:id", isAuthenticated, async (req, res, next) => {
     try {
         let senderId = req.user._id;
@@ -111,13 +112,13 @@ message_router.post("/:id", upload_message_images.single("messageImage"), isAuth
                     ],
                     isGroupChat: false
                 }).sort({ createdAt: 1 });
-                let promptWithHistory = "You are an AI chatting with a user. Here’s the conversation so far:\n";
+                let promptWithHistory = "You are an AI chatting with a user. Here’s the conversation so far, also if message from user is deleted ignore that thing:\n";
                 previousMessages.forEach(msg => {
                     promptWithHistory += `${msg.senderId.equals(senderId) ? "User" : "AI"}: ${msg.text}\n`;
                 });
                 promptWithHistory += `User: ${message_text}\nAI:`;
                 console.log(promptWithHistory);
-                
+
                 //testing
                 let prompt = req.body.messageText;
                 const result = await gemini_ai.generateContent(promptWithHistory);
@@ -172,4 +173,65 @@ message_router.put("/:id", isAuthenticated,
             res.status(500).send({ message: error.message })
         }
     });
+message_router.delete("/", isAuthenticated, async (req, res, next) => {
+    try {
+        const { isGroupChat, senderId, receiverId, createdAt } = req.body; // No need to parse JSON
+        console.log("IN ROUTE", req.body);
+        // Find and update the message
+        let newMessage = await Message.updateMany(
+            {
+                isGroupChat,
+                senderId,
+                receiverId,
+                createdAt,
+            },
+            {
+                text: "This message was deleted",
+                status: "delivered" // Ensure this is the correct status you want
+            },
+            { new: true } // Returns the updated document
+        );
+        let isrecieverUserAi = await User.findById(receiverId);
+        isrecieverUserAi = isrecieverUserAi.isAi;
+        if (isrecieverUserAi) {
+            let newMessageAI = await Message.deleteMany(
+                {
+                    isGroupChat,
+                    senderId: receiverId,
+                    receiverId: senderId,
+                    createdAt,
+                }
+            );
+        }
+        newMessage = await Message.find({
+            isGroupChat,
+            senderId,
+            receiverId,
+            createdAt,
+        });
+        // const { isGroupChat, senderId, receiverId, createdAt } = req.body; // No need to parse JSON
+
+        await chatNotification.updateOne({
+            senderId: senderId,
+            recieverId: receiverId,
+            createdAt: createdAt,
+            isGroupChat: isGroupChat
+        },
+            {
+                $set: { text: "This message was deleted" }
+            });
+
+        // If message not found
+        if (!newMessage) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+
+        res.status(200).json({ message: newMessage });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
+    }
+});
+
+
 module.exports = message_router;

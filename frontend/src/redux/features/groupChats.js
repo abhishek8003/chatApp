@@ -13,6 +13,19 @@ const groupChatSlice = createSlice({
         setGroupChat: (state, action) => {
             return action.payload; // Correct way to replace state
         },
+        editGroupChat:(state, action)=>{
+            return {
+                ...state,
+                groupMessages: state.groupMessages.map((m) => {
+                    if (m.senderId._id == action.payload.senderId._id && m.receiverId == action.payload.receiverId && m.createdAt == action.payload.createdAt) {
+                        console.log("GROUP MESSAGE DELETE TARGET FOUND!");
+                        return { ...m, text:action.payload.text }
+                    }
+                    return m;
+                })
+            }
+        },
+        
         updateGroupChat: (state, action) => {
             if (!state.groupMessages) {
                 state.groupMessages = []; // Ensure groupMessages exists
@@ -25,7 +38,6 @@ const groupChatSlice = createSlice({
                 groupMessages: state.groupMessages.map((m) => {
                     if (m.senderId._id == action.payload.senderId._id && m.receiverId == action.payload.receiverId && m.createdAt == action.payload.createdAt) {
                         console.log("GROUP MESSAGE TARGET FOUND!");
-                        
                         return { ...m, status: action.payload.status }
                     }
                     return m;
@@ -63,4 +75,4 @@ const groupChatSlice = createSlice({
 });
 
 export default groupChatSlice.reducer;
-export const { setGroupChat, updateGroupChat, removeMemberFromGroupChat, addMemberInGroupChat,changeGroupMessageStatus } = groupChatSlice.actions;
+export const { setGroupChat, updateGroupChat, editGroupChat,removeMemberFromGroupChat, addMemberInGroupChat,changeGroupMessageStatus } = groupChatSlice.actions;

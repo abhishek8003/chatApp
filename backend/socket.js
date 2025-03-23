@@ -15,6 +15,7 @@ const io_server = new Server(http_server, {
 const ChatNotification = require("./models/chatNotification")
 const GroupNotification = require("./models/groupNotification");
 const Message = require("./models/messages");
+const chatNotification = require("./models/chatNotification");
 
 let online_users = [];
 
@@ -37,11 +38,11 @@ io_server.on("connection", (clientSocket) => {
     online_users.push(user);
     console.log(`new online users :`, online_users);
     io_server.emit("getOnlineUsers", online_users);
-    clientSocket.on("keepAlive", (d,callback) => {
+    clientSocket.on("keepAlive", (d, callback) => {
         console.log(`Received keepAlive from ${clientSocket.id}`);
         if (callback) {
             callback(); // This triggers the client's callback function.
-          }
+        }
     });
     clientSocket.on("deleteOnlineUser", (data) => {
         console.log(data);
@@ -112,7 +113,7 @@ io_server.on("connection", (clientSocket) => {
                 status: "sent"
             });
             io_server.to(reciever.socketId).emit("addNotification", {
-                createdAt: new Date(Date.now()),
+                createdAt: messageBody.createdAt,
                 senderId: messageBody.senderId,
                 recieverId: messageBody.recieverId,
                 text: messageBody.message_text,
@@ -121,6 +122,60 @@ io_server.on("connection", (clientSocket) => {
             });
         }
     });
+    clientSocket.on("deleteMessage", async (messageBody) => {
+        console.log("Message to be deleted!", messageBody);
+        if (online_users.find((u) => {
+            if (u._id == messageBody.receiverId) { return u; }
+        }
+        )) {
+            console.log("Liivng message");
+            const reciever = online_users.find((r) => {
+                if (r._id == messageBody.receiverId) {
+                    return r;
+                }
+            });
+            // let sender=await User.findById(messageBody.senderId);
+
+            io_server.to(reciever.socketId).emit("recieveMessageDeleteLive", {
+                senderId: messageBody.senderId,
+                receiverId: messageBody.receiverId,
+                text: "This message was deleted",
+                image: messageBody.message_image,
+                isGroupChat: false,
+                status: "sent",
+                createdAt: messageBody.createdAt,
+            });
+     
+            io_server.to(reciever.socketId).emit("recieveMessageNotificationDeleteLive", {
+                senderId: messageBody.senderId,
+                recieverId: messageBody.receiverId,
+                text: "This message was deleted",
+                image: messageBody.message_image,
+                isGroupChat: false,
+                status: "sent",
+                createdAt: messageBody.createdAt,
+            });
+            clientSocket.emit("messageSent", {
+                createdAt: messageBody.createdAt,
+                senderId: messageBody.senderId,
+                receiverId: messageBody.recieverId,
+                text: messageBody.message_text,
+                image: messageBody.message_image,
+                isGroupChat: false,
+                status: "sent"
+            });
+            // io_server.to(reciever.socketId).emit("addNotification", {
+            //     createdAt: new Date(Date.now()),
+            //     senderId: messageBody.senderId,
+            //     recieverId: messageBody.recieverId,
+            //     text: messageBody.message_text,
+            //     image: messageBody.message_image,
+            //     isGroupChat: false
+            // });
+        }
+
+    })
+   
 
     clientSocket.on("messagesSeenByUser", async (Targetuser) => {
         console.log("MESSAGES GOT SEEN");
@@ -234,7 +289,7 @@ io_server.on("connection", (clientSocket) => {
         console.log(data.messageBody);
         console.log(data.selectedGroup);
         let roomID = data.selectedGroup;
-        let time=data.messageBody.createdAt;
+        let time = data.messageBody.createdAt;
         if (completeUser) {
             clientSocket.broadcast.to(roomID).emit("recieveGroupMessageLive", {
                 isGroupChat: true,
@@ -259,7 +314,7 @@ io_server.on("connection", (clientSocket) => {
                     public_id: '',
                 },
                 createdAt: time,
-                status:"delivered"
+                status: "delivered"
             });
             io_server.to(roomID).emit("addGroupNotification", {
                 isGroupChat: true,
@@ -270,10 +325,47 @@ io_server.on("connection", (clientSocket) => {
                     local_url: '',
                     cloud_url: data.messageBody.messageImage,
                     public_id: '',
-                }
+                },
+                createdAt:time
             })
 
         }
+    });
+    clientSocket.on("deleteGroupMessage",async(messageBody)=>{
+        console.log("Group message to be Deleted:",messageBody);
+        let completeUser = online_users.find((u) => { if (u._id == user._id) { return true } });
+        console.log(messageBody);
+        let roomID = messageBody.receiverId;
+        let time = messageBody.createdAt;
+        console.log("complete USER",completeUser);
+        
+        if (completeUser) {
+            clientSocket.broadcast.to(roomID).emit("recieveGroupMessageDeleteLive", {
+                isGroupChat: true,
+                senderId: completeUser,
+                receiverId: roomID,
+                text: messageBody.text,
+                image: {
+                    local_url: '',
+                    cloud_url: messageBody.messageImage,
+                    public_id: '',
+                },
+                createdAt: time,
+            });
+            clientSocket.broadcast.to(roomID).emit("deleteGroupNotification",{
+                isGroupChat: true,
+                senderId: messageBody.senderId._id,
+                receiverId: roomID,
+                text: messageBody.text,
+                image: {
+                    local_url: '',
+                    cloud_url: messageBody.messageImage,
+                    public_id: '',
+                },
+                createdAt: time,
+            })
+        }
+
     })
     clientSocket.on("memberKick", async (info) => {
         let targetMemberEmail = info.memberEmail;

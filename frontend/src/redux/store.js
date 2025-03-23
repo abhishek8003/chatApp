@@ -30,6 +30,7 @@ import retryReducer from "./features/retry";
 import uploadingReducer from "./features/uploading";
 import keepAliveIntervalReducer from "./features/keepAliveInterval"
 import typingReducer from "./features/typing"
+import selectedChatReducer from "./features/selectedChat";
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -62,7 +63,8 @@ const store=configureStore({
         retry:retryReducer,
         uploading:uploadingReducer,
         keepAliveInterval:keepAliveIntervalReducer,
-        typing:typingReducer
+        typing:typingReducer,
+        selectedChat:selectedChatReducer
     }
 });
 export default store;
