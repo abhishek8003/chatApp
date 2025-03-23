@@ -346,13 +346,15 @@ group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res
                 $set: { text: "This message was deleted" }
             });
         console.log(newMessage);
-        let targetUpdatedMessage = await Message.find({
+        let targetUpdatedMessage = await Message.findOne({
             isGroupChat,
             senderId: senderId._id,
             receiverId,
             createdAt,
-        });
+        }).populate("senderId");
+        
         if(targetUpdatedMessage){
+            console.log("POPULATED NEW GROUP MESSAGE:",targetUpdatedMessage);
             res.status(200).json({message:targetUpdatedMessage});
         }
         else{

@@ -14,6 +14,8 @@ const groupChatSlice = createSlice({
             return action.payload; // Correct way to replace state
         },
         editGroupChat:(state, action)=>{
+            console.log("EDIT FROUP CHAT ACTION.payload:",action.payload);
+            
             return {
                 ...state,
                 groupMessages: state.groupMessages.map((m) => {

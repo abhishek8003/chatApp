@@ -112,7 +112,7 @@ function GroupBody() {
     clientSocket?.emit("deleteGroupMessage", {...selectedGroupChat,text: "This message was deleted",});
     try {
       // /:group_id/deleteMessage/
-      const response = await fetch(`${backendUrl}/api/groups/${selectedGroup._id}/deleteMessage`, {
+      const response = await fetch(`${backendUrl}/api/groups/${selectedGroupChat._id}/deleteMessage`, {
         method: "DELETE",
         credentials: "include",
         headers: {
@@ -129,8 +129,8 @@ function GroupBody() {
         throw new Error(json.message);
       }
     } catch (error) {
-      console.error("Error in delete Message:", error.message);
-      toast.error(error.message);
+      console.error("Error in delete Message:", error);
+      toast.error(error);
     } finally {
       handleClose();
     }
