@@ -92,6 +92,7 @@ function GroupBody() {
   // Handle edit and delete
   const handleEdit = () => {
     console.log("Edit message:", selectedGroupChat);
+    toast.success("coming soon");
     handleClose();
   };
 

@@ -96,7 +96,7 @@ function ChatBody() {
   // Handle edit and delete
   const handleEdit = () => {
     console.log("Edit message:", selectedChat);
-    alert("coming soon");
+    toast.success("coming soon");
     handleClose();
   };
 
