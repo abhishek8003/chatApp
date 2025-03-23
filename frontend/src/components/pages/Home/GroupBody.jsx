@@ -103,7 +103,7 @@ function GroupBody() {
         isGroupChat: selectedGroupChat.isGroupChat,
         receiverId: selectedGroupChat.receiverId,
         senderId: selectedGroupChat.senderId,
-        status: "pending",
+        status: "deleting message...",
         text: "This message was deleted",
       })
     );

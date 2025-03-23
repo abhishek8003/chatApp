@@ -15,7 +15,12 @@ import { setmessageImagePreviewUrl } from "../../../redux/features/messageImageP
 import { messageImagePreviewToggle } from "../../../redux/features/messageImagePreview";
 import { backendContext } from "../../../BackendProvider";
 import { setSelectedChat } from "../../../redux/features/selectedChat";
-import { changeStatus, editChats, removeChats, updateChats } from "../../../redux/features/Chats";
+import {
+  changeStatus,
+  editChats,
+  removeChats,
+  updateChats,
+} from "../../../redux/features/Chats";
 import { socketContext } from "../../../SocketProvider";
 import toast from "react-hot-toast";
 
@@ -27,11 +32,11 @@ function ChatBody() {
   const chats = useSelector((store) => store.chats);
   const chatContainer = useRef();
   const scrollTo = useRef();
-  
+
   const backendUrl = useContext(backendContext);
   const dispatch = useDispatch();
   let clientSocket = useContext(socketContext);
-let onlineUsers=useSelector((store)=>store.onlineUsers)
+  let onlineUsers = useSelector((store) => store.onlineUsers);
   const handleImagePreview = (imageUrl) => {
     dispatch(setmessageImagePreviewUrl(imageUrl));
     dispatch(messageImagePreviewToggle());
@@ -91,13 +96,12 @@ let onlineUsers=useSelector((store)=>store.onlineUsers)
   // Handle edit and delete
   const handleEdit = () => {
     console.log("Edit message:", selectedChat);
-    alert("coming soon")
+    alert("coming soon");
     handleClose();
   };
 
   const handleDelete = async () => {
     console.log("Delete message:", selectedChat);
-
     dispatch(
       editChats({
         senderId: userAuth._id,
@@ -105,11 +109,20 @@ let onlineUsers=useSelector((store)=>store.onlineUsers)
         text: "This message was deleted",
         image: { local_url: "", cloud_url: "" },
         createdAt: selectedChat.createdAt,
-        status: "pending",
+        status: "deleting message...",
         isGroupChat: selectedChat.isGroupChat,
       })
     );
-    clientSocket?.emit("deleteMessage", selectedChat);
+
+    clientSocket?.emit("deleteMessage", {
+      senderId: userAuth._id,
+      receiverId: selectedUser._id,
+      text: "This message was deleted",
+      image: { local_url: "", cloud_url: "" },
+      createdAt: selectedChat.createdAt,
+      status: "pending",
+      isGroupChat: selectedChat.isGroupChat,
+    });
     try {
       const response = await fetch(`${backendUrl}/api/chats/`, {
         method: "DELETE",
@@ -117,39 +130,44 @@ let onlineUsers=useSelector((store)=>store.onlineUsers)
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({...selectedChat, image: { local_url: "", cloud_url: "" },}),
+        body: JSON.stringify({
+          ...selectedChat,
+          image: { local_url: "", cloud_url: "" },
+        }),
       });
       let json = await response.json();
       if (response.status == 200) {
-        console.log("MEssage after saving to database:", json.message);//json.message is an Array
+        console.log("MEssage after saving to database:", json.message); //json.message is an Array
         const receiverStatus = onlineUsers.some(
           (u) => u._id === json.message.receiverId
         );
         if (!receiverStatus || selectedUser.isAi) {
-          json.message.forEach((e)=>{
+          json.message.forEach((e) => {
             dispatch(editChats(e));
-          })
-        //   if (c.senderId === action.payload.senderId &&
-        //     c.isGroupChat === action.payload.isGroupChat &&
-        //     c.receiverId === action.payload.receiverId &&
-        //     c.createdAt === action.payload.createdAt) {
-        //      false
-        // }
-          if(selectedUser.isAi){
+          });
+          //   if (c.senderId === action.payload.senderId &&
+          //     c.isGroupChat === action.payload.isGroupChat &&
+          //     c.receiverId === action.payload.receiverId &&
+          //     c.createdAt === action.payload.createdAt) {
+          //      false
+          // }
+          if (selectedUser.isAi) {
             console.log("AI HCATASFMAJFPAJWF");
-            json.message.forEach((e)=>{
-              dispatch(editChats({...e,status:"processed"}));
+            json.message.forEach((e) => {
+              dispatch(editChats({ ...e, status: "processed" }));
             });
-            console.log("CHATS",chats);
-            
-            chats.forEach((e)=>{
-              dispatch(removeChats({
-                senderId:json.message[0].receiverId,
-                receiverId:json.message[0].senderId,
-                createdAt:json.message[0].createdAt,
-                isGroupChat:json.message[0].isGroupChat
-              }));
-            })
+            console.log("CHATS", chats);
+
+            chats.forEach((e) => {
+              dispatch(
+                removeChats({
+                  senderId: json.message[0].receiverId,
+                  receiverId: json.message[0].senderId,
+                  createdAt: json.message[0].createdAt,
+                  isGroupChat: json.message[0].isGroupChat,
+                })
+              );
+            });
           }
         }
       } else {

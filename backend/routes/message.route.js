@@ -227,6 +227,7 @@ message_router.delete("/", isAuthenticated, async (req, res, next) => {
         }
 
         res.status(200).json({ message: newMessage });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
