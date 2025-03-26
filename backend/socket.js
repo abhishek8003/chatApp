@@ -140,9 +140,9 @@ io_server.on("connection", (clientSocket) => {
                 senderId: messageBody.senderId,
                 receiverId: messageBody.receiverId,
                 text: "This message was deleted",
-                image: messageBody.message_image,
+                image: messageBody?.image || null,
                 isGroupChat: false,
-                status: "sent",
+                status: "deleted",
                 createdAt: messageBody.createdAt,
             });
      
@@ -150,19 +150,64 @@ io_server.on("connection", (clientSocket) => {
                 senderId: messageBody.senderId,
                 recieverId: messageBody.receiverId,
                 text: "This message was deleted",
-                image: messageBody.message_image,
+                image: "",
                 isGroupChat: false,
-                status: "sent",
+                status: "deleted",
                 createdAt: messageBody.createdAt,
             });
-            clientSocket.emit("messageSent", {
+            clientSocket.emit("messageUpdated", {
                 createdAt: messageBody.createdAt,
                 senderId: messageBody.senderId,
-                receiverId: messageBody.recieverId,
-                text: messageBody.message_text,
-                image: messageBody.message_image,
+                receiverId: messageBody.receiverId,
+                text: "This message was deleted",
+                image: messageBody.image,
                 isGroupChat: false,
-                status: "sent"
+                status: "deleted"
+            });
+        }
+
+    })
+    clientSocket.on("editMessage", async (messageBody) => {
+        console.log("Message to be Edited", messageBody);
+        if (online_users.find((u) => {
+            if (u._id == messageBody.receiverId) { return u; }
+        }
+        )) {
+            // console.log("Liivng edit message");
+            const reciever = online_users.find((r) => {
+                if (r._id == messageBody.receiverId) {
+                    return r;
+                }
+            });
+            // let sender=await User.findById(messageBody.senderId);
+
+            io_server.to(reciever.socketId).emit("recieveMessageEditLive", {
+                senderId: messageBody.senderId,
+                receiverId: messageBody.receiverId,
+                text: messageBody.text,
+                image: messageBody?.image || null,
+                isGroupChat: false,
+                status: "edited",
+                createdAt: messageBody.createdAt,
+            });
+     
+            io_server.to(reciever.socketId).emit("recieveMessageNotificationEditLive", {
+                senderId: messageBody.senderId,
+                recieverId: messageBody.receiverId,
+                text:  messageBody.text,
+                image: messageBody?.image?.cloud_url || "",
+                isGroupChat: false,
+                status: "edited",
+                createdAt: messageBody.createdAt,
+            });
+            clientSocket.emit("messageUpdated", {
+                createdAt: messageBody.createdAt,
+                senderId: messageBody.senderId,
+                receiverId: messageBody.receiverId,
+                text: messageBody.text,
+                image: messageBody.image,
+                isGroupChat: false,
+                status: "edited"
             });
             // io_server.to(reciever.socketId).emit("addNotification", {
             //     createdAt: new Date(Date.now()),
@@ -175,7 +220,6 @@ io_server.on("connection", (clientSocket) => {
         }
 
     })
-   
 
     clientSocket.on("messagesSeenByUser", async (Targetuser) => {
         console.log("MESSAGES GOT SEEN");
@@ -298,7 +342,7 @@ io_server.on("connection", (clientSocket) => {
                 text: data.messageBody.messageText,
                 image: {
                     local_url: '',
-                    cloud_url: data.messageBody.messageImage,
+                    cloud_url: data.messageBody.messageImage ||"",
                     public_id: '',
                 },
                 createdAt: time,
@@ -310,7 +354,7 @@ io_server.on("connection", (clientSocket) => {
                 text: data.messageBody.messageText,
                 image: {
                     local_url: '',
-                    cloud_url: data.messageBody.messageImage,
+                    cloud_url: data.messageBody.messageImage ||"",
                     public_id: '',
                 },
                 createdAt: time,
@@ -321,11 +365,7 @@ io_server.on("connection", (clientSocket) => {
                 senderId: user._id,
                 receiverId: roomID,
                 text: data.messageBody.messageText,
-                image: {
-                    local_url: '',
-                    cloud_url: data.messageBody.messageImage,
-                    public_id: '',
-                },
+                image: data.messageBody.messageImage || "",
                 createdAt:time
             })
 
@@ -338,30 +378,34 @@ io_server.on("connection", (clientSocket) => {
         let roomID = messageBody.receiverId;
         let time = messageBody.createdAt;
         console.log("complete USER",completeUser);
+        let image=messageBody.image;
         
         if (completeUser) {
             clientSocket.broadcast.to(roomID).emit("recieveGroupMessageDeleteLive", {
                 isGroupChat: true,
                 senderId: completeUser,
+                status:"deleted",
                 receiverId: roomID,
                 text: messageBody.text,
-                image: {
-                    local_url: '',
-                    cloud_url: messageBody.messageImage,
-                    public_id: '',
-                },
+                image: image,
                 createdAt: time,
             });
             clientSocket.broadcast.to(roomID).emit("deleteGroupNotification",{
                 isGroupChat: true,
                 senderId: messageBody.senderId._id,
+                status:"deleted",
                 receiverId: roomID,
                 text: messageBody.text,
-                image: {
-                    local_url: '',
-                    cloud_url: messageBody.messageImage,
-                    public_id: '',
-                },
+                image:image,
+                createdAt: time,
+            });
+            clientSocket.emit("groupMessageUpdated",{
+                isGroupChat: true,
+                senderId: messageBody.senderId._id,
+                status:"deleted",
+                receiverId: roomID,
+                text: messageBody.text,
+                image: image,
                 createdAt: time,
             })
         }

@@ -175,7 +175,7 @@ message_router.put("/:id", isAuthenticated,
     });
 message_router.delete("/", isAuthenticated, async (req, res, next) => {
     try {
-        const { isGroupChat, senderId, receiverId, createdAt } = req.body; // No need to parse JSON
+        const { isGroupChat, senderId, receiverId, createdAt, image } = req.body; // No need to parse JSON
         console.log("IN ROUTE", req.body);
         // Find and update the message
         let newMessage = await Message.updateMany(
@@ -186,8 +186,9 @@ message_router.delete("/", isAuthenticated, async (req, res, next) => {
                 createdAt,
             },
             {
+                image: null,
                 text: "This message was deleted",
-                status: "delivered" // Ensure this is the correct status you want
+                status: "deleted" // Ensure this is the correct status you want
             },
             { new: true } // Returns the updated document
         );
@@ -218,7 +219,10 @@ message_router.delete("/", isAuthenticated, async (req, res, next) => {
             isGroupChat: isGroupChat
         },
             {
-                $set: { text: "This message was deleted" }
+                $set: {
+                    text: "This message was deleted",
+                    image: ""
+                }
             });
 
         // If message not found
@@ -231,6 +235,58 @@ message_router.delete("/", isAuthenticated, async (req, res, next) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Internal server error" });
+    }
+});
+message_router.put("/", isAuthenticated, async (req, res, next) => {
+    try {
+        const { isGroupChat, senderId, receiverId, createdAt, text } = req.body; // No need to parse JSON
+        console.log("IN ROUTE of edit", req.body);
+        // Find and update the message
+        let newMessage = await Message.updateMany(
+            {
+                isGroupChat,
+                senderId,
+                receiverId,
+                createdAt,
+            },
+            {
+                text: text,
+                status: "edited" // Ensure this is the correct status you want
+            },
+            { new: true } // Returns the updated document
+        );
+        let isrecieverUserAi = await User.findById(receiverId);
+        isrecieverUserAi = isrecieverUserAi.isAi;
+        if (isrecieverUserAi) {
+         throw new Error("You cant edit AI chats!")
+        }
+        newMessage = await Message.find({
+            isGroupChat,
+            senderId,
+            receiverId,
+            createdAt,
+        });
+        // const { isGroupChat, senderId, receiverId, createdAt } = req.body; // No need to parse JSON
+
+        await chatNotification.updateOne({
+            senderId: senderId,
+            recieverId: receiverId,
+            createdAt: createdAt,
+            isGroupChat: isGroupChat
+        },
+            {
+                $set: { text: text }
+            });
+
+        // If message not found
+        if (!newMessage) {
+            return res.status(404).json({ message: "Message not found" });
+        }
+        res.status(200).json({ message: newMessage });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: error.message });
     }
 });
 

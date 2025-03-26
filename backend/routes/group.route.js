@@ -331,8 +331,9 @@ group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res
                 createdAt,
             },
             {
+                image: null,
                 text: "This message was deleted",
-                status: "delivered" // Ensure this is the correct status you want
+                status: "deleted" // Ensure this is the correct status you want
             },
             { new: true } // Returns the updated document
         );
@@ -343,7 +344,10 @@ group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res
             isGroupChat: isGroupChat
         },
             {
-                $set: { text: "This message was deleted" }
+                $set: {
+                    text: "This message was deleted",
+                    image: ""
+                }
             });
         console.log(newMessage);
         let targetUpdatedMessage = await Message.findOne({
@@ -352,13 +356,13 @@ group_route.delete("/:group_id/deleteMessage/", isAuthenticated, async (req, res
             receiverId,
             createdAt,
         }).populate("senderId");
-        
-        if(targetUpdatedMessage){
-            console.log("POPULATED NEW GROUP MESSAGE:",targetUpdatedMessage);
-            res.status(200).json({message:targetUpdatedMessage});
+
+        if (targetUpdatedMessage) {
+            console.log("POPULATED NEW GROUP MESSAGE:", targetUpdatedMessage);
+            res.status(200).json({ message: targetUpdatedMessage });
         }
-        else{
-            res.status(404).json({message:"Message not Found!"});
+        else {
+            res.status(404).json({ message: "Message not Found!" });
         }
     } catch (error) {
         console.error(error);

@@ -159,7 +159,7 @@ function SocketProvider({ children }) {
       dispatch(changeStatus(message));
       dispatch(uploadingToggle(false));
     });
-  }, [clientSocket]);
+  }, [clientSocket]); ///fuck
 
   useEffect(() => {
     if (!clientSocket) {
@@ -316,22 +316,49 @@ function SocketProvider({ children }) {
             status: newMessage.status,
           })
         );
-        console.log("i will tell sender that message was deleted!");
-        clientSocket.emit("messagesSeenByUser", selectedUser); //selectedUser is target user
-        console.log("i  told sender that message was deleted!");
       }
-      clientSocket.on("recieveMessageNotificationDeleteLive", (message) => {
-        console.log("notification to be deleted",message);
-        
-        dispatch(editNotificationOfUser(message));
-        // console.log("New notification:", message);
-        // Play notification sound
-        notificationSound.current.play().catch((error) => {
-          console.error("Audio play failed:", error);
-        });
-      });
+    });
+    clientSocket.on("messageUpdated", (message) => {
+      console.log("MESAGE got deleted UPDATED BROOOOOOOOOOOO",message);
+      dispatch(editChats(message));
+    });
+    clientSocket.on("recieveMessageEditLive", (newMessage) => {
+      console.log("a message got Edited:", newMessage);
+      if (selectedUser?._id === newMessage.senderId.toString()) {
+        dispatch(
+          editChats({
+            senderId: newMessage.senderId,
+            isGroupChat: false,
+            receiverId: newMessage.receiverId,
+            text: newMessage.text,
+            image:  newMessage.image ? newMessage.image : null,
+            createdAt: newMessage.createdAt,
+            status: newMessage.status,
+          })
+        );
+      }
     });
 
+    clientSocket.on("recieveMessageNotificationDeleteLive", (message) => {
+      console.log("notification to be deleted", message);
+
+      dispatch(editNotificationOfUser(message));
+      // console.log("New notification:", message);
+      // Play notification sound
+      // notificationSound.current.play().catch((error) => {
+      //   console.error("Audio play failed:", error);
+      // });
+    });
+    clientSocket.on("recieveMessageNotificationEditLive", (message) => {
+      console.log("notification to be deleted", message);
+
+      dispatch(editNotificationOfUser(message));
+      // console.log("New notification:", message);
+      // Play notification sound
+      // notificationSound.current.play().catch((error) => {
+      //   console.error("Audio play failed:", error);
+      // });
+    });
     clientSocket.on("profileUpdated", (data) => {
       console.log("Profile updated:", data);
       dispatch(updateOneUser(data));
@@ -421,14 +448,18 @@ function SocketProvider({ children }) {
         console.error("Audio play failed:", error);
       });
     });
-    clientSocket.on("recieveGroupMessageDeleteLive",(message)=>{
-      console.log("Group message was deleted:",message);
+    clientSocket.on("recieveGroupMessageDeleteLive", (message) => {
+      console.log("Group message was deleted:", message);
       dispatch(editGroupChat(message));
     });
-    clientSocket.on("deleteGroupNotification",(messsage)=>{
-      console.log("Group Notification to be edited:",messsage);
+    clientSocket.on("groupMessageUpdated", (message) => {
+      console.log("Group message was deleted (for sender):", message);
+      dispatch(editGroupChat(message));
+    });
+    clientSocket.on("deleteGroupNotification", (messsage) => {
+      console.log("Group Notification to be edited:", messsage);
       dispatch(editNotificationOfGroup(messsage));
-    })
+    });
     // Cleanup event listener
     return () => {
       clientSocket.off("recieveGroupMessageLive");

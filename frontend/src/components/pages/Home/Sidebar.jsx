@@ -58,7 +58,7 @@ function Sidebar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(targetUserNotifications[0]),
+      body: JSON.stringify({...targetUserNotifications[0],image:""}),
     })
       .then((result) => {
         console.log("notification for current target chat wiped successfully!");
@@ -86,7 +86,7 @@ function Sidebar() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(targetGroupNotifications[0]),
+      body: JSON.stringify({...targetGroupNotifications[0],image:""}),
     })
       .then((result) => {
         console.log("notification for current target grouped wiped successfully!");

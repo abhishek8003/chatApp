@@ -31,6 +31,7 @@ import uploadingReducer from "./features/uploading";
 import keepAliveIntervalReducer from "./features/keepAliveInterval"
 import typingReducer from "./features/typing"
 import selectedChatReducer from "./features/selectedChat";
+import editMessageToggleReducer from "./features/editMessageToggle"
 const store=configureStore({
     reducer:{
         userAuth:userAuthReducer,
@@ -64,7 +65,8 @@ const store=configureStore({
         uploading:uploadingReducer,
         keepAliveInterval:keepAliveIntervalReducer,
         typing:typingReducer,
-        selectedChat:selectedChatReducer
+        selectedChat:selectedChatReducer,
+        editMessageToggle:editMessageToggleReducer
     }
 });
 export default store;

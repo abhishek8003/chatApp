@@ -12,7 +12,7 @@ const selectedChatSlice=createSlice({
             // let newState=state;
             console.log(action.payload);
             
-        }
+        },
     }
 });
 export default selectedChatSlice.reducer;

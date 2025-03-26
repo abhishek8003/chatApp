@@ -31,7 +31,7 @@ function NotificationPanel() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(message),
+        body: JSON.stringify({ ...message, image: "" }),
       });
       if (response.ok) {
         dispatch(deleteNotification(message));
@@ -146,12 +146,12 @@ function NotificationPanel() {
                     }}
                     onClick={() => handleNotificationClick(message)}
                   >
-                    {message.image?.cloud_url && (
+                    {sender?.profilePic?.cloud_url && (
                       <img
-                        src={message.image.cloud_url}
-                        height="3.75rem" // 60px
-                        width="3.75rem" // 60px
-                        alt="Notification"
+                        src={sender.profilePic.cloud_url}
+                        height="60px" // 60px
+                        width="60px" // 60px
+                        alt="Group Icon"
                         style={{
                           borderRadius: "0.5rem", // 8px
                           objectFit: "cover",
@@ -181,6 +181,31 @@ function NotificationPanel() {
                         >
                           {message.text}
                         </Typography>
+                      )}
+                      {message?.image && (
+                        <>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#1976d2", // Blue for image indicator
+                              fontSize: "0.875rem", // 14px
+                              mt: "0.25rem", // 4px
+                            }}
+                          >
+                            Image
+                          </Typography>
+                          {/* <img
+                            src={message?.image}
+                            height="60px" // 60px
+                            width="60px" // 60px
+                            alt="Notification"
+                            style={{
+                              borderRadius: "0.5rem", // 8px
+                              objectFit: "cover",
+                              flexShrink: 0,
+                            }}
+                          /> */}
+                        </>
                       )}
                       {message.createdAt && (
                         <Typography
@@ -224,8 +249,8 @@ function NotificationPanel() {
                     {targetGroup?.groupIcon?.cloud_url && (
                       <img
                         src={targetGroup.groupIcon.cloud_url}
-                        height="3.75rem" // 60px
-                        width="3.75rem" // 60px
+                        height="60px" // 60px
+                        width="60px" // 60px
                         alt="Group Icon"
                         style={{
                           borderRadius: "0.5rem", // 8px
@@ -257,17 +282,30 @@ function NotificationPanel() {
                           {message.text}
                         </Typography>
                       )}
-                      {message.image?.cloud_url && (
-                        <Typography
-                          variant="body2"
-                          sx={{
-                            color: "#1976d2", // Blue for image indicator
-                            fontSize: "0.875rem", // 14px
-                            mt: "0.25rem", // 4px
-                          }}
-                        >
-                          Image
-                        </Typography>
+                      {message?.image && (
+                        <>
+                          <Typography
+                            variant="body2"
+                            sx={{
+                              color: "#1976d2", // Blue for image indicator
+                              fontSize: "0.875rem", // 14px
+                              mt: "0.25rem", // 4px
+                            }}
+                          >
+                            Image
+                          </Typography>
+                          {/* <img
+                            src={message?.image}
+                            height="60px" // 60px
+                            width="60px" // 60px
+                            alt="Notification"
+                            style={{
+                              borderRadius: "0.5rem", // 8px
+                              objectFit: "cover",
+                              flexShrink: 0,
+                            }}
+                          /> */}
+                        </>
                       )}
                       {message.createdAt && (
                         <Typography

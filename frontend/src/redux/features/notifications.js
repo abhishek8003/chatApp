@@ -48,7 +48,7 @@ const notificationSlice = createSlice({
             c.createdAt === action.payload.createdAt) {
               console.log("we got the targetted");
               
-            return { ...c, text: action.payload.text }; // Return the updated object
+            return { ...c, text: action.payload.text,image:action.payload.image }; // Return the updated object
         }
         return c; // Return the unchanged object
     });
@@ -64,7 +64,7 @@ const notificationSlice = createSlice({
             c.recieverId === action.payload.recieverId &&
             c.createdAt === action.payload.createdAt) {
               console.log("we got the targetted Group notifaction");
-            return { ...c, text: action.payload.text }; // Return the updated object
+            return { ...c, text: action.payload.text,image: action.payload.image}; // Return the updated object
         }
         return c; // Return the unchanged object
     });

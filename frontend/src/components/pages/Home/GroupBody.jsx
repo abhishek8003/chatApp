@@ -28,7 +28,7 @@ function GroupBody() {
   const backendUrl = useContext(backendContext);
   let selectedGroup = useSelector((store) => store.selectedGroup);
   let [selectedGroupChat, setSelectedGroupChat] = useState(null);
-  let clientSocket=useContext(socketContext)
+  let clientSocket = useContext(socketContext);
 
   useEffect(() => {
     if (chatContainer.current) {
@@ -50,13 +50,11 @@ function GroupBody() {
       minute: "2-digit",
       hour12: true,
     });
-
   const formatDate = (date) => {
     const messageDate = new Date(date);
     const today = new Date();
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
-
     if (messageDate.toDateString() === today.toDateString()) {
       return "Today";
     } else if (messageDate.toDateString() === yesterday.toDateString()) {
@@ -70,7 +68,6 @@ function GroupBody() {
       });
     }
   };
-
   let lastDate = null;
   const [contextMenu, setContextMenu] = useState(null);
   const handleContextMenu = (event, chat) => {
@@ -82,26 +79,24 @@ function GroupBody() {
       mouseY: event.clientY,
     });
   };
-
   // Handle menu close
   const handleClose = () => {
     setContextMenu(null);
     setSelectedGroupChat(null);
   };
-
   // Handle edit and delete
   const handleEdit = () => {
     console.log("Edit message:", selectedGroupChat);
     toast.success("coming soon");
     handleClose();
   };
-
   const handleDelete = async () => {
     console.log("Delete message:", selectedGroupChat);
     dispatch(
       editGroupChat({
         createdAt: selectedGroupChat.createdAt,
         isGroupChat: selectedGroupChat.isGroupChat,
+        image:null,
         receiverId: selectedGroupChat.receiverId,
         senderId: selectedGroupChat.senderId,
         status: "deleting message...",
@@ -109,23 +104,32 @@ function GroupBody() {
       })
     );
 
-    
-    clientSocket?.emit("deleteGroupMessage", {...selectedGroupChat,text: "This message was deleted",});
+    clientSocket?.emit("deleteGroupMessage", {
+      ...selectedGroupChat,
+      image:null,
+      status: "deleted",
+      text: "This message was deleted",
+    });
     try {
       // /:group_id/deleteMessage/
-      const response = await fetch(`${backendUrl}/api/groups/${selectedGroupChat._id}/deleteMessage`, {
-        method: "DELETE",
-        credentials: "include",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({...selectedGroupChat, image: { local_url: "", cloud_url: "" },}),
-      });
+      const response = await fetch(
+        `${backendUrl}/api/groups/${selectedGroupChat._id}/deleteMessage`,
+        {
+          method: "DELETE",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            ...selectedGroupChat,
+             image:null,
+          }),
+        }
+      );
       let json = await response.json();
       if (response.status == 200) {
-        console.log("MEssage after saving to database:", json.message);//json.message is an Array
-        dispatch(editGroupChat(json.message))
-
+        console.log("MEssage after saving to database:", json.message); //json.message is an Array
+        dispatch(editGroupChat(json.message));
       } else {
         throw new Error(json.message);
       }
@@ -135,7 +139,6 @@ function GroupBody() {
     } finally {
       handleClose();
     }
-  
   };
   let pressTimer = null;
   const handleTouchStart = (event, chat) => {

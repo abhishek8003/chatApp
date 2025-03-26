@@ -70,7 +70,6 @@ auth_router.post("/login", validate_user,initAI, async (req, res, next) => {
             httpOnly: true,
             secure: process.env.NODE_ENV == "production",
             sameSite: process.env.NODE_ENV == "production" ? "None" : "strict",
-
         });
 
         res.status(200).json({ message: "Login successful", user: registeredUser });

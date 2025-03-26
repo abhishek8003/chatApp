@@ -19,12 +19,13 @@ const chatsSlice = createSlice({
         //     createdAt,
         // }
         editChats: (state, action) => {
+            console.log("Edit chat to:",action.payload);
             return state.map((c) => {
                 if (c.senderId === action.payload.senderId &&
                     c.isGroupChat === action.payload.isGroupChat &&
                     c.receiverId === action.payload.receiverId &&
                     c.createdAt === action.payload.createdAt) {
-                    return { ...c, text: action.payload.text ,status:action.payload.status}; // Return the updated object
+                    return { ...c, text: action.payload.text ,status:action.payload.status,image:action.payload.image}; // Return the updated object
                 }
                 return c; // Return the unchanged object
             });

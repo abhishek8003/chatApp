@@ -23,6 +23,8 @@ import {
 } from "../../../redux/features/Chats";
 import { socketContext } from "../../../SocketProvider";
 import toast from "react-hot-toast";
+import { seteditMessageToggle } from "../../../redux/features/editMessageToggle";
+import EditMessage from "./editMessage";
 
 function ChatBody() {
   const selectedUser = useSelector((store) => store.selectedUser);
@@ -90,13 +92,14 @@ function ChatBody() {
   // Handle menu close
   const handleClose = () => {
     setContextMenu(null);
-    dispatch(setSelectedChat(null));
+    // dispatch(setSelectedChat(null));
   };
 
   // Handle edit and delete
   const handleEdit = () => {
     console.log("Edit message:", selectedChat);
-    toast.success("coming soon");
+    // toast.success("coming soon");
+    dispatch(seteditMessageToggle(true));
     handleClose();
   };
 
@@ -118,11 +121,12 @@ function ChatBody() {
       senderId: userAuth._id,
       receiverId: selectedUser._id,
       text: "This message was deleted",
-      image: { local_url: "", cloud_url: "" },
+      image: null,
       createdAt: selectedChat.createdAt,
-      status: "pending",
+      status: "deleting message...",
       isGroupChat: selectedChat.isGroupChat,
     });
+
     try {
       const response = await fetch(`${backendUrl}/api/chats/`, {
         method: "DELETE",
@@ -138,10 +142,17 @@ function ChatBody() {
       let json = await response.json();
       if (response.status == 200) {
         console.log("MEssage after saving to database:", json.message); //json.message is an Array
-        const receiverStatus = onlineUsers.some(
-          (u) => u._id === json.message.receiverId
+        console.log("onlineUsers sdf:",onlineUsers);
+        
+        const receiver = onlineUsers.find(
+          (u) => u._id === json.message[0].receiverId
         );
+        const receiverStatus = !!receiver; // Converts `receiver` to a boolean
+        console.log(receiverStatus);
+
         if (!receiverStatus || selectedUser.isAi) {
+          console.log("FUOAJDPOJ{OJ123123123");
+
           json.message.forEach((e) => {
             dispatch(editChats(e));
           });
@@ -178,6 +189,7 @@ function ChatBody() {
       toast.error(error.message);
     } finally {
       handleClose();
+      dispatch(setSelectedChat(null));
     }
   };
   let pressTimer = null;
@@ -238,6 +250,7 @@ function ChatBody() {
                       width: "100%",
                     }}
                   >
+                    <EditMessage selectedChat={selectedChat}></EditMessage>
                     <Typography
                       sx={{
                         background: "linear-gradient(45deg, #e1e1e1, #ffffff)",
@@ -486,8 +499,8 @@ function ChatBody() {
                             : undefined
                         }
                       >
-                        <MenuItem onClick={handleEdit}>Edit</MenuItem>
-                        <MenuItem onClick={handleDelete}>Delete</MenuItem>
+                        {!selectedUser.isAi?<MenuItem onClick={handleEdit}>Edit</MenuItem>:null}
+                        {<MenuItem onClick={handleDelete}>Delete</MenuItem>}
                       </Menu>
                     </Box>
                   </Box>

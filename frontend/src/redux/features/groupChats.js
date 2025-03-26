@@ -21,7 +21,7 @@ const groupChatSlice = createSlice({
                 groupMessages: state.groupMessages.map((m) => {
                     if (m.senderId._id == action.payload.senderId._id && m.receiverId == action.payload.receiverId && m.createdAt == action.payload.createdAt) {
                         console.log("GROUP MESSAGE DELETE TARGET FOUND!");
-                        return { ...m, text:action.payload.text,status:action.payload.status }
+                        return { ...m, text:action.payload.text,status:action.payload.status,image:action.payload.image }
                     }
                     return m;
                 })
