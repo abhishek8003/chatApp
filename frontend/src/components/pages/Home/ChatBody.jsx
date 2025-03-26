@@ -24,7 +24,7 @@ import {
 import { socketContext } from "../../../SocketProvider";
 import toast from "react-hot-toast";
 import { seteditMessageToggle } from "../../../redux/features/editMessageToggle";
-import EditMessage from "./editMessage";
+import EditMessage from "./EditMessage.jsx";
 
 function ChatBody() {
   const selectedUser = useSelector((store) => store.selectedUser);
